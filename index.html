@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>სახურავქვეშ — უძრავი ქონება</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Georgian:wght@500;700&family=Noto+Sans+Georgian:wght@400;500;600&display=swap');
+
+  :root {
+    --ink: #16202A;
+    --parchment: #F5F1E8;
+    --card: #FFFFFF;
+    --wine: #7C2D3E;
+    --wine-dark: #5C1F2C;
+    --sage: #5F7052;
+    --gold: #C9A227;
+    --slate: #5B6470;
+    --line: #E4DDCC;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Noto Sans Georgian', sans-serif;
+    background: var(--parchment);
+    color: var(--ink);
+  }
+  button, select, input { font-family: 'Noto Sans Georgian', sans-serif; }
+  button { cursor: pointer; }
+  input:focus, select:focus {
+    border-color: var(--wine) !important;
+    box-shadow: 0 0 0 3px rgba(124,45,62,0.12);
+    outline: none;
+  }
+  .icon { width: 15px; height: 15px; display: inline-block; vertical-align: -3px; flex-shrink: 0; }
+
+  header {
+    background: var(--ink); color: #F5F1E8; padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-badge {
+    width: 34px; height: 34px; border-radius: 8px; background: var(--wine);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Noto Serif Georgian', serif; font-weight: 700; font-size: 18px;
+  }
+  .logo-text { font-family: 'Noto Serif Georgian', serif; font-size: 21px; font-weight: 700; }
+  #favToggle {
+    display: flex; align-items: center; gap: 6px; background: transparent;
+    border: 1px solid #5B6470; color: #F5F1E8; border-radius: 8px; padding: 8px 14px; font-size: 14px;
+  }
+  #favToggle.active { background: var(--wine); border-color: var(--wine); }
+
+  .hero { background: #fff; border-bottom: 1px solid var(--line); padding: 40px 24px 0; }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  h1 { font-family: 'Noto Serif Georgian', serif; font-size: 34px; font-weight: 700; margin: 0 0 8px; }
+  .subtitle { color: var(--slate); font-size: 15px; margin: 0 0 24px; }
+
+  .search-panel { background: var(--parchment); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  .search-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .search-input-wrap { flex: 2 1 260px; position: relative; }
+  .search-input-wrap .icon { position: absolute; left: 12px; top: 13px; color: var(--slate); }
+  input[type="text"], input[type="number"], select {
+    padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line);
+    background: #fff; font-size: 14px; color: var(--ink); width: 100%;
+  }
+  #q { padding-left: 34px; }
+  select { flex: 1 1 140px; width: auto; }
+  .deal-toggle { display: flex; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
+  .deal-toggle button {
+    padding: 10px 14px; border: none; font-size: 14px; background: #fff; color: var(--ink);
+  }
+  .deal-toggle button.active { background: var(--wine); color: #fff; }
+  #filterToggle {
+    display: flex; align-items: center; gap: 6px; padding: 10px 12px; border-radius: 8px;
+    border: 1px solid var(--line); background: #fff; color: var(--ink); font-size: 14px;
+  }
+  #filterToggle.active { background: var(--ink); color: #fff; }
+
+  .filters-extra {
+    display: none; gap: 10px; flex-wrap: wrap; padding-top: 12px; border-top: 1px solid var(--line);
+  }
+  .filters-extra.show { display: flex; }
+  .filters-extra > * { flex: 1 1 140px; }
+  #resetFilters {
+    display: flex; align-items: center; gap: 6px; color: var(--wine); background: #fff;
+    border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; font-size: 14px;
+  }
+
+  .skyline-wrap { margin: 20px 0 0; opacity: 0.9; }
+
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 24px 64px; }
+  .results-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .results-count { color: var(--slate); font-size: 14px; }
+  .sort-wrap { display: flex; align-items: center; gap: 8px; }
+  #sort { font-size: 13px; }
+
+  .empty-state {
+    text-align: center; padding: 60px 20px; color: var(--slate);
+    border: 1px dashed var(--line); border-radius: 12px; background: #fff; display: none;
+  }
+  .empty-state.show { display: block; }
+  .empty-state p:first-child { font-size: 16px; margin-bottom: 6px; color: var(--ink); }
+  .empty-state button {
+    padding: 10px 12px; border-radius: 8px; border: none; background: var(--wine); color: #fff; font-size: 14px;
+  }
+
+  #grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 18px;
+  }
+  .card {
+    background: var(--card); border-radius: 12px; overflow: hidden;
+    border: 1px solid var(--line); display: flex; flex-direction: column;
+  }
+  .card-media { position: relative; aspect-ratio: 4 / 3; }
+  .card-media svg { width: 100%; height: 100%; display: block; background: var(--parchment); }
+  .badge-deal {
+    position: absolute; top: 10px; left: 10px; font-size: 11px; font-weight: 600;
+    padding: 4px 9px; border-radius: 999px; color: #fff;
+  }
+  .fav-btn {
+    position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; border-radius: 50%;
+    border: none; background: rgba(255,255,255,0.9);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .card-body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .card-meta { display: flex; align-items: center; gap: 6px; color: var(--slate); font-size: 12px; flex-wrap: wrap; }
+  .card-title { margin: 0; font-size: 15px; font-weight: 600; }
+  .card-stats { display: flex; gap: 12px; font-size: 12.5px; color: var(--slate); flex-wrap: wrap; }
+  .card-stats span { display: flex; align-items: center; gap: 4px; }
+  .card-price {
+    margin-top: auto; padding-top: 8px; border-top: 1px solid var(--line);
+    font-family: 'Noto Serif Georgian', serif; font-size: 19px; font-weight: 700; color: var(--wine-dark);
+  }
+
+  footer { background: var(--ink); color: #B4B2A9; padding: 20px 24px; font-size: 13px; text-align: center; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-badge">ს</div>
+    <span class="logo-text">სახურავქვეშ</span>
+  </div>
+  <button id="favToggle">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+    <span id="favLabel">ფავორიტები</span>
+  </button>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <h1>იპოვე შენი შემდეგი სახლი</h1>
+    <p class="subtitle" id="totalCount">32 განცხადება მთელი საქართველოს მასშტაბით — ბინები, სახლები, კომერციული ფართები და მიწის ნაკვეთები</p>
+
+    <div class="search-panel">
+      <div class="search-row">
+        <div class="search-input-wrap">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="q" placeholder="მოძებნე რაიონით, ქალაქით ან სათაურით..." />
+        </div>
+        <select id="city"></select>
+        <div class="deal-toggle" id="dealToggle">
+          <button data-deal="all" class="active">ყველა</button>
+          <button data-deal="sale">იყიდება</button>
+          <button data-deal="rent">ქირავდება</button>
+        </div>
+        <button id="filterToggle">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="6" r="1.6" fill="currentColor"/><circle cx="16" cy="12" r="1.6" fill="currentColor"/><circle cx="10" cy="18" r="1.6" fill="currentColor"/></svg>
+          ფილტრები
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </div>
+
+      <div class="filters-extra" id="filtersExtra">
+        <select id="type"></select>
+        <select id="rooms">
+          <option value="all">ოთახები: ყველა</option>
+        </select>
+        <input type="number" id="minPrice" placeholder="ფასი დან" />
+        <input type="number" id="maxPrice" placeholder="ფასი მდე" />
+        <button id="resetFilters">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          გასუფთავება
+        </button>
+      </div>
+    </div>
+
+    <div class="skyline-wrap">
+      <svg viewBox="0 0 900 160" style="width:100%; height:auto; display:block;" aria-hidden="true">
+        <g fill="none" stroke="#16202A" stroke-width="2" opacity="0.35">
+          <rect x="20" y="90" width="40" height="60" />
+          <rect x="70" y="60" width="30" height="90" />
+          <rect x="110" y="100" width="50" height="50" />
+          <path d="M200 150 L200 70 Q220 40 240 70 L240 150 Z" />
+          <circle cx="220" cy="55" r="6" />
+          <path d="M320 150 L320 40 L330 20 L340 40 L340 150 Z" />
+          <path d="M400 150 Q450 90 500 150 Z" />
+          <rect x="560" y="80" width="26" height="70" />
+          <rect x="596" y="50" width="26" height="100" />
+          <rect x="632" y="95" width="26" height="55" />
+          <path d="M700 150 C 700 100, 780 100, 780 150" />
+          <rect x="820" y="70" width="34" height="80" />
+        </g>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="results-bar">
+    <span class="results-count"><span id="resultCount">32</span> განცხადება</span>
+    <div class="sort-wrap">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#5B6470" stroke-width="2"><path d="M3 7h11M3 12h7M3 17h4"/><path d="M17 3v14M17 17l4-4M17 17l-4-4"/></svg>
+      <select id="sort">
+        <option value="newest">უახლესი</option>
+        <option value="price_asc">ფასი: ზრდადობით</option>
+        <option value="price_desc">ფასი: კლებადობით</option>
+        <option value="area_desc">ფართობი: კლებადობით</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="empty-state" id="emptyState">
+    <p>ამ ფილტრებით განცხადება ვერ მოიძებნა</p>
+    <p style="font-size:14px; margin-bottom:16px;">სცადე ფასის დიაპაზონის გაფართოება ან სხვა ქალაქის არჩევა</p>
+    <button id="resetFiltersEmpty">ფილტრების გასუფთავება</button>
+  </div>
+
+  <div id="grid"></div>
+</main>
+
+<footer>სახურავქვეშ · დემო პროექტი, ყველა განცხადება — სატესტო მონაცემია</footer>
+
+<script>
+(function () {
+  const COLORS = {
+    ink: "#16202A", wine: "#7C2D3E", sage: "#5F7052", gold: "#C9A227", parchment: "#F5F1E8"
+  };
+
+  const CITIES = ["თბილისი", "ბათუმი", "ქუთაისი", "თელავი", "ზუგდიდი", "გორი"];
+  const DISTRICTS = {
+    "თბილისი": ["ვაკე", "საბურთალო", "ვერა", "ძველი თბილისი", "დიდუბე", "გლდანი", "ისანი"],
+    "ბათუმი": ["ძველი ბათუმი", "ახალი ბულვარი", "ხიმშიაშვილი"],
+    "ქუთაისი": ["ცენტრი", "ავტოქარხანა"],
+    "თელავი": ["ცენტრი"],
+    "ზუგდიდი": ["ცენტრი"],
+    "გორი": ["ცენტრი"],
+  };
+  const TYPES = [
+    { id: "apartment", label: "ბინა" },
+    { id: "house", label: "სახლი" },
+    { id: "commercial", label: "კომერციული" },
+    { id: "land", label: "მიწა" },
+  ];
+  const TYPE_ICON_PATHS = {
+    apartment: '<path d="M4 21V8l8-5 8 5v13"/><path d="M9 21v-6h6v6"/>',
+    house: '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/>',
+    commercial: '<rect x="4" y="3" width="16" height="18"/><line x1="8" y1="7" x2="8" y2="7"/><line x1="12" y1="7" x2="12" y2="7"/>',
+    land: '<path d="M4 20c2-6 5-9 8-9s6 3 8 9"/><circle cx="12" cy="8" r="3"/>',
+  };
+
+  function seededRand(seed) {
+    let x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+  }
+
+  function makeListings() {
+    const items = [];
+    let id = 1;
+    for (let i = 0; i < 32; i++) {
+      const cityIdx = Math.floor(seededRand(i * 3.1) * CITIES.length);
+      const city = CITIES[cityIdx];
+      const districts = DISTRICTS[city];
+      const district = districts[Math.floor(seededRand(i * 7.7) * districts.length)];
+      const typeIdx = Math.floor(seededRand(i * 5.3) * TYPES.length);
+      const type = TYPES[typeIdx].id;
+      const deal = seededRand(i * 2.2) > 0.45 ? "sale" : "rent";
+      const rooms = type === "land" ? 0 : 1 + Math.floor(seededRand(i * 9.9) * 5);
+      const area = type === "land"
+        ? Math.round(200 + seededRand(i * 4.4) * 1800)
+        : Math.round(35 + seededRand(i * 4.4) * 165);
+      const floor = (type === "house" || type === "land") ? null : 1 + Math.floor(seededRand(i * 6.6) * 16);
+      const totalFloors = floor ? floor + Math.floor(seededRand(i * 8.8) * 6) : null;
+      const basePricePerM2 = deal === "sale" ? 900 + seededRand(i * 1.6) * 1600 : 8 + seededRand(i * 1.6) * 14;
+      const price = Math.round(basePricePerM2 * area);
+      items.push({
+        id: id++, title: `${TYPES[typeIdx].label} ${district}ში`,
+        city, district, type, deal, rooms, area, floor, totalFloors, price, seed: i,
+      });
+    }
+    return items;
+  }
+
+  const LISTINGS = makeListings();
+  const favorites = new Set();
+  let showFavoritesOnly = false;
+
+  function formatPrice(n) {
+    return new Intl.NumberFormat("ka-GE").format(n);
+  }
+
+  function fingerprintSVG(seed, type) {
+    const typeColors = {
+      apartment: [COLORS.wine, COLORS.gold],
+      house: [COLORS.sage, COLORS.gold],
+      commercial: [COLORS.ink, COLORS.wine],
+      land: [COLORS.sage, COLORS.ink],
+    };
+    const [c1, c2] = typeColors[type];
+    let shapes = "";
+    const n = 5 + Math.floor(seededRand(seed * 11) * 4);
+    for (let i = 0; i < n; i++) {
+      const x = seededRand(seed * (i + 1) * 3.3) * 100;
+      const y = seededRand(seed * (i + 1) * 7.7) * 100;
+      const r = 6 + seededRand(seed * (i + 1) * 5.1) * 20;
+      const kind = seededRand(seed * (i + 1) * 9.9);
+      const color = i % 2 === 0 ? c1 : c2;
+      if (kind < 0.4) {
+        shapes += `<circle cx="${x}" cy="${y}" r="${r/2}" fill="${color}" opacity="0.85" />`;
+      } else if (kind < 0.75) {
+        const rot = Math.round(seededRand(seed * i) * 45);
+        shapes += `<rect x="${x - r/2}" y="${y - r/2}" width="${r}" height="${r}" fill="${color}" opacity="0.85" transform="rotate(${rot} ${x} ${y})" />`;
+      } else {
+        shapes += `<line x1="${x}" y1="${y}" x2="${x + r}" y2="${y - r/2}" stroke="${color}" stroke-width="3" opacity="0.7" stroke-linecap="round" />`;
+      }
+    }
+    return `<svg viewBox="0 0 100 100">${shapes}</svg>`;
+  }
+
+  // populate selects
+  const citySel = document.getElementById("city");
+  citySel.innerHTML = '<option value="all">ყველა ქალაქი</option>' + CITIES.map(c => `<option value="${c}">${c}</option>`).join("");
+
+  const typeSel = document.getElementById("type");
+  typeSel.innerHTML = '<option value="all">ტიპი: ყველა</option>' + TYPES.map(t => `<option value="${t.id}">${t.label}</option>`).join("");
+
+  const roomsSel = document.getElementById("rooms");
+  roomsSel.innerHTML += [1,2,3,4,5].map(r => `<option value="${r}">${r} ოთახი</option>`).join("");
+
+  document.getElementById("totalCount").textContent =
+    `${LISTINGS.length} განცხადება მთელი საქართველოს მასშტაბით — ბინები, სახლები, კომერციული ფართები და მიწის ნაკვეთები`;
+
+  let state = { deal: "all" };
+
+  const qEl = document.getElementById("q");
+  const minPriceEl = document.getElementById("minPrice");
+  const maxPriceEl = document.getElementById("maxPrice");
+  const sortEl = document.getElementById("sort");
+  const grid = document.getElementById("grid");
+  const emptyState = document.getElementById("emptyState");
+  const resultCount = document.getElementById("resultCount");
+  const favLabel = document.getElementById("favLabel");
+  const favToggleBtn = document.getElementById("favToggle");
+
+  function getFiltered() {
+    let list = LISTINGS.filter(l => {
+      if (showFavoritesOnly && !favorites.has(l.id)) return false;
+      if (state.deal !== "all" && l.deal !== state.deal) return false;
+      if (typeSel.value !== "all" && l.type !== typeSel.value) return false;
+      if (citySel.value !== "all" && l.city !== citySel.value) return false;
+      if (roomsSel.value !== "all" && String(l.rooms) !== roomsSel.value) return false;
+      if (minPriceEl.value && l.price < Number(minPriceEl.value)) return false;
+      if (maxPriceEl.value && l.price > Number(maxPriceEl.value)) return false;
+      const q = qEl.value.trim().toLowerCase();
+      if (q) {
+        const hay = `${l.title} ${l.city} ${l.district}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+    const sort = sortEl.value;
+    if (sort === "price_asc") list = [...list].sort((a,b) => a.price - b.price);
+    if (sort === "price_desc") list = [...list].sort((a,b) => b.price - a.price);
+    if (sort === "area_desc") list = [...list].sort((a,b) => b.area - a.area);
+    if (sort === "newest") list = [...list].sort((a,b) => b.id - a.id);
+    return list;
+  }
+
+  function render() {
+    const list = getFiltered();
+    resultCount.textContent = list.length;
+    favLabel.textContent = favorites.size > 0 ? `ფავორიტები (${favorites.size})` : "ფავორიტები";
+    favToggleBtn.classList.toggle("active", showFavoritesOnly);
+
+    if (list.length === 0) {
+      emptyState.classList.add("show");
+      grid.style.display = "none";
+      return;
+    }
+    emptyState.classList.remove("show");
+    grid.style.display = "grid";
+
+    grid.innerHTML = list.map(l => {
+      const typeLabel = TYPES.find(t => t.id === l.type).label;
+      const isFav = favorites.has(l.id);
+      const dealColor = l.deal === "sale" ? COLORS.wine : COLORS.sage;
+      const dealLabel = l.deal === "sale" ? "იყიდება" : "ქირავდება";
+      const roomsHtml = l.rooms > 0 ? `<span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M3 12V8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="3" y1="18" x2="3" y2="20"/><line x1="21" y1="18" x2="21" y2="20"/></svg> ${l.rooms} ოთახი</span>` : "";
+      const floorHtml = l.floor ? `<span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><rect x="3" y="3" width="18" height="18"/></svg> ${l.floor}/${l.totalFloors}</span>` : "";
+      return `
+        <div class="card">
+          <div class="card-media">
+            ${fingerprintSVG(l.seed + 1, l.type)}
+            <span class="badge-deal" style="background:${dealColor}">${dealLabel}</span>
+            <button class="fav-btn" data-id="${l.id}" aria-label="favorite">
+              <svg class="icon" style="width:16px;height:16px;" viewBox="0 0 24 24" fill="${isFav ? COLORS.wine : 'none'}" stroke="${COLORS.wine}" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="card-meta">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${TYPE_ICON_PATHS[l.type]}</svg>
+              <span>${typeLabel}</span>
+              <span>·</span>
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>${l.district}, ${l.city}</span>
+            </div>
+            <h3 class="card-title">${l.title}</h3>
+            <div class="card-stats">
+              ${roomsHtml}
+              <span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15V9a2 2 0 0 0-2-2H9"/><path d="M3 9v6a2 2 0 0 0 2 2h10"/><line x1="3" y1="9" x2="9" y2="9"/><line x1="15" y1="15" x2="21" y2="15"/></svg> ${l.area} მ²</span>
+              ${floorHtml}
+            </div>
+            <div class="card-price">${formatPrice(l.price)} ₾${l.deal === "rent" ? " / თვე" : ""}</div>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    grid.querySelectorAll(".fav-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const id = Number(btn.dataset.id);
+        favorites.has(id) ? favorites.delete(id) : favorites.add(id);
+        render();
+      });
+    });
+  }
+
+  // event bindings
+  qEl.addEventListener("input", render);
+  citySel.addEventListener("change", render);
+  typeSel.addEventListener("change", render);
+  roomsSel.addEventListener("change", render);
+  minPriceEl.addEventListener("input", render);
+  maxPriceEl.addEventListener("input", render);
+  sortEl.addEventListener("change", render);
+
+  document.querySelectorAll("#dealToggle button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#dealToggle button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      state.deal = btn.dataset.deal;
+      render();
+    });
+  });
+
+  const filterToggle = document.getElementById("filterToggle");
+  const filtersExtra = document.getElementById("filtersExtra");
+  filterToggle.addEventListener("click", () => {
+    filtersExtra.classList.toggle("show");
+    filterToggle.classList.toggle("active");
+  });
+
+  function resetFilters() {
+    qEl.value = "";
+    citySel.value = "all";
+    typeSel.value = "all";
+    roomsSel.value = "all";
+    minPriceEl.value = "";
+    maxPriceEl.value = "";
+    sortEl.value = "newest";
+    state.deal = "all";
+    document.querySelectorAll("#dealToggle button").forEach(b => b.classList.remove("active"));
+    document.querySelector('#dealToggle button[data-deal="all"]').classList.add("active");
+    render();
+  }
+  document.getElementById("resetFilters").addEventListener("click", resetFilters);
+  document.getElementById("resetFiltersEmpty").addEventListener("click", resetFilters);
+
+  favToggleBtn.addEventListener("click", () => {
+    showFavoritesOnly = !showFavoritesOnly;
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
+
