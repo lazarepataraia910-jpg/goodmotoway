@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GoodMotoway — Admin</title>
+<style>
+  :root {
+    --ink: #14171C;
+    --paper: #f8f5f2;
+    --panel: #1b1f26;
+    --red: #d61f2a;
+    --red-dark: #a20f18;
+    --line-light: #e8d9db;
+    --slate: #7f8895;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: Arial, sans-serif; background: var(--paper); color: var(--ink);
+  }
+  a { text-decoration: none; }
+  .topbar {
+    background: var(--ink); color: #fff; padding: 14px 24px; display: flex;
+    align-items: center; justify-content: space-between; gap: 12px;
+    position: sticky; top: 0; z-index: 20;
+  }
+  .brand { font-weight: 700; font-size: 20px; }
+  .brand b { color: var(--red); }
+  .top-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn {
+    border: none; border-radius: 8px; padding: 10px 14px; cursor: pointer; font-weight: 700;
+  }
+  .btn.red { background: var(--red); color: #fff; }
+  .btn.dark { background: #14171C; color: #fff; border: 1px solid #444; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 22px 24px 60px; }
+  .admin-card {
+    background: #fff; border: 1px solid var(--line-light); border-radius: 16px;
+    padding: 18px; box-shadow: 0 10px 28px rgba(20,23,28,0.08);
+  }
+  .admin-login {
+    display: flex; align-items: end; gap: 10px; flex-wrap: wrap; margin-bottom: 16px;
+  }
+  .field { flex: 1 1 220px; }
+  label { display: block; margin-bottom: 6px; font-size: 12.5px; font-weight: 700; color: var(--slate); }
+  input, textarea {
+    width: 100%; border: 1px solid var(--line-light); border-radius: 8px; padding: 10px 12px;
+    font-size: 14px; color: var(--ink); background: #fff; transition: 0.2s ease;
+  }
+  input:focus, textarea:focus {
+    outline: none; border-color: rgba(214, 31, 42, 0.7); box-shadow: 0 0 0 3px rgba(214, 31, 42, 0.12);
+  }
+  textarea { min-height: 90px; resize: vertical; }
+  input.invalid, textarea.invalid {
+    border-color: #c93a42; background: #fff7f8;
+  }
+  .upload-shell {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    padding: 14px; border-radius: 14px; background: linear-gradient(135deg, #fff8f8, #fff);
+    border: 1.5px dashed rgba(214, 31, 42, 0.38);
+  }
+  .upload-preview {
+    width: 84px; height: 84px; border-radius: 14px; overflow: hidden;
+    background: #f2ecea; border: 1px solid var(--line-light); display: flex; align-items: center; justify-content: center;
+  }
+  .upload-preview img {
+    width: 100%; height: 100%; object-fit: cover; display: none;
+  }
+  .upload-meta { flex: 1 1 220px; }
+  .upload-label {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 14px; border-radius: 999px; background: var(--red); color: #fff;
+    font-weight: 700; cursor: pointer; box-shadow: 0 8px 18px rgba(214, 31, 42, 0.22);
+  }
+  .upload-hint {
+    margin-top: 8px; font-size: 12px; color: var(--slate);
+  }
+  .upload-input {
+    position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none;
+  }
+  .feedback { margin-top: 8px; font-size: 12.5px; color: var(--red-dark); }
+  .feedback.success { color: #176d3a; }
+  .admin-body {
+    display: none; grid-template-columns: 1.1fr 0.9fr; gap: 14px;
+    margin-top: 16px;
+  }
+  .admin-form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .admin-form .full { grid-column: 1 / -1; }
+  .form-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .product-list {
+    display: flex; flex-direction: column; gap: 10px; max-height: 420px; overflow: auto;
+  }
+  .product-item {
+    display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center;
+    border: 1px solid var(--line-light); border-radius: 10px; background: #fff; padding: 10px;
+  }
+  .small { font-size: 12px; color: #5b6470; }
+  @media (max-width: 800px) {
+    .admin-body { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">Good<b>Motoway</b></div>
+  <div class="top-actions">
+    <a class="btn dark" href="index.html">საიტის დაბრუნება</a>
+    <button class="btn red" id="logoutBtn" type="button">გასვლა</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="admin-card">
+    <div class="admin-login" id="adminLoginBox">
+      <div class="field">
+        <label for="adminPassword">პაროლი</label>
+        <input type="password" id="adminPassword" placeholder="შეიყვანე პაროლი" />
+      </div>
+      <button class="btn red" id="adminLoginSubmit" type="button">შესვლა</button>
+      <div class="feedback" id="adminFeedback"></div>
+    </div>
+
+    <div class="admin-body" id="adminBody">
+      <form id="productForm" class="admin-form" novalidate>
+        <div class="field full">
+          <label for="productName">პროდუქტის დასახელება</label>
+          <input id="productName" type="text" placeholder="მაგ: CQ-3" required />
+        </div>
+        <div class="field">
+          <label for="productTag">თეგი</label>
+          <input id="productTag" type="text" placeholder="მაგ: სპორტული" required />
+        </div>
+        <div class="field">
+          <label for="productPrice">ფასი</label>
+          <input id="productPrice" type="number" placeholder="3700" required />
+        </div>
+        <div class="field">
+          <label for="productMotor">ძრავა (W)</label>
+          <input id="productMotor" type="number" placeholder="1500" required />
+        </div>
+        <div class="field">
+          <label for="productSpeed">სიჩქარე (კმ/სთ)</label>
+          <input id="productSpeed" type="number" placeholder="60" required />
+        </div>
+        <div class="field">
+          <label for="productRangeMin">გარბენი მინ</label>
+          <input id="productRangeMin" type="number" placeholder="80" required />
+        </div>
+        <div class="field">
+          <label for="productRangeMax">გარბენი მაქს</label>
+          <input id="productRangeMax" type="number" placeholder="90" required />
+        </div>
+        <div class="field">
+          <label for="productBattery">ბატარეა</label>
+          <input id="productBattery" type="text" placeholder="72V 30Ah Lithium" required />
+        </div>
+        <div class="field">
+          <label for="productTyres">საბურავი</label>
+          <input id="productTyres" type="text" placeholder="110/70-12 Vacuum" required />
+        </div>
+        <div class="field">
+          <label for="productBrakes">მუხრუჭები</label>
+          <input id="productBrakes" type="text" placeholder="დისკური" required />
+        </div>
+        <div class="field">
+          <label for="productDims">გაბარიტები</label>
+          <input id="productDims" type="text" placeholder="1650×360×750 მმ" required />
+        </div>
+        <div class="field">
+          <label for="productWeight">წონა</label>
+          <input id="productWeight" type="number" placeholder="200" required />
+        </div>
+        <div class="field full">
+          <label for="productDesc">აღწერა</label>
+          <textarea id="productDesc" placeholder="პროდუქტის მოკლე აღწერა" required></textarea>
+        </div>
+        <div class="field full">
+          <label for="productImg">სურათის URL</label>
+          <input id="productImg" type="text" placeholder="data:image/... ან HTTPS URL" required />
+        </div>
+        <div class="field full">
+          <div class="upload-shell">
+            <div class="upload-preview" id="uploadPreview">
+              <img id="uploadPreviewImg" alt="uploaded preview" />
+            </div>
+            <div class="upload-meta">
+              <label class="upload-label" for="productImageFile">📷 ფოტოს ატვირთვა</label>
+              <div class="upload-hint">აირჩიე ფოტო და ის ავტომატურად შეივსებს URL ველს</div>
+            </div>
+            <input class="upload-input" id="productImageFile" type="file" accept="image/*" />
+          </div>
+        </div>
+        <div class="form-actions full">
+          <button class="btn red" type="submit">პროდუქტის შენახვა</button>
+          <button class="btn dark" id="cancelEditBtn" type="button">გაუქმება</button>
+        </div>
+      </form>
+
+      <div>
+        <h3>პროდუქტების სია</h3>
+        <div class="product-list" id="adminProductList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const STORAGE_KEY = 'goodmotoway_products_v1';
+  const ADMIN_PASSWORD = 'xtrl123';
+  const DEFAULT_PRODUCTS = [
+    { id: 1, name: 'Ducati ედიცია', tag: 'სპორტული დიზაინი', price: 3700, motor: 1500, speed: 60, rangeMin: 80, rangeMax: 90, battery: '72V 30Ah Lithium', tyres: '110/70-12 Vacuum', brakes: 'დისკური', dims: '1650×360×750 მმ', weight: 200, desc: 'სპორტული डिजაინი', img: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=800&q=80' },
+    { id: 2, name: 'CQ-3 Pro', tag: 'ქალაქური', price: 2450, motor: 1200, speed: 55, rangeMin: 65, rangeMax: 75, battery: '60V 28Ah', tyres: '3.0-10', brakes: 'დისკური', dims: '1550×360×730 მმ', weight: 172, desc: 'კომფორტული ქალაქისთვის', img: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=800&q=80' },
+    { id: 3, name: 'City Rider', tag: 'მყუდრო', price: 1980, motor: 800, speed: 45, rangeMin: 55, rangeMax: 65, battery: '48V 20Ah', tyres: '3.0-10', brakes: 'დისკური', dims: '1480×330×720 მმ', weight: 150, desc: 'ეკონომიური და კომფორტული', img: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80' }
+  ];
+
+  let PRODUCTS = loadProducts();
+  let editingProductId = null;
+
+  const adminLoginBox = document.getElementById('adminLoginBox');
+  const adminBody = document.getElementById('adminBody');
+  const adminPasswordEl = document.getElementById('adminPassword');
+  const adminFeedbackEl = document.getElementById('adminFeedback');
+  const adminProductList = document.getElementById('adminProductList');
+  const productForm = document.getElementById('productForm');
+  const cancelEditBtn = document.getElementById('cancelEditBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const productImageFileEl = document.getElementById('productImageFile');
+  const productImgEl = document.getElementById('productImg');
+  const uploadPreviewImg = document.getElementById('uploadPreviewImg');
+
+  function loadProducts() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      console.warn('Unable to load saved products', e);
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_PRODUCTS));
+    return [...DEFAULT_PRODUCTS];
+  }
+
+  function saveProducts() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(PRODUCTS));
+  }
+
+  function setFeedback(text, success = false) {
+    adminFeedbackEl.className = 'feedback' + (success ? ' success' : '');
+    adminFeedbackEl.textContent = text;
+  }
+
+  function markFieldInvalid(field, invalid) {
+    if (field) {
+      field.classList.toggle('invalid', invalid);
+    }
+  }
+
+  function clearFormInvalids() {
+    [
+      document.getElementById('productName'),
+      document.getElementById('productTag'),
+      document.getElementById('productPrice'),
+      document.getElementById('productMotor'),
+      document.getElementById('productSpeed'),
+      document.getElementById('productRangeMin'),
+      document.getElementById('productRangeMax'),
+      document.getElementById('productBattery'),
+      document.getElementById('productTyres'),
+      document.getElementById('productBrakes'),
+      document.getElementById('productDims'),
+      document.getElementById('productWeight'),
+      document.getElementById('productDesc'),
+      document.getElementById('productImg')
+    ].forEach((field) => markFieldInvalid(field, false));
+  }
+
+  function renderAdminProducts() {
+    adminProductList.innerHTML = PRODUCTS.map(p => `
+      <div class="product-item">
+        <div>
+          <strong>${p.name}</strong><br />
+          <span class="small">${p.price} ₾ · ${p.speed} კმ/სთ · ${p.motor}W</span>
+        </div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <button class="btn dark" type="button" data-edit="${p.id}">რედაქტირება</button>
+          <button class="btn red" type="button" data-delete="${p.id}">წაშლა</button>
+        </div>
+      </div>
+    `).join('');
+
+    adminProductList.querySelectorAll('[data-edit]').forEach(btn => {
+      btn.addEventListener('click', () => editProduct(Number(btn.dataset.edit)));
+    });
+    adminProductList.querySelectorAll('[data-delete]').forEach(btn => {
+      btn.addEventListener('click', () => deleteProduct(Number(btn.dataset.delete)));
+    });
+  }
+
+  function editProduct(id) {
+    const product = PRODUCTS.find(item => item.id === id);
+    if (!product) return;
+    editingProductId = id;
+    document.getElementById('productName').value = product.name;
+    document.getElementById('productTag').value = product.tag;
+    document.getElementById('productPrice').value = product.price;
+    document.getElementById('productMotor').value = product.motor;
+    document.getElementById('productSpeed').value = product.speed;
+    document.getElementById('productRangeMin').value = product.rangeMin;
+    document.getElementById('productRangeMax').value = product.rangeMax;
+    document.getElementById('productBattery').value = product.battery;
+    document.getElementById('productTyres').value = product.tyres;
+    document.getElementById('productBrakes').value = product.brakes;
+    document.getElementById('productDims').value = product.dims;
+    document.getElementById('productWeight').value = product.weight;
+    document.getElementById('productDesc').value = product.desc;
+    document.getElementById('productImg').value = product.img;
+    setFeedback('პროდუქტი მზად არის შესაცვლელად');
+  }
+
+  function deleteProduct(id) {
+    PRODUCTS = PRODUCTS.filter(item => item.id !== id);
+    saveProducts();
+    renderAdminProducts();
+    setFeedback('პროდუქტი წაშლილია');
+  }
+
+  function handleAdminLogin() {
+    if (adminPasswordEl.value.trim() !== ADMIN_PASSWORD) {
+      setFeedback('პაროლი არასწორია');
+      return;
+    }
+    adminLoginBox.style.display = 'none';
+    adminBody.style.display = 'grid';
+    renderAdminProducts();
+    setFeedback('შესვლა წარმატებულია', true);
+  }
+
+  productImageFileEl.addEventListener('change', async (event) => {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const imageData = String(reader.result);
+      productImgEl.value = imageData;
+      uploadPreviewImg.src = imageData;
+      uploadPreviewImg.style.display = 'block';
+      markFieldInvalid(productImgEl, false);
+      setFeedback('ფოტო ატვირთულია', true);
+    };
+    reader.onerror = () => {
+      setFeedback('ფოტოს ატვირთვა ვერ მოხერხდა');
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('adminLoginSubmit').addEventListener('click', handleAdminLogin);
+  adminPasswordEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handleAdminLogin();
+  });
+
+  productForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    clearFormInvalids();
+
+    const payload = {
+      name: document.getElementById('productName').value.trim(),
+      tag: document.getElementById('productTag').value.trim(),
+      price: Number(document.getElementById('productPrice').value),
+      motor: Number(document.getElementById('productMotor').value),
+      speed: Number(document.getElementById('productSpeed').value),
+      rangeMin: Number(document.getElementById('productRangeMin').value),
+      rangeMax: Number(document.getElementById('productRangeMax').value),
+      battery: document.getElementById('productBattery').value.trim(),
+      tyres: document.getElementById('productTyres').value.trim(),
+      brakes: document.getElementById('productBrakes').value.trim(),
+      dims: document.getElementById('productDims').value.trim(),
+      weight: Number(document.getElementById('productWeight').value),
+      desc: document.getElementById('productDesc').value.trim(),
+      img: document.getElementById('productImg').value.trim()
+    };
+
+    const requiredFields = [
+      { field: document.getElementById('productName'), value: payload.name },
+      { field: document.getElementById('productTag'), value: payload.tag },
+      { field: document.getElementById('productPrice'), value: payload.price },
+      { field: document.getElementById('productMotor'), value: payload.motor },
+      { field: document.getElementById('productSpeed'), value: payload.speed },
+      { field: document.getElementById('productRangeMin'), value: payload.rangeMin },
+      { field: document.getElementById('productRangeMax'), value: payload.rangeMax },
+      { field: document.getElementById('productBattery'), value: payload.battery },
+      { field: document.getElementById('productTyres'), value: payload.tyres },
+      { field: document.getElementById('productBrakes'), value: payload.brakes },
+      { field: document.getElementById('productDims'), value: payload.dims },
+      { field: document.getElementById('productWeight'), value: payload.weight },
+      { field: document.getElementById('productDesc'), value: payload.desc },
+      { field: document.getElementById('productImg'), value: payload.img }
+    ];
+
+    const missingField = requiredFields.find(({ value }) => !value);
+    if (missingField) {
+      markFieldInvalid(missingField.field, true);
+      setFeedback('გთხოვთ, ყველა ველი სრულად შეავსოთ');
+      return;
+    }
+
+    if (editingProductId) {
+      PRODUCTS = PRODUCTS.map(item => item.id === editingProductId ? { ...item, ...payload } : item);
+    } else {
+      PRODUCTS.push({ id: Date.now(), ...payload });
+    }
+
+    saveProducts();
+    renderAdminProducts();
+    productForm.reset();
+    uploadPreviewImg.style.display = 'none';
+    uploadPreviewImg.removeAttribute('src');
+    editingProductId = null;
+    setFeedback('პროდუქტი შენახულია', true);
+  });
+
+  cancelEditBtn.addEventListener('click', () => {
+    editingProductId = null;
+    productForm.reset();
+    setFeedback('რედაქტირება გაუქმებულია');
+  });
+
+  logoutBtn.addEventListener('click', () => {
+    window.location.href = 'index.html';
+  });
+})();
+</script>
+</body>
+</html>
