@@ -385,9 +385,14 @@
     return DEFAULT_PRODUCTS.map(item => normalizeProduct({ ...item }));
   }
 
+  const STORAGE_SOFT_LIMIT_BYTES = 4 * 1024 * 1024;
+  let storageWarning = '';
+
   function saveProducts() {
+    let serialized;
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(PRODUCTS));
+      serialized = JSON.stringify(PRODUCTS);
+      localStorage.setItem(STORAGE_KEY, serialized);
     } catch (e) {
       console.error('Unable to save products', e);
       setFeedback('შენახვა ვერ მოხერხდა — მეხსიერება სავსეა. სცადეთ ნაკლები ან უფრო მსუბუქი ფოტოების ატვირთვა');
@@ -398,6 +403,9 @@
       channel.postMessage({ type: 'catalog-updated' });
       channel.close();
     }
+    storageWarning = serialized.length > STORAGE_SOFT_LIMIT_BYTES
+      ? 'შენახულია, მაგრამ მეხსიერება თითქმის სავსეა — მალე ვერ შეძლებთ ახალი ფოტოების დამატებას'
+      : '';
     return true;
   }
 
@@ -500,7 +508,7 @@
       return;
     }
     renderAdminProducts();
-    setFeedback('პროდუქტი წაშლილია', true);
+    setFeedback(storageWarning || 'პროდუქტი წაშლილია', true);
   }
 
   function handleAdminLogin() {
@@ -514,7 +522,7 @@
     setFeedback('შესვლა წარმატებულია', true);
   }
 
-  function compressImage(file, maxDim = 900, quality = 0.72) {
+  function compressImage(file, maxDim = 700, quality = 0.6) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onerror = () => reject(new Error('read-failed'));
@@ -638,7 +646,7 @@
     uploadPreviewImg.removeAttribute('src');
     productGalleryEl.value = '';
     editingProductId = null;
-    setFeedback('პროდუქტი შენახულია', true);
+    setFeedback(storageWarning || 'პროდუქტი შენახულია', true);
   });
 
   cancelEditBtn.addEventListener('click', () => {
