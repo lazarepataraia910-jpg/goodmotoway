@@ -447,6 +447,7 @@
     } catch (e) {
       console.warn('Could not load saved products', e);
     }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_PRODUCTS.map(item => normalizeProduct({ ...item }))));
     return DEFAULT_PRODUCTS.map(item => normalizeProduct({ ...item }));
   }
 

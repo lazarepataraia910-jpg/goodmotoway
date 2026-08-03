@@ -223,7 +223,7 @@
   </div>
   <div class="top-actions">
     <a class="btn ghost" href="index.html">საიტის დაბრუნება</a>
-    <button class="btn dark" id="logoutBtn" type="button">გასვლა</button>
+    <button class="btn dark" id="logoutBtn" type="button" style="display:none;">გასვლა</button>
   </div>
 </header>
 
@@ -517,6 +517,7 @@
     }
     adminLoginBox.style.display = 'none';
     adminBody.style.display = 'grid';
+    logoutBtn.style.display = 'inline-block';
     renderAdminProducts();
     setFeedback('შესვლა წარმატებულია', true);
   }
