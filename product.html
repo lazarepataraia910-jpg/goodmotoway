@@ -1,175 +1,87 @@
 <!DOCTYPE html>
 <html lang="ka">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>GoodMotoway — პროდუქტის გალერეა</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap');
-
-  :root {
-    --ink: #14171C;
-    --panel: #1B1F26;
-    --paper: #F3F1EB;
-    --red: #D8253B;
-    --red-dark: #A60F1E;
-    --sage: #5F7052;
-    --line-light: #E4E1D8;
-    --slate: #8A93A0;
-  }
-  * { box-sizing: border-box; }
-  body { margin: 0; font-family: 'Noto Sans Georgian', sans-serif; background: var(--paper); color: var(--ink); }
-  button, a { font-family: 'Noto Sans Georgian', sans-serif; }
-  button { cursor: pointer; }
-  .display { font-family: 'Rajdhani', 'Noto Sans Georgian', sans-serif; font-weight: 700; letter-spacing: 0.3px; }
-  .icon { width: 15px; height: 15px; display: inline-block; vertical-align: -3px; flex-shrink: 0; }
-  a { text-decoration: none; color: inherit; }
-
-  header {
-    background: var(--ink); color: #F3F1EB; padding: 14px 24px;
-    display: flex; align-items: center; justify-content: space-between;
-    position: sticky; top: 0; z-index: 20; border-bottom: 3px solid var(--red);
-  }
-  .logo-text { font-size: 20px; letter-spacing: 0.5px; }
-  .logo-text b { color: var(--red); }
-  .back-link {
-    display: flex; align-items: center; gap: 7px; background: transparent;
-    border: 1px solid #3A414D; color: #F3F1EB; border-radius: 8px; padding: 9px 14px; font-size: 14px; font-weight: 700;
-    transition: 0.2s ease;
-  }
-  .back-link:hover { background: rgba(216,37,59,0.15); border-color: var(--red); }
-
-  .breadcrumb {
-    max-width: 1160px; margin: 22px auto 0; padding: 0 24px; font-size: 13px; color: var(--slate);
-    display: flex; align-items: center; gap: 6px;
-  }
-  .breadcrumb a { color: var(--slate); }
-  .breadcrumb a:hover { color: var(--red-dark); }
-  .breadcrumb span.current { color: var(--ink); font-weight: 600; }
-
-  main { max-width: 1160px; margin: 0 auto; padding: 16px 24px 70px; }
-
-  .detail-card {
-    background: #fff; border: 1px solid var(--line-light); border-radius: 18px; overflow: hidden;
-    box-shadow: 0 16px 40px rgba(20,23,28,0.06);
-  }
-  .detail-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; }
-
-  .gallery-side { padding: 28px; border-right: 1px solid var(--line-light); }
-  .main-image {
-    width: 100%; aspect-ratio: 4 / 3; background: #EFECE3; border-radius: 14px; overflow: hidden;
-    position: relative; cursor: zoom-in;
-  }
-  .main-image img {
-    width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.35s ease;
-  }
-  .main-image:hover img { transform: scale(1.06); }
-  .img-counter {
-    position: absolute; bottom: 12px; right: 12px; background: rgba(20,23,28,0.75); color: #fff;
-    font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 999px;
-  }
-  .thumb-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 10px; margin-top: 14px;
-  }
-  .thumb {
-    width: 100%; aspect-ratio: 4 / 3; border-radius: 10px; overflow: hidden; padding: 0;
-    border: 2px solid transparent; background: #EFECE3; transition: 0.15s ease;
-  }
-  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .thumb:hover { border-color: var(--line-light); }
-  .thumb.active { border-color: var(--red); }
-
-  .info-side { padding: 32px; display: flex; flex-direction: column; }
-  .eyebrow-tag {
-    display: inline-flex; align-self: flex-start; align-items: center; gap: 6px;
-    background: #FBEAEA; color: var(--red-dark); font-size: 12px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.5px; padding: 6px 12px; border-radius: 999px; margin-bottom: 14px;
-  }
-  .product-title { font-size: 32px; margin: 0 0 6px; line-height: 1.15; }
-  .warranty-note { color: var(--sage); font-size: 13px; font-weight: 600; margin-bottom: 18px; display: flex; align-items: center; gap: 6px; }
-
-  .price-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 20px; }
-  .price { font-family: 'Rajdhani', sans-serif; font-size: 38px; font-weight: 700; color: var(--ink); }
-  .price small { font-size: 13px; color: var(--slate); font-weight: 500; }
-
-  .desc-text { color: #40474F; font-size: 14.5px; line-height: 1.65; margin-bottom: 22px; white-space: pre-line; }
-
-  .spec-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px;
-    padding: 16px 0; border-top: 1px dashed var(--line-light); border-bottom: 1px dashed var(--line-light);
-    margin-bottom: 24px;
-  }
-  .spec-item { display: flex; align-items: flex-start; gap: 8px; font-size: 12.5px; color: #40474F; }
-  .spec-item svg { margin-top: 2px; color: var(--red-dark); flex-shrink: 0; }
-  .sv-label { display: block; color: #8A93A0; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.3px; }
-  .sv-value { font-weight: 600; color: var(--ink); }
-
-  .cta-row { display: flex; gap: 10px; margin-top: auto; flex-wrap: wrap; }
-  .btn-primary {
-    flex: 1 1 180px; border: none; background: var(--red); color: #fff; border-radius: 10px;
-    padding: 14px 18px; font-size: 15px; font-weight: 700; transition: 0.2s ease;
-  }
-  .btn-primary:hover { background: var(--red-dark); }
-  .btn-secondary {
-    flex: 1 1 140px; border: 1px solid var(--line-light); background: #fff; color: var(--ink); border-radius: 10px;
-    padding: 14px 18px; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;
-  }
-  .btn-secondary:hover { background: var(--paper); }
-
-  /* empty / not found state */
-  .empty-wrap {
-    text-align: center; padding: 80px 24px; background: #fff; border: 1px dashed var(--line-light);
-    border-radius: 18px; color: var(--slate);
-  }
-  .empty-wrap .ok-icon {
-    width: 56px; height: 56px; border-radius: 50%; background: var(--paper); color: var(--red-dark);
-    display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;
-  }
-  .empty-wrap h2 { color: var(--ink); font-size: 20px; margin-bottom: 8px; }
-  .empty-wrap a.btn-primary { display: inline-flex; align-items: center; justify-content: center; margin-top: 16px; text-decoration: none; max-width: 220px; }
-
-  footer { background: var(--ink); color: #8A93A0; padding: 22px 24px; font-size: 13px; text-align: center; margin-top: 40px; }
-  footer b { color: var(--red); }
-
-  @media (max-width: 860px) {
-    .detail-grid { grid-template-columns: 1fr; }
-    .gallery-side { border-right: none; border-bottom: 1px solid var(--line-light); }
-    .product-title { font-size: 26px; }
-    .price { font-size: 30px; }
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GoodMotoway — Product Gallery</title>
+  <style>
+    :root {
+      --ink: #14171C;
+      --paper: #f8f5f2;
+      --red: #d61f2a;
+      --red-dark: #a20f18;
+      --line-light: #e8d9db;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: Arial, sans-serif; background: var(--paper); color: var(--ink);
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 20px 48px; }
+    .topbar {
+      background: var(--ink); color: #fff; padding: 14px 24px; display: flex;
+      align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .brand { font-weight: 700; font-size: 20px; }
+    .brand b { color: var(--red); }
+    .btn {
+      border: none; border-radius: 8px; padding: 10px 14px; cursor: pointer; font-weight: 700;
+      background: var(--red); color: #fff; text-decoration: none;
+    }
+    .gallery-card {
+      background: #fff; border: 1px solid var(--line-light); border-radius: 18px;
+      overflow: hidden; box-shadow: 0 12px 26px rgba(15,15,15,0.08);
+    }
+    .hero {
+      display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 18px; padding: 18px;
+    }
+    .main-image {
+      width: 100%; aspect-ratio: 4 / 3; background: #f4efe8; overflow: hidden; border-radius: 14px;
+    }
+    .main-image img, .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .thumb-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px;
+      margin-top: 12px;
+    }
+    .thumb {
+      width: 100%; aspect-ratio: 4 / 3; border-radius: 10px; overflow: hidden;
+      border: 1px solid var(--line-light); background: #f4efe8; cursor: pointer;
+    }
+    .thumb.active { outline: 3px solid rgba(214,31,42,0.65); }
+    .info h1 { margin: 0 0 8px; font-size: 32px; }
+    .price { color: var(--red-dark); font-size: 28px; font-weight: 700; margin-bottom: 12px; }
+    .meta { color: #5b6470; line-height: 1.6; }
+    @media (max-width: 880px) {
+      .hero { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-
-<header>
-  <div class="logo-text display">Good<b>Motoway</b></div>
-  <a class="back-link" href="index.html">
-    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-    საიტზე დაბრუნება
-  </a>
+<header class="topbar">
+  <div class="brand">Good<b>Motoway</b></div>
+  <a class="btn" href="index.html">საიტზე დაბრუნება</a>
 </header>
-
-<nav class="breadcrumb">
-  <a href="index.html">მთავარი</a>
-  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><polyline points="9 18 15 12 9 6"/></svg>
-  <span class="current" id="crumbName">პროდუქტი</span>
-</nav>
-
-<main id="mainContent">
-  <!-- filled by JS -->
-</main>
-
-<footer>Good<b>Motoway</b> · ელექტრო მოპედების ავტორიზებული დილერი · უნივერსიტეტის ქუჩა N6 · 551 48 48 83</footer>
-
+<div class="wrap">
+  <div class="gallery-card">
+    <div class="hero">
+      <div>
+        <div class="main-image"><img id="mainImage" src="" alt="" /></div>
+        <div class="thumb-grid" id="thumbGrid"></div>
+      </div>
+      <div class="info">
+        <h1 id="productName">პროდუქტი</h1>
+        <div class="price" id="productPrice"></div>
+        <div class="meta" id="productDesc"></div>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
 (function () {
   const STORAGE_KEY = 'goodmotoway_products_v1';
-
   function readQuery() {
     const params = new URLSearchParams(window.location.search);
     return Number(params.get('id'));
   }
-
   function loadProducts() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -180,120 +92,45 @@
     } catch (e) {}
     return [];
   }
-
   function normalizeProduct(product) {
     const images = Array.isArray(product.images) ? product.images.filter(Boolean) : [];
     const fallback = typeof product.img === 'string' ? product.img.trim() : '';
     const merged = images.length > 0 ? images : (fallback ? [fallback] : []);
     return { ...product, img: merged[0] || fallback, images: merged };
   }
-
-  function formatPrice(n) { return new Intl.NumberFormat('ka-GE').format(n); }
-
-  function specItem(iconPath, label, value) {
-    return `<div class="spec-item">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${iconPath}</svg>
-      <span><span class="sv-label">${label}</span><span class="sv-value">${value}</span></span>
-    </div>`;
-  }
-
-  function renderNotFound() {
-    document.getElementById('crumbName').textContent = 'ვერ მოიძებნა';
-    document.getElementById('mainContent').innerHTML = `
-      <div class="empty-wrap">
-        <div class="ok-icon">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        </div>
-        <h2 class="display">პროდუქტი ვერ მოიძებნა</h2>
-        <p>შესაძლოა ბმული მოძველებულია, ან პროდუქტი აღარ არის ხელმისაწვდომი.</p>
-        <a class="btn-primary" href="index.html">კატალოგზე დაბრუნება</a>
-      </div>
-    `;
-  }
-
   const productId = readQuery();
   const product = loadProducts().map(normalizeProduct).find(item => item.id === productId);
-
+  const mainImage = document.getElementById('mainImage');
+  const productName = document.getElementById('productName');
+  const productPrice = document.getElementById('productPrice');
+  const productDesc = document.getElementById('productDesc');
+  const thumbGrid = document.getElementById('thumbGrid');
   if (!product) {
-    renderNotFound();
+    productName.textContent = 'პროდუქტი ვერ მოიძებნა';
+    productDesc.textContent = 'მიუთითეთ სწორი პროდუქტი საიტიდან.';
     return;
   }
-
-  document.title = `${product.name} — GoodMotoway`;
-  document.getElementById('crumbName').textContent = product.name;
-
   const images = product.images && product.images.length ? product.images : [product.img];
   let activeIndex = 0;
-
-  document.getElementById('mainContent').innerHTML = `
-    <div class="detail-card">
-      <div class="detail-grid">
-        <div class="gallery-side">
-          <div class="main-image">
-            <img id="mainImage" src="${images[0]}" alt="${product.name}" />
-            ${images.length > 1 ? `<span class="img-counter" id="imgCounter">1 / ${images.length}</span>` : ''}
-          </div>
-          ${images.length > 1 ? `<div class="thumb-grid" id="thumbGrid"></div>` : ''}
-        </div>
-        <div class="info-side">
-          <span class="eyebrow-tag">${product.tag || 'GoodMotoway'}</span>
-          <h1 class="product-title display">${product.name}</h1>
-          <div class="warranty-note">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4z"/></svg>
-            1 წლიანი გარანტია
-          </div>
-          <div class="price-row">
-            <span class="price">${formatPrice(product.price)} ₾</span>
-          </div>
-          <p class="desc-text">${product.desc || ''}</p>
-          <div class="spec-grid">
-            ${product.speed ? specItem('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>', 'მაქს. სიჩქარე', product.speed + ' კმ/სთ') : ''}
-            ${(product.rangeMin && product.rangeMax) ? specItem('<path d="M3 12h18M9 6l-6 6 6 6M15 6l6 6-6 6"/>', 'გარბენი', product.rangeMin + '-' + product.rangeMax + ' კმ') : ''}
-            ${product.motor ? specItem('<path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/>', 'ძრავა', product.motor + 'W') : ''}
-            ${product.battery ? specItem('<rect x="3" y="7" width="16" height="10" rx="1"/><line x1="21" y1="10" x2="21" y2="14"/>', 'ბატარეა', product.battery) : ''}
-            ${product.brakes ? specItem('<path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4z"/>', 'მუხრუჭები', product.brakes) : ''}
-            ${product.weight ? specItem('<path d="M6 2h12v6l-3 3 3 3v6H6v-6l3-3-3-3z"/>', 'წონა', product.weight + ' კგ') : ''}
-          </div>
-          <div class="cta-row">
-            <button class="btn-primary" id="orderBtn">შეკვეთა</button>
-            <a class="btn-secondary" href="tel:551484883">
-              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.4 2.1L8.1 9.7a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2z"/></svg>
-              551 48 48 83
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-
   function renderGallery() {
-    const mainImage = document.getElementById('mainImage');
     mainImage.src = images[activeIndex];
     mainImage.alt = product.name;
-
-    const counter = document.getElementById('imgCounter');
-    if (counter) counter.textContent = `${activeIndex + 1} / ${images.length}`;
-
-    const thumbGrid = document.getElementById('thumbGrid');
-    if (thumbGrid) {
-      thumbGrid.innerHTML = images.map((src, index) => `
-        <button class="thumb ${index === activeIndex ? 'active' : ''}" type="button" data-index="${index}">
-          <img src="${src}" alt="${product.name} ${index + 1}" />
-        </button>
-      `).join('');
-      thumbGrid.querySelectorAll('.thumb').forEach(btn => {
-        btn.addEventListener('click', () => {
-          activeIndex = Number(btn.dataset.index);
-          renderGallery();
-        });
+    thumbGrid.innerHTML = images.map((src, index) => `
+      <button class="thumb ${index === activeIndex ? 'active' : ''}" type="button" data-index="${index}">
+        <img src="${src}" alt="${product.name} ${index + 1}" />
+      </button>
+    `).join('');
+    thumbGrid.querySelectorAll('.thumb').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeIndex = Number(btn.dataset.index);
+        renderGallery();
       });
-    }
+    });
   }
+  productName.textContent = product.name;
+  productPrice.textContent = `${product.price} ₾`;
+  productDesc.textContent = `${product.desc}\n\nსიჩქარე: ${product.speed} კმ/სთ · ძრავა: ${product.motor}W · გარბენი: ${product.rangeMin}-${product.rangeMax} კმ`;
   renderGallery();
-
-  document.getElementById('orderBtn').addEventListener('click', () => {
-    window.location.href = `index.html#order-${product.id}`;
-  });
 })();
 </script>
 </body>
