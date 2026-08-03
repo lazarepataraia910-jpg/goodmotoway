@@ -291,6 +291,11 @@
     .spec-grid { grid-template-columns: 1fr; }
     .card-price-row { flex-direction: column; align-items: stretch; }
     .card-actions { flex-direction: column; }
+    .hero::before {
+      content: ""; position: absolute; inset: 0;
+      background: rgba(20,23,28,0.94); pointer-events: none;
+    }
+    .hero > .wrap { position: relative; z-index: 1; }
   }
 </style>
 </head>
