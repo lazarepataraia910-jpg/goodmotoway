@@ -100,6 +100,16 @@
   .product-title { font-size: 32px; margin: 0 0 6px; line-height: 1.15; }
   .warranty-note { color: var(--sage); font-size: 13px; font-weight: 600; margin-bottom: 18px; display: flex; align-items: center; gap: 6px; }
 
+  .color-picker { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+  .color-picker-label { font-size: 12px; font-weight: 700; color: var(--slate); text-transform: uppercase; letter-spacing: 0.4px; }
+  .color-swatch-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .color-swatch-btn {
+    width: 28px; height: 28px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1.5px var(--line-light);
+    cursor: pointer; padding: 0; transition: box-shadow 0.15s ease, transform 0.15s ease;
+  }
+  .color-swatch-btn:hover { transform: scale(1.08); }
+  .color-swatch-btn.active { box-shadow: 0 0 0 2px var(--red); }
+
   .price-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 20px; }
   .price { font-family: 'Rajdhani', sans-serif; font-size: 38px; font-weight: 700; color: var(--ink); }
   .price small { font-size: 13px; color: var(--slate); font-weight: 500; }
@@ -231,7 +241,8 @@
       charge: row.charge,
       inStock: row.in_stock !== false,
       img: merged[0] || fallback,
-      images: merged
+      images: merged,
+      colors: Array.isArray(row.colors) ? row.colors : []
     };
   }
 
@@ -290,6 +301,13 @@
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4z"/></svg>
             1 წლიანი გარანტია
           </div>
+          ${product.colors && product.colors.length ? `
+          <div class="color-picker">
+            <span class="color-picker-label">ფერი:</span>
+            <div class="color-swatch-row" id="colorSwatchRow">
+              ${product.colors.map((c) => `<button class="color-swatch-btn" type="button" style="background:${c.hex};" title="${c.name || c.hex}" aria-label="${c.name || c.hex}"></button>`).join('')}
+            </div>
+          </div>` : ''}
           <div class="price-row">
             <span class="price">${formatPrice(product.price)} ₾</span>
           </div>
@@ -337,6 +355,21 @@
     }
   }
   renderGallery();
+
+  const colorSwatchRow = document.getElementById('colorSwatchRow');
+  if (colorSwatchRow) {
+    const swatchBtns = colorSwatchRow.querySelectorAll('.color-swatch-btn');
+    swatchBtns.forEach((btn, i) => {
+      if (i === 0) btn.classList.add('active');
+      btn.addEventListener('click', () => {
+        swatchBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const mainImage = document.getElementById('mainImage');
+        mainImage.src = product.colors[i].image;
+        mainImage.alt = product.name + (product.colors[i].name ? ' - ' + product.colors[i].name : '');
+      });
+    });
+  }
 })();
 </script>
 </body>

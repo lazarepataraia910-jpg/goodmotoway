@@ -23,6 +23,7 @@ create table public.products (
   in_stock boolean not null default true,
   img text,
   images text[] not null default '{}',
+  colors jsonb not null default '[]'::jsonb,
   created_at timestamptz not null default now()
 );
 
