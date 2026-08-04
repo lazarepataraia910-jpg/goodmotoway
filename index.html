@@ -167,69 +167,14 @@
   .card-price-row { margin-top: auto; display: flex; align-items: flex-end; justify-content: space-between; padding-top: 4px; gap: 8px; }
   .card-price { font-family: 'Rajdhani', sans-serif; font-size: 23px; font-weight: 700; color: var(--ink); }
   .card-price small { font-size: 11.5px; color: #8A93A0; font-weight: 500; }
-  .card-cta { border: none; background: var(--ink); color: #fff; border-radius: 8px; padding: 9px 13px; font-size: 13px; font-weight: 700; white-space: nowrap; }
-  .card-cta:hover { background: var(--red-dark); }
 
-  .card-actions { display: flex; gap: 8px; margin-top: 2px; }
-  .card-cta.secondary { background: #fff; color: var(--ink); border: 1px solid var(--line-light); }
-  .card-cta.secondary:hover { background: #F3F1EB; }
-  .card-cta.buy { background: var(--red); color: #fff; }
-  .card-cta.buy:hover { background: var(--red-dark); color: #fff; }
-
-  .modal-overlay {
-    position: fixed; inset: 0; background: rgba(20,23,28,0.6); display: none;
-    align-items: center; justify-content: center; z-index: 100; padding: 16px;
+  .whatsapp-float {
+    position: fixed; right: 20px; bottom: 20px; width: 58px; height: 58px; border-radius: 50%;
+    background: #25D366; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 20px rgba(37,211,102,0.4); z-index: 50; transition: transform 0.15s ease;
   }
-  .modal-overlay.show { display: flex; }
-  .modal {
-    background: #fff; border-radius: 16px; max-width: 460px; width: 100%;
-    max-height: 90vh; overflow-y: auto; padding: 22px; position: relative;
-  }
-  .modal-close {
-    position: absolute; top: 14px; right: 14px; width: 30px; height: 30px; border-radius: 50%;
-    border: 1px solid var(--line-light); background: #fff; display: flex; align-items: center; justify-content: center;
-  }
-  .modal h2 { font-size: 19px; margin: 0 0 4px; padding-right: 30px; }
-  .modal .modal-sub { color: #5B6470; font-size: 13px; margin: 0 0 16px; }
-  .order-summary {
-    display: flex; gap: 12px; align-items: center; background: var(--paper); border-radius: 10px;
-    padding: 10px; margin-bottom: 16px;
-  }
-  .order-summary img { width: 62px; height: 46px; object-fit: cover; border-radius: 6px; }
-  .order-summary .os-name { font-weight: 700; font-size: 14px; }
-  .order-summary .os-price { color: var(--red-dark); font-weight: 700; font-size: 15px; }
-  .field-group { margin-bottom: 12px; }
-  .field-group label { display: block; font-size: 12.5px; color: #5B6470; margin-bottom: 5px; font-weight: 600; }
-  .field-group input {
-    width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line-light);
-    background: #fff; color: var(--ink); font-size: 14px;
-  }
-  .pay-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
-  .pay-method {
-    display: flex; align-items: center; gap: 8px; border: 2px solid var(--line-light); border-radius: 10px;
-    padding: 10px; font-size: 13px; font-weight: 700; background: #fff; color: var(--ink);
-  }
-  .pay-method.selected { border-color: var(--red); background: #FFF4EA; }
-  .pay-method .pm-icon { width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #fff; font-size: 11px; font-weight: 700; }
-  .pm-bog { background: #E30613; }
-  .pm-tbc { background: #00A6E1; }
-  .pm-gpay { background: #14171C; }
-  .pm-cash { background: #5F7052; }
-
-  .submit-order {
-    width: 100%; padding: 12px; border: none; border-radius: 10px; background: var(--ink); color: #fff;
-    font-size: 15px; font-weight: 700;
-  }
-  .submit-order:hover { background: var(--red-dark); }
-  .order-note { font-size: 11.5px; color: #8A93A0; margin-top: 10px; text-align: center; line-height: 1.5; }
-
-  .order-success { text-align: center; padding: 10px 0; }
-  .order-success .ok-icon {
-    width: 56px; height: 56px; border-radius: 50%; background: #EDF4EA; color: var(--sage, #5F7052);
-    display: flex; align-items: center; justify-content: center; margin: 0 auto 14px;
-  }
-  .order-success h2 { margin-bottom: 8px; }
-  .order-success p { color: #5B6470; font-size: 13.5px; }
+  .whatsapp-float:hover { transform: scale(1.06); }
+  .whatsapp-float svg { width: 30px; height: 30px; fill: #fff; }
 
   .admin-panel { display: none; }
   .admin-panel-header {
@@ -295,7 +240,6 @@
     .contact-strip { flex-direction: column; align-items: flex-start; }
     .spec-grid { grid-template-columns: 1fr; }
     .card-price-row { flex-direction: column; align-items: stretch; }
-    .card-actions { flex-direction: column; }
     .hero::before {
       content: ""; position: absolute; inset: 0;
       background: rgba(20,23,28,0.94); pointer-events: none;
@@ -419,11 +363,9 @@
 
 <footer>Good<b>Motoway</b> · ელექტრო მოპედების ავტორიზებული დილერი · უნივერსიტეტის ქუჩა N6 · 551 48 48 83</footer>
 
-
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal" id="modalBox"></div>
-</div>
-
+<a class="whatsapp-float" href="https://wa.me/995551484883" target="_blank" rel="noopener" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.1-1.7-.9-2-1-.3-.1-.5-.1-.6.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.3-.4.1-.2 0-.3 0-.5s-.6-1.5-.9-2c-.2-.5-.5-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.4s1 2.8 1.1 3c.1.2 2 3.1 5 4.3.7.3 1.2.5 1.7.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 1.9-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.3-.6-.4z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.4 5.2L2 22l4.9-1.3C8.5 21.6 10.2 22 12 22c5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.2c-1.6 0-3.1-.4-4.5-1.2l-.3-.2-3.3.9.9-3.2-.2-.3C3.7 14.7 3.2 13.4 3.2 12 3.2 7.1 7.1 3.2 12 3.2S20.8 7.1 20.8 12 16.9 20.2 12 20.2z"/></svg>
+</a>
 
 <script>
 (function () {
@@ -575,9 +517,6 @@
             </div>
             <div class="card-price-row">
               <div class="card-price">${formatPrice(p.price)} ₾<br><small>1 წლიანი გარანტია</small></div>
-              <div class="card-actions">
-                <button class="card-cta buy" data-order="${p.id}">შეკვეთა</button>
-              </div>
             </div>
           </div>
         </div>
@@ -591,110 +530,7 @@
         render();
       });
     });
-
-    grid.querySelectorAll("[data-order]").forEach(btn => {
-      btn.addEventListener("click", () => openOrderModal(Number(btn.dataset.order)));
-    });
   }
-
-  // ---- checkout modal ----
-  const overlay = document.getElementById("modalOverlay");
-  const modalBox = document.getElementById("modalBox");
-  let selectedPay = "tbc";
-
-  function paymentMethodsHtml() {
-    const methods = [
-      { id: "tbc", cls: "pm-tbc", label: "TBC ბანკი", short: "TBC" },
-      { id: "bog", cls: "pm-bog", label: "საქართველოს ბანკი", short: "BOG" },
-      { id: "gpay", cls: "pm-gpay", label: "Google Pay", short: "G" },
-      { id: "cash", cls: "pm-cash", label: "ნაღდი / ადგილზე", short: "₾" },
-    ];
-    return methods.map(m => `
-      <button type="button" class="pay-method ${m.id === selectedPay ? 'selected' : ''}" data-pay="${m.id}">
-        <span class="pm-icon ${m.cls}">${m.short}</span> ${m.label}
-      </button>
-    `).join("");
-  }
-
-  function openOrderModal(productId) {
-    const p = PRODUCTS.find(x => x.id === productId);
-    if (!p) return;
-    selectedPay = "tbc";
-    modalBox.innerHTML = `
-      <button class="modal-close" id="modalClose">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-      <h2 class="display">შეკვეთის გაფორმება</h2>
-      <p class="modal-sub">შეავსე მონაცემები და აირჩიე გადახდის მეთოდი</p>
-      <div class="order-summary">
-        <img src="${p.img}" alt="${p.name}" />
-        <div>
-          <div class="os-name">${p.name}</div>
-          <div class="os-price">${new Intl.NumberFormat("ka-GE").format(p.price)} ₾</div>
-        </div>
-      </div>
-      <form id="orderForm">
-        <div class="field-group">
-          <label>სახელი გვარი</label>
-          <input type="text" id="ordName" placeholder="თქვენი სახელი" required />
-        </div>
-        <div class="field-group">
-          <label>საკონტაქტო ნომერი</label>
-          <input type="text" id="ordPhone" placeholder="5XX XX XX XX" required />
-        </div>
-        <div class="field-group">
-          <label>გადახდის მეთოდი</label>
-          <div class="pay-methods" id="payMethods">${paymentMethodsHtml()}</div>
-        </div>
-        <button type="submit" class="submit-order">შეკვეთის დადასტურება</button>
-        <p class="order-note">ეს დემო-ფორმაა. რეალურ გადახდაზე გადასასვლელად საჭიროა TBC/BOG-თან სავაჭრო ხელშეკრულება და backend ინტეგრაცია.</p>
-      </form>
-    `;
-    overlay.classList.add("show");
-
-    modalBox.querySelectorAll(".pay-method").forEach(btn => {
-      btn.addEventListener("click", () => {
-        selectedPay = btn.dataset.pay;
-        modalBox.querySelectorAll(".pay-method").forEach(b => b.classList.remove("selected"));
-        btn.classList.add("selected");
-      });
-    });
-
-    document.getElementById("modalClose").addEventListener("click", closeModal);
-    document.getElementById("orderForm").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const name = document.getElementById("ordName").value.trim();
-      const phone = document.getElementById("ordPhone").value.trim();
-      if (!name || !phone) return;
-      showOrderSuccess(p, name, phone);
-    });
-  }
-
-  function showOrderSuccess(p, name, phone) {
-    const payLabels = { tbc: "TBC ბანკი", bog: "საქართველოს ბანკი", gpay: "Google Pay", cash: "ნაღდი ანგარიშსწორება" };
-    modalBox.innerHTML = `
-      <button class="modal-close" id="modalClose2">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-      <div class="order-success">
-        <div class="ok-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <h2 class="display">შეკვეთა მიღებულია</h2>
-        <p>${name}, გმადლობთ! ${p.name} — ${new Intl.NumberFormat("ka-GE").format(p.price)} ₾<br>
-        გადახდის მეთოდი: <b>${payLabels[selectedPay]}</b><br>
-        ჩვენი მენეჯერი დაგიკავშირდებათ ნომერზე ${phone}.</p>
-        <p class="order-note">დემო რეჟიმი — რეალურ პროექტში აქ მოხდება გადამისამართება ბანკის გადახდის გვერდზე.</p>
-      </div>
-    `;
-    document.getElementById("modalClose2").addEventListener("click", closeModal);
-  }
-
-  function closeModal() {
-    overlay.classList.remove("show");
-  }
-  overlay.addEventListener("click", (e) => { if (e.target === overlay) closeModal(); });
-
 
   qEl.addEventListener("input", render);
   powerSel.addEventListener("change", render);
