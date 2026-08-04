@@ -379,6 +379,7 @@
         <div class="field full">
           <div class="color-list" id="colorList"></div>
           <button class="add-color-btn" type="button" id="addColorBtn">+ ფერის დამატება</button>
+          <input class="upload-input" id="colorGalleryFileInput" type="file" accept="image/*" multiple />
         </div>
 
         <div class="form-actions full">
@@ -505,9 +506,11 @@
   let currentColors = [];
   let pickedColorFile = null;
   let pickedHex = null;
+  let colorGalleryTargetIndex = null;
 
   const colorListEl = document.getElementById('colorList');
   const addColorBtn = document.getElementById('addColorBtn');
+  const colorGalleryFileInput = document.getElementById('colorGalleryFileInput');
   const colorModalOverlay = document.getElementById('colorModalOverlay');
   const colorPhotoInput = document.getElementById('colorPhotoInput');
   const colorCanvasWrap = document.getElementById('colorCanvasWrap');
@@ -528,6 +531,8 @@
       <span class="color-chip">
         <span class="swatch" style="background:${c.hex}"></span>
         ${c.name || c.hex}
+        <span style="color:var(--slate);font-weight:500;">· ${(c.images || []).length} ფოტო</span>
+        <button type="button" data-add-photo="${i}" aria-label="ფოტოს დამატება" title="ფოტოს დამატება">+</button>
         <button type="button" data-remove-color="${i}" aria-label="წაშლა">×</button>
       </span>
     `).join('');
@@ -535,6 +540,12 @@
       btn.addEventListener('click', () => {
         currentColors.splice(Number(btn.dataset.removeColor), 1);
         renderColorList();
+      });
+    });
+    colorListEl.querySelectorAll('[data-add-photo]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        colorGalleryTargetIndex = Number(btn.dataset.addPhoto);
+        colorGalleryFileInput.click();
       });
     });
   }
@@ -627,7 +638,7 @@
     try {
       const blob = await compressImage(pickedColorFile);
       const url = await uploadImage(blob);
-      currentColors.push({ hex: pickedHex, name: colorNameInput.value.trim(), image: url });
+      currentColors.push({ hex: pickedHex, name: colorNameInput.value.trim(), images: [url] });
       renderColorList();
       closeColorModal();
     } catch (err) {
@@ -636,6 +647,29 @@
     } finally {
       colorAddBtn.disabled = false;
       colorAddBtn.textContent = 'დამატება';
+    }
+  });
+
+  colorGalleryFileInput.addEventListener('change', async () => {
+    const files = Array.from(colorGalleryFileInput.files || []);
+    if (!files.length || colorGalleryTargetIndex === null) return;
+    const targetIndex = colorGalleryTargetIndex;
+    setFeedback('ფოტოს ატვირთვა მიმდინარეობს...');
+    try {
+      for (const file of files) {
+        const blob = await compressImage(file);
+        const url = await uploadImage(blob);
+        if (!currentColors[targetIndex].images) currentColors[targetIndex].images = [];
+        currentColors[targetIndex].images.push(url);
+      }
+      renderColorList();
+      setFeedback('ფოტო დაემატა ფერს', true);
+    } catch (err) {
+      console.error(err);
+      setFeedback('ფოტოს ატვირთვა ვერ მოხერხდა');
+    } finally {
+      colorGalleryFileInput.value = '';
+      colorGalleryTargetIndex = null;
     }
   });
 
@@ -745,7 +779,7 @@
     document.getElementById('productDesc').value = product.desc;
     document.getElementById('productImg').value = product.img;
     productGalleryEl.value = (product.images || [product.img]).slice(1).join('\n');
-    currentColors = (product.colors || []).map(c => ({ ...c }));
+    currentColors = (product.colors || []).map(c => ({ ...c, images: c.images || (c.image ? [c.image] : []) }));
     renderColorList();
     setFeedback('პროდუქტი მზად არის შესაცვლელად');
   }

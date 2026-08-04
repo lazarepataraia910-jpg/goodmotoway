@@ -280,7 +280,7 @@
   document.title = `${product.name} — GoodMotoway`;
   document.getElementById('crumbName').textContent = product.name;
 
-  const images = product.images && product.images.length ? product.images : [product.img];
+  let images = product.images && product.images.length ? product.images : [product.img];
   let activeIndex = 0;
 
   document.getElementById('mainContent').innerHTML = `
@@ -289,9 +289,9 @@
         <div class="gallery-side">
           <div class="main-image">
             <img id="mainImage" src="${images[0]}" alt="${product.name}" />
-            ${images.length > 1 ? `<span class="img-counter" id="imgCounter">1 / ${images.length}</span>` : ''}
+            <span class="img-counter" id="imgCounter"></span>
           </div>
-          ${images.length > 1 ? `<div class="thumb-grid" id="thumbGrid"></div>` : ''}
+          <div class="thumb-grid" id="thumbGrid"></div>
         </div>
         <div class="info-side">
           <span class="eyebrow-tag">${product.tag || 'GoodMotoway'}</span>
@@ -337,10 +337,12 @@
     mainImage.alt = product.name;
 
     const counter = document.getElementById('imgCounter');
-    if (counter) counter.textContent = `${activeIndex + 1} / ${images.length}`;
+    if (counter) counter.textContent = images.length > 1 ? `${activeIndex + 1} / ${images.length}` : '';
+    if (counter) counter.style.display = images.length > 1 ? 'block' : 'none';
 
     const thumbGrid = document.getElementById('thumbGrid');
     if (thumbGrid) {
+      thumbGrid.style.display = images.length > 1 ? 'grid' : 'none';
       thumbGrid.innerHTML = images.map((src, index) => `
         <button class="thumb ${index === activeIndex ? 'active' : ''}" type="button" data-index="${index}">
           <img src="${src}" alt="${product.name} ${index + 1}" />
@@ -354,6 +356,13 @@
       });
     }
   }
+
+  function setGallery(newImages) {
+    images = newImages && newImages.length ? newImages : [product.img];
+    activeIndex = 0;
+    renderGallery();
+  }
+
   renderGallery();
 
   const colorSwatchRow = document.getElementById('colorSwatchRow');
@@ -364,9 +373,9 @@
       btn.addEventListener('click', () => {
         swatchBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        const mainImage = document.getElementById('mainImage');
-        mainImage.src = product.colors[i].image;
-        mainImage.alt = product.name + (product.colors[i].name ? ' - ' + product.colors[i].name : '');
+        const color = product.colors[i];
+        const colorImages = color.images && color.images.length ? color.images : (color.image ? [color.image] : []);
+        setGallery(colorImages);
       });
     });
   }
