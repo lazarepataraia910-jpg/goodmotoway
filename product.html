@@ -185,31 +185,49 @@
 
 <footer>Good<b>Motoway</b> · ელექტრო მოპედების ავტორიზებული დილერი · უნივერსიტეტის ქუჩა N6 · 551 48 48 83</footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
-(function () {
-  const STORAGE_KEY = 'goodmotoway_products_v1';
+(async function () {
+  const SUPABASE_URL = 'https://lceebrhbvnyzoxkauugo.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxjZWVicmhidm55em94a2F1dWdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU3ODkyNzAsImV4cCI6MjEwMTM2NTI3MH0.IeGvLg09wjni7OJdiLeAiO3pvrXxIUgzISNKnVKpXYI';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   function readQuery() {
     const params = new URLSearchParams(window.location.search);
     return Number(params.get('id'));
   }
 
-  function loadProducts() {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return Array.isArray(parsed) ? parsed : [];
-      }
-    } catch (e) {}
-    return [];
+  async function loadProduct(id) {
+    const { data, error } = await supabaseClient.from('products').select('*').eq('id', id).maybeSingle();
+    if (error || !data) return null;
+    return normalizeProduct(data);
   }
 
-  function normalizeProduct(product) {
-    const images = Array.isArray(product.images) ? product.images.filter(Boolean) : [];
-    const fallback = typeof product.img === 'string' ? product.img.trim() : '';
+  function normalizeProduct(row) {
+    const images = Array.isArray(row.images) ? row.images.filter(Boolean) : [];
+    const fallback = typeof row.img === 'string' ? row.img.trim() : '';
     const merged = images.length > 0 ? images : (fallback ? [fallback] : []);
-    return { ...product, img: merged[0] || fallback, images: merged, inStock: product.inStock !== false };
+    return {
+      id: row.id,
+      key: row.key,
+      name: row.name,
+      tag: row.tag,
+      price: row.price,
+      desc: row.description,
+      battery: row.battery,
+      motor: row.motor,
+      speed: row.speed,
+      rangeMin: row.range_min,
+      rangeMax: row.range_max,
+      weight: row.weight,
+      brakes: row.brakes,
+      tyres: row.tyres,
+      dims: row.dims,
+      charge: row.charge,
+      inStock: row.in_stock !== false,
+      img: merged[0] || fallback,
+      images: merged
+    };
   }
 
   function formatPrice(n) { return new Intl.NumberFormat('ka-GE').format(n); }
@@ -236,7 +254,7 @@
   }
 
   const productId = readQuery();
-  const product = loadProducts().map(normalizeProduct).find(item => item.id === productId);
+  const product = await loadProduct(productId);
 
   if (!product) {
     renderNotFound();
