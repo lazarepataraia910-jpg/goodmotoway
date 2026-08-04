@@ -90,6 +90,13 @@
     background: #FBEAEA; color: var(--red-dark); font-size: 12px; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.5px; padding: 6px 12px; border-radius: 999px; margin-bottom: 14px;
   }
+  .stock-tag {
+    display: inline-flex; align-self: flex-start; align-items: center; gap: 6px;
+    background: #EDF4EA; color: var(--sage, #5F7052); font-size: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px; padding: 6px 12px; border-radius: 999px;
+    margin-bottom: 14px; margin-left: 8px;
+  }
+  .stock-tag.out { background: #F0F0EE; color: var(--slate); }
   .product-title { font-size: 32px; margin: 0 0 6px; line-height: 1.15; }
   .warranty-note { color: var(--sage); font-size: 13px; font-weight: 600; margin-bottom: 18px; display: flex; align-items: center; gap: 6px; }
 
@@ -202,7 +209,7 @@
     const images = Array.isArray(product.images) ? product.images.filter(Boolean) : [];
     const fallback = typeof product.img === 'string' ? product.img.trim() : '';
     const merged = images.length > 0 ? images : (fallback ? [fallback] : []);
-    return { ...product, img: merged[0] || fallback, images: merged };
+    return { ...product, img: merged[0] || fallback, images: merged, inStock: product.inStock !== false };
   }
 
   function formatPrice(n) { return new Intl.NumberFormat('ka-GE').format(n); }
@@ -254,6 +261,7 @@
         </div>
         <div class="info-side">
           <span class="eyebrow-tag">${product.tag || 'GoodMotoway'}</span>
+          <span class="stock-tag ${product.inStock ? '' : 'out'}">${product.inStock ? 'მარაგშია' : 'არ არის მარაგში'}</span>
           <h1 class="product-title display">${product.name}</h1>
           <div class="warranty-note">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4z"/></svg>

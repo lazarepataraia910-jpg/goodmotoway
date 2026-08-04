@@ -88,12 +88,12 @@
   /* ---- Form fields ---- */
   .field { flex: 1 1 220px; }
   label { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 700; color: var(--slate); letter-spacing: 0.2px; }
-  input, textarea {
+  input, textarea, select {
     width: 100%; border: 1px solid var(--line-light); border-radius: 8px; padding: 10px 12px;
     font-size: 14px; color: var(--ink); background: #fff; transition: 0.2s ease;
     font-family: 'Noto Sans Georgian', sans-serif;
   }
-  input:focus, textarea:focus {
+  input:focus, textarea:focus, select:focus {
     outline: none; border-color: var(--red); box-shadow: 0 0 0 3px rgba(216,37,59,0.15);
   }
   textarea { min-height: 90px; resize: vertical; }
@@ -259,6 +259,13 @@
           <label for="productPrice">ფასი</label>
           <input id="productPrice" type="number" placeholder="3700" required />
         </div>
+        <div class="field">
+          <label for="productInStock">მარაგი</label>
+          <select id="productInStock">
+            <option value="true">მარაგშია</option>
+            <option value="false">არ არის მარაგში</option>
+          </select>
+        </div>
 
         <div class="group-label">საექსპლუატაციო მაჩვენებლები</div>
         <div class="field">
@@ -354,7 +361,8 @@
     return {
       ...product,
       img: mergedImages[0] || fallbackImage,
-      images: mergedImages
+      images: mergedImages,
+      inStock: product.inStock !== false
     };
   }
 
@@ -457,6 +465,7 @@
           <div class="product-meta">
             <div class="product-price">${p.price} ₾</div>
             <div class="product-speedline">${p.speed} კმ/სთ · ${p.motor}W</div>
+            <div style="font-size:11px;font-weight:700;color:${p.inStock ? 'var(--sage)' : 'var(--red-dark)'};">${p.inStock ? '● მარაგშია' : '● არ არის მარაგში'}</div>
           </div>
           <div class="product-specs">
             <span>🔋 ${p.battery}</span>
@@ -487,6 +496,7 @@
     document.getElementById('productName').value = product.name;
     document.getElementById('productTag').value = product.tag;
     document.getElementById('productPrice').value = product.price;
+    document.getElementById('productInStock').value = product.inStock === false ? 'false' : 'true';
     document.getElementById('productMotor').value = product.motor;
     document.getElementById('productSpeed').value = product.speed;
     document.getElementById('productRangeMin').value = product.rangeMin;
@@ -595,6 +605,7 @@
       name: document.getElementById('productName').value.trim(),
       tag: document.getElementById('productTag').value.trim(),
       price: Number(document.getElementById('productPrice').value),
+      inStock: document.getElementById('productInStock').value !== 'false',
       motor: Number(document.getElementById('productMotor').value),
       speed: Number(document.getElementById('productSpeed').value),
       rangeMin: Number(document.getElementById('productRangeMin').value),

@@ -108,6 +108,7 @@ async function main() {
       name: p.name,
       tag: p.tag || null,
       price: p.price ?? 0,
+      in_stock: p.inStock !== false,
       description: p.desc || null,
       battery: p.battery || null,
       motor: p.motor ?? null,

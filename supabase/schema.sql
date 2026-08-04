@@ -18,6 +18,7 @@ create table if not exists public.products (
   tyres text,
   dims text,
   charge text,
+  in_stock boolean not null default true,
   img text,
   images text[] not null default '{}',
   created_at timestamptz not null default now()
