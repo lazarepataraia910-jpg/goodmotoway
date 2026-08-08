@@ -377,6 +377,14 @@
 
         <div class="group-label">ფერის ვარიანტები</div>
         <div class="field full">
+          <label style="display:flex;align-items:center;gap:8px;margin-bottom:10px;font-weight:600;font-size:12.5px;color:var(--slate);cursor:pointer;">
+            <input type="checkbox" id="baseColorToggle" style="width:auto;" />
+            მთავარი ფოტოც ფერის ვარიანტია
+          </label>
+          <div id="baseColorFields" style="display:none; gap:8px; margin-bottom:12px;">
+            <input type="text" id="baseColorName" placeholder="მაგ: შავი" style="flex:1;" />
+            <input type="color" id="baseColorHex" value="#14171C" style="width:44px; padding:2px; height:38px; border-radius:8px;" />
+          </div>
           <div class="color-list" id="colorList"></div>
           <button class="add-color-btn" type="button" id="addColorBtn">+ ფერის დამატება</button>
           <input class="upload-input" id="colorGalleryFileInput" type="file" accept="image/*" multiple />
@@ -511,6 +519,14 @@
   const colorListEl = document.getElementById('colorList');
   const addColorBtn = document.getElementById('addColorBtn');
   const colorGalleryFileInput = document.getElementById('colorGalleryFileInput');
+  const baseColorToggle = document.getElementById('baseColorToggle');
+  const baseColorFields = document.getElementById('baseColorFields');
+  const baseColorName = document.getElementById('baseColorName');
+  const baseColorHex = document.getElementById('baseColorHex');
+
+  baseColorToggle.addEventListener('change', () => {
+    baseColorFields.style.display = baseColorToggle.checked ? 'flex' : 'none';
+  });
   const colorModalOverlay = document.getElementById('colorModalOverlay');
   const colorPhotoInput = document.getElementById('colorPhotoInput');
   const colorCanvasWrap = document.getElementById('colorCanvasWrap');
@@ -779,7 +795,19 @@
     document.getElementById('productDesc').value = product.desc;
     document.getElementById('productImg').value = product.img;
     productGalleryEl.value = (product.images || [product.img]).slice(1).join('\n');
-    currentColors = (product.colors || []).map(c => ({ ...c, images: c.images || (c.image ? [c.image] : []) }));
+    const baseEntry = (product.colors || []).find(c => c.isBase);
+    if (baseEntry) {
+      baseColorToggle.checked = true;
+      baseColorFields.style.display = 'flex';
+      baseColorName.value = baseEntry.name || '';
+      baseColorHex.value = baseEntry.hex || '#14171C';
+    } else {
+      baseColorToggle.checked = false;
+      baseColorFields.style.display = 'none';
+      baseColorName.value = '';
+      baseColorHex.value = '#14171C';
+    }
+    currentColors = (product.colors || []).filter(c => !c.isBase).map(c => ({ ...c, images: c.images || (c.image ? [c.image] : []) }));
     renderColorList();
     setFeedback('პროდუქტი მზად არის შესაცვლელად');
   }
@@ -897,7 +925,9 @@
       desc: document.getElementById('productDesc').value.trim(),
       img: document.getElementById('productImg').value.trim(),
       images: [document.getElementById('productImg').value.trim(), ...rawGalleryUrls].filter(Boolean),
-      colors: currentColors
+      colors: baseColorToggle.checked
+        ? [{ isBase: true, hex: baseColorHex.value, name: baseColorName.value.trim() }, ...currentColors]
+        : currentColors
     };
 
     const requiredFields = [
@@ -952,6 +982,7 @@
     productGalleryEl.value = '';
     editingProductId = null;
     currentColors = [];
+    baseColorFields.style.display = 'none';
     renderColorList();
     setFeedback('პროდუქტი შენახულია', true);
   });
@@ -963,6 +994,7 @@
     uploadPreviewImg.style.display = 'none';
     uploadPreviewImg.removeAttribute('src');
     currentColors = [];
+    baseColorFields.style.display = 'none';
     renderColorList();
     setFeedback('რედაქტირება გაუქმებულია');
   });

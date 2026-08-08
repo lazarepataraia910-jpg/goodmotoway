@@ -100,8 +100,9 @@
   .product-title { font-size: 32px; margin: 0 0 6px; line-height: 1.15; }
   .warranty-note { color: var(--sage); font-size: 13px; font-weight: 600; margin-bottom: 18px; display: flex; align-items: center; gap: 6px; }
 
-  .color-picker { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+  .color-picker { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
   .color-picker-label { font-size: 12px; font-weight: 700; color: var(--slate); text-transform: uppercase; letter-spacing: 0.4px; }
+  .color-picker-label b { color: var(--ink); text-transform: none; letter-spacing: normal; }
   .color-swatch-row { display: flex; gap: 8px; flex-wrap: wrap; }
   .color-swatch-btn {
     width: 28px; height: 28px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1.5px var(--line-light);
@@ -303,7 +304,7 @@
           </div>
           ${product.colors && product.colors.length ? `
           <div class="color-picker">
-            <span class="color-picker-label">ფერი:</span>
+            <span class="color-picker-label">ფერი: <b id="activeColorName">${product.colors[0].name || ''}</b></span>
             <div class="color-swatch-row" id="colorSwatchRow">
               ${product.colors.map((c) => `<button class="color-swatch-btn" type="button" style="background:${c.hex};" title="${c.name || c.hex}" aria-label="${c.name || c.hex}"></button>`).join('')}
             </div>
@@ -374,7 +375,10 @@
         swatchBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         const color = product.colors[i];
-        const colorImages = color.images && color.images.length ? color.images : (color.image ? [color.image] : []);
+        document.getElementById('activeColorName').textContent = color.name || '';
+        const colorImages = color.isBase
+          ? (product.images && product.images.length ? product.images : [product.img])
+          : (color.images && color.images.length ? color.images : (color.image ? [color.image] : []));
         setGallery(colorImages);
       });
     });
