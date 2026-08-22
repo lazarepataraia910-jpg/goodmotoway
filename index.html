@@ -230,13 +230,16 @@
       flex-direction: column; align-items: stretch; gap: 12px;
     }
     .header-right {
-      flex-direction: column;
-      align-items: stretch;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .call-btn {
+      grid-column: 1 / -1;
     }
     .call-btn,
     #favToggle {
       justify-content: center;
-      width: 100%;
     }
     h1 { font-size: 28px; }
     .contact-strip { flex-direction: column; align-items: flex-start; }

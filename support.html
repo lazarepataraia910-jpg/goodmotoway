@@ -62,6 +62,10 @@
     margin-top: auto; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
     border-radius: 10px; padding: 12px 16px; font-weight: 700; font-size: 14px;
   }
+  .support-card .sc-action-group {
+    margin-top: auto; display: flex; flex-direction: column; gap: 8px;
+  }
+  .support-card .sc-action-group .sc-action { margin-top: 0; }
   .support-card .sc-action.red { background: var(--red); color: #fff; }
   .support-card .sc-action.red:hover { background: var(--red-dark); }
   .support-card .sc-action.wa { background: #25D366; color: #fff; }
@@ -145,9 +149,14 @@
       </div>
       <h3>დარეკვა</h3>
       <p>გჭირდებათ სწრაფი პასუხი ტელეფონით? დაგვირეკეთ სამუშაო საათებში.</p>
-      <a class="sc-action red" href="tel:551484883">
-        551 48 48 83
-      </a>
+      <div class="sc-action-group">
+        <a class="sc-action red" href="tel:551484883">
+          551 48 48 83
+        </a>
+        <a class="sc-action red" href="tel:599866122">
+          599 86 61 22
+        </a>
+      </div>
     </div>
   </div>
 
