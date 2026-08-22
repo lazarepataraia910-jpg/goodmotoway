@@ -40,6 +40,7 @@
     transition: 0.2s ease;
   }
   .back-link:hover { background: rgba(216,37,59,0.15); border-color: var(--red); }
+  .header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
 
   main { max-width: 800px; margin: 0 auto; padding: 36px 24px 70px; }
   h1.display { font-size: 30px; margin: 0 0 6px; }
@@ -98,10 +99,14 @@
 
 <header>
   <div class="logo-text display">Good<b>Motoway</b></div>
-  <a class="back-link" href="index.html">
-    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-    საიტზე დაბრუნება
-  </a>
+  <div class="header-actions">
+    <a class="back-link" href="compare.html">შედარება</a>
+    <a class="back-link" href="support.html">მხარდაჭერა</a>
+    <a class="back-link" href="index.html">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      საიტზე დაბრუნება
+    </a>
+  </div>
 </header>
 
 <main>

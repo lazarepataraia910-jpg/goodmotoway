@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>მოდელების შედარება — GoodMotoway</title>
+<!-- Vercel Web Analytics -->
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap');
+
+  :root {
+    --ink: #14171C;
+    --paper: #F3F1EB;
+    --red: #D8253B;
+    --red-dark: #A60F1E;
+    --sage: #5F7052;
+    --line-light: #E4E1D8;
+    --slate: #8A93A0;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Noto Sans Georgian', sans-serif; background: var(--paper); color: var(--ink); }
+  a { text-decoration: none; color: inherit; }
+  button { font-family: 'Noto Sans Georgian', sans-serif; cursor: pointer; }
+  .display { font-family: 'Rajdhani', 'Noto Sans Georgian', sans-serif; font-weight: 700; letter-spacing: 0.3px; }
+  .icon { width: 15px; height: 15px; display: inline-block; vertical-align: -3px; flex-shrink: 0; }
+
+  header {
+    background: var(--ink); color: #F3F1EB; padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 20; border-bottom: 3px solid var(--red);
+  }
+  .logo-text { font-size: 20px; letter-spacing: 0.5px; }
+  .logo-text b { color: var(--red); }
+  .header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .back-link {
+    display: flex; align-items: center; gap: 7px; background: transparent;
+    border: 1px solid #3A414D; color: #F3F1EB; border-radius: 8px; padding: 9px 14px; font-size: 14px; font-weight: 700;
+    transition: 0.2s ease;
+  }
+  .back-link:hover { background: rgba(216,37,59,0.15); border-color: var(--red); }
+
+  main { max-width: 1000px; margin: 0 auto; padding: 36px 24px 70px; }
+  h1.display { font-size: 30px; margin: 0 0 6px; }
+  .lead { color: #5B6470; font-size: 14.5px; margin: 0 0 26px; }
+
+  .step { display: none; }
+  .step.active { display: block; }
+
+  .loading-note { color: var(--slate); font-size: 14px; padding: 20px 0; }
+
+  .count-grid { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; }
+  .count-card {
+    flex: 1 1 140px; background: #fff; border: 1.5px solid var(--line-light); border-radius: 16px;
+    padding: 30px 20px; text-align: center; transition: 0.2s ease;
+  }
+  .count-card:hover { border-color: var(--red); box-shadow: 0 10px 24px rgba(216,37,59,0.12); transform: translateY(-2px); }
+  .count-card .num { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 44px; color: var(--red-dark); line-height: 1; }
+  .count-card .lbl { font-size: 13px; color: var(--slate); font-weight: 600; margin-top: 6px; }
+
+  .mini-btn {
+    display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 1px solid var(--line-light);
+    color: var(--ink); border-radius: 8px; padding: 9px 14px; font-size: 13.5px; font-weight: 700;
+  }
+  .mini-btn:hover { border-color: var(--red); color: var(--red-dark); }
+
+  .step-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+  .select-counter { font-size: 13px; font-weight: 700; color: var(--red-dark); background: #FBEAEA; padding: 6px 12px; border-radius: 999px; }
+
+  .model-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; }
+  .model-card {
+    background: #fff; border: 2px solid var(--line-light); border-radius: 14px; overflow: hidden;
+    transition: 0.2s ease; position: relative; padding: 0; text-align: left;
+  }
+  .model-card.selected { border-color: var(--red); box-shadow: 0 10px 24px rgba(216,37,59,0.15); }
+  .model-card:disabled { opacity: 0.4; cursor: not-allowed; }
+  .model-card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; background: #EFECE3; }
+  .model-card .mc-body { padding: 10px 12px; }
+  .model-card .mc-name { font-weight: 700; font-size: 13.5px; }
+  .model-card .mc-price { color: var(--red-dark); font-weight: 700; font-size: 13px; margin-top: 2px; font-family: 'Rajdhani', sans-serif; }
+  .model-card .check {
+    position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border-radius: 50%; background: #fff;
+    border: 2px solid var(--line-light); display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 13px; font-weight: 700;
+  }
+  .model-card.selected .check { background: var(--red); border-color: var(--red); }
+
+  .compare-actions { display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+  .btn-primary {
+    border: none; background: var(--red); color: #fff; border-radius: 10px;
+    padding: 13px 22px; font-size: 14.5px; font-weight: 700; transition: 0.2s ease;
+  }
+  .btn-primary:hover:not(:disabled) { background: var(--red-dark); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .compare-table-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid var(--line-light); background: #fff; }
+  table.compare-table { border-collapse: collapse; width: 100%; min-width: 560px; }
+  .compare-table th, .compare-table td { padding: 12px 16px; border-bottom: 1px solid var(--line-light); text-align: left; font-size: 13.5px; vertical-align: top; }
+  .compare-table tbody tr:last-child td { border-bottom: none; }
+  .compare-table th.spec-col, .compare-table td.spec-col {
+    position: sticky; left: 0; background: #fff; font-weight: 700; color: var(--slate);
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap;
+  }
+  .compare-table thead th { background: var(--paper); }
+  .compare-table thead th.spec-col { background: var(--paper); }
+  .compare-col-head { display: flex; flex-direction: column; align-items: flex-start; gap: 7px; min-width: 150px; }
+  .compare-col-head img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; background: #EFECE3; }
+  .compare-col-head .cc-name { font-weight: 700; font-size: 14px; }
+  .compare-col-head .cc-price { color: var(--red-dark); font-weight: 700; font-family: 'Rajdhani', sans-serif; font-size: 16px; }
+  .compare-col-head a { font-size: 12px; color: var(--red-dark); font-weight: 700; }
+  .compare-col-head a:hover { color: var(--ink); }
+
+  footer { background: var(--ink); color: #8A93A0; padding: 22px 24px; font-size: 13px; text-align: center; margin-top: 40px; }
+  footer b { color: var(--red); }
+
+  .whatsapp-float {
+    position: fixed; right: 20px; bottom: 20px; width: 58px; height: 58px; border-radius: 50%;
+    background: #25D366; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 20px rgba(37,211,102,0.4); z-index: 50; transition: transform 0.15s ease;
+  }
+  .whatsapp-float:hover { transform: scale(1.06); }
+  .whatsapp-float svg { width: 30px; height: 30px; fill: #fff; }
+</style>
+</head>
+<body>
+
+<a class="whatsapp-float" href="https://wa.me/995551484883" target="_blank" rel="noopener" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.1-1.7-.9-2-1-.3-.1-.5-.1-.6.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.3-.4.1-.2 0-.3 0-.5s-.6-1.5-.9-2c-.2-.5-.5-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.4s1 2.8 1.1 3c.1.2 2 3.1 5 4.3.7.3 1.2.5 1.7.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 1.9-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.3-.6-.4z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.4 5.2L2 22l4.9-1.3C8.5 21.6 10.2 22 12 22c5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.2c-1.6 0-3.1-.4-4.5-1.2l-.3-.2-3.3.9.9-3.2-.2-.3C3.7 14.7 3.2 13.4 3.2 12 3.2 7.1 7.1 3.2 12 3.2S20.8 7.1 20.8 12 16.9 20.2 12 20.2z"/></svg>
+</a>
+
+<header>
+  <div class="logo-text display">Good<b>Motoway</b></div>
+  <div class="header-actions">
+    <a class="back-link" href="faq.html">კითხვები</a>
+    <a class="back-link" href="support.html">მხარდაჭერა</a>
+    <a class="back-link" href="index.html">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      საიტზე დაბრუნება
+    </a>
+  </div>
+</header>
+
+<main>
+  <h1 class="display">მოდელების შედარება</h1>
+  <p class="lead">აირჩიე რამდენი მოდელის შედარება გსურთ, შემდეგ — კონკრეტული მოდელები.</p>
+
+  <div class="step active" id="step1">
+    <div class="loading-note" id="loadingNote">იტვირთება...</div>
+    <div class="count-grid" id="countGrid" style="display:none;"></div>
+  </div>
+
+  <div class="step" id="step2">
+    <div class="step-head">
+      <button class="mini-btn" type="button" id="backToStep1">← უკან</button>
+      <span class="select-counter" id="selectCounter"></span>
+    </div>
+    <div class="model-grid" id="modelGrid"></div>
+    <div class="compare-actions">
+      <button class="btn-primary" type="button" id="compareBtn" disabled>შედარება</button>
+    </div>
+  </div>
+
+  <div class="step" id="step3">
+    <div class="step-head">
+      <button class="mini-btn" type="button" id="restartBtn">↺ თავიდან დაწყება</button>
+    </div>
+    <div class="compare-table-wrap" id="compareTableWrap"></div>
+  </div>
+</main>
+
+<footer>Good<b>Motoway</b> · ელექტრო მოპედების ავტორიზებული დილერი · უნივერსიტეტის ქუჩა N6 · 551 48 48 83</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+(async function () {
+  const SUPABASE_URL = 'https://lceebrhbvnyzoxkauugo.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxjZWVicmhidm55em94a2F1dWdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU3ODkyNzAsImV4cCI6MjEwMTM2NTI3MH0.IeGvLg09wjni7OJdiLeAiO3pvrXxIUgzISNKnVKpXYI';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  function normalizeProduct(row) {
+    const images = Array.isArray(row.images) ? row.images.filter(Boolean) : [];
+    const fallbackImage = typeof row.img === 'string' ? row.img.trim() : '';
+    return {
+      id: row.id,
+      name: row.name,
+      tag: row.tag,
+      price: row.price,
+      battery: row.battery,
+      motor: row.motor,
+      speed: row.speed,
+      rangeMin: row.range_min,
+      rangeMax: row.range_max,
+      weight: row.weight,
+      brakes: row.brakes,
+      tyres: row.tyres,
+      dims: row.dims,
+      inStock: row.in_stock !== false,
+      img: images[0] || fallbackImage
+    };
+  }
+
+  async function loadProducts() {
+    const { data, error } = await supabaseClient.from('products').select('*').order('id');
+    if (error) {
+      console.error('Could not load products', error);
+      return [];
+    }
+    return data.map(normalizeProduct);
+  }
+
+  function formatPrice(n) { return new Intl.NumberFormat('ka-GE').format(n); }
+
+  let PRODUCTS = [];
+  let targetCount = 0;
+  let selected = [];
+
+  const step1 = document.getElementById('step1');
+  const step2 = document.getElementById('step2');
+  const step3 = document.getElementById('step3');
+  const loadingNote = document.getElementById('loadingNote');
+  const countGrid = document.getElementById('countGrid');
+  const modelGrid = document.getElementById('modelGrid');
+  const selectCounter = document.getElementById('selectCounter');
+  const compareBtn = document.getElementById('compareBtn');
+  const backToStep1Btn = document.getElementById('backToStep1');
+  const restartBtn = document.getElementById('restartBtn');
+  const compareTableWrap = document.getElementById('compareTableWrap');
+
+  function showStep(n) {
+    [step1, step2, step3].forEach((el, i) => el.classList.toggle('active', i === n - 1));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function renderCountOptions() {
+    const options = [2, 3, 4].filter(n => n <= PRODUCTS.length);
+    if (options.length === 0) {
+      loadingNote.textContent = 'შედარებისთვის საჭიროა მინიმუმ 2 მოდელი კატალოგში.';
+      return;
+    }
+    loadingNote.style.display = 'none';
+    countGrid.style.display = 'flex';
+    countGrid.innerHTML = options.map(n => `
+      <button class="count-card" type="button" data-count="${n}">
+        <div class="num">${n}</div>
+        <div class="lbl">მოდელი</div>
+      </button>
+    `).join('');
+    countGrid.querySelectorAll('.count-card').forEach(card => {
+      card.addEventListener('click', () => {
+        targetCount = Number(card.dataset.count);
+        selected = [];
+        renderModelGrid();
+        showStep(2);
+      });
+    });
+  }
+
+  function renderModelGrid() {
+    selectCounter.textContent = `არჩეულია ${selected.length} / ${targetCount}`;
+    modelGrid.innerHTML = PRODUCTS.map(p => {
+      const isSelected = selected.includes(p.id);
+      const isDisabled = !isSelected && selected.length >= targetCount;
+      return `
+        <button type="button" class="model-card ${isSelected ? 'selected' : ''}" data-id="${p.id}" ${isDisabled ? 'disabled' : ''}>
+          <span class="check">${isSelected ? '✓' : ''}</span>
+          <img src="${p.img}" alt="${p.name}" />
+          <div class="mc-body">
+            <div class="mc-name">${p.name}</div>
+            <div class="mc-price">${formatPrice(p.price)} ₾</div>
+          </div>
+        </button>
+      `;
+    }).join('');
+    modelGrid.querySelectorAll('.model-card').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = Number(btn.dataset.id);
+        if (selected.includes(id)) {
+          selected = selected.filter(x => x !== id);
+        } else if (selected.length < targetCount) {
+          selected.push(id);
+        }
+        renderModelGrid();
+      });
+    });
+    compareBtn.disabled = selected.length !== targetCount;
+  }
+
+  backToStep1Btn.addEventListener('click', () => showStep(1));
+
+  compareBtn.addEventListener('click', () => {
+    renderComparison();
+    showStep(3);
+  });
+
+  restartBtn.addEventListener('click', () => {
+    targetCount = 0;
+    selected = [];
+    showStep(1);
+  });
+
+  const SPEC_ROWS = [
+    { label: 'ფასი', fn: p => formatPrice(p.price) + ' ₾' },
+    { label: 'მარაგი', fn: p => p.inStock ? 'მარაგშია' : 'არ არის მარაგში' },
+    { label: 'მაქს. სიჩქარე', fn: p => p.speed ? p.speed + ' კმ/სთ' : '—' },
+    { label: 'გარბენი', fn: p => (p.rangeMin && p.rangeMax) ? p.rangeMin + '-' + p.rangeMax + ' კმ' : '—' },
+    { label: 'ძრავა', fn: p => p.motor ? p.motor + 'W' : '—' },
+    { label: 'ბატარეა', fn: p => p.battery || '—' },
+    { label: 'საბურავი', fn: p => p.tyres || '—' },
+    { label: 'მუხრუჭები', fn: p => p.brakes || '—' },
+    { label: 'გაბარიტები', fn: p => p.dims || '—' },
+    { label: 'წონა', fn: p => p.weight ? p.weight + ' კგ' : '—' }
+  ];
+
+  function renderComparison() {
+    const chosen = selected.map(id => PRODUCTS.find(p => p.id === id)).filter(Boolean);
+    compareTableWrap.innerHTML = `
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th class="spec-col"></th>
+            ${chosen.map(p => `
+              <th>
+                <div class="compare-col-head">
+                  <img src="${p.img}" alt="${p.name}" />
+                  <span class="cc-name">${p.name}</span>
+                  <span class="cc-price">${formatPrice(p.price)} ₾</span>
+                  <a href="product.html?id=${p.id}">დეტალურად →</a>
+                </div>
+              </th>
+            `).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          ${SPEC_ROWS.map(row => `
+            <tr>
+              <td class="spec-col">${row.label}</td>
+              ${chosen.map(p => `<td>${row.fn(p)}</td>`).join('')}
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+
+  PRODUCTS = await loadProducts();
+  renderCountOptions();
+})();
+</script>
+</body>
+</html>
