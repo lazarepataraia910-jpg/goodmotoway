@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html lang="ka">
 <head>
-<script>
-  (function(){try{if(localStorage.getItem('gm_theme')==='dark'){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();
-</script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>GoodMotoway — Admin</title>
@@ -233,6 +230,22 @@
   .color-confirm-head .dot { width: 30px; height: 30px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.15); flex-shrink: 0; }
   .color-confirm-actions { display: flex; gap: 8px; margin-top: 10px; }
 </style>
+<script>
+  (function(){try{
+    var t = localStorage.getItem('gm_theme');
+    if (t === 'dark') { document.documentElement.setAttribute('data-theme','dark'); }
+    else if (t === 'classic') {
+      var f = location.pathname.split('/').pop();
+      var m = {'index.html':'classic-index.css','':'classic-index.css','product.html':'classic-product.css','admin.html':'classic-admin.css','faq.html':'classic-faq.css','support.html':'classic-support.css','compare.html':'classic-compare.css'};
+      var href = m[f];
+      if (href) {
+        var l = document.createElement('link');
+        l.id = 'gmClassicTheme'; l.rel = 'stylesheet'; l.href = href;
+        document.head.appendChild(l);
+      }
+    }
+  }catch(e){}})();
+</script>
 </head>
 <body>
 <header class="topbar">

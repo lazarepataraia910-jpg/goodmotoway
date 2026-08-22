@@ -4,12 +4,43 @@
   const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   window.gmAuthClient = client;
 
+  var CLASSIC_CSS_BY_PAGE = {
+    'index.html': 'classic-index.css',
+    '': 'classic-index.css',
+    'product.html': 'classic-product.css',
+    'admin.html': 'classic-admin.css',
+    'faq.html': 'classic-faq.css',
+    'support.html': 'classic-support.css',
+    'compare.html': 'classic-compare.css'
+  };
+
+  function classicHrefForCurrentPage() {
+    var file = window.location.pathname.split('/').pop();
+    return CLASSIC_CSS_BY_PAGE[file] || null;
+  }
+
   function applyTheme(theme) {
     try { localStorage.setItem('gm_theme', theme); } catch (e) {}
+    document.documentElement.removeAttribute('data-theme');
+    var existingClassic = document.getElementById('gmClassicTheme');
+
+    if (theme === 'classic') {
+      if (!existingClassic) {
+        var href = classicHrefForCurrentPage();
+        if (href) {
+          var link = document.createElement('link');
+          link.id = 'gmClassicTheme';
+          link.rel = 'stylesheet';
+          link.href = href;
+          document.head.appendChild(link);
+        }
+      }
+      return;
+    }
+
+    if (existingClassic) existingClassic.remove();
     if (theme === 'dark') {
       document.documentElement.setAttribute('data-theme', 'dark');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
     }
   }
   window.gmApplyTheme = applyTheme;
@@ -24,7 +55,10 @@
     const { data } = await client.from('profiles').select('id, theme').eq('id', user.id).maybeSingle();
     if (!data) {
       let startTheme = 'light';
-      try { startTheme = localStorage.getItem('gm_theme') === 'dark' ? 'dark' : 'light'; } catch (e) {}
+      try {
+        const saved = localStorage.getItem('gm_theme');
+        if (saved === 'dark' || saved === 'classic') startTheme = saved;
+      } catch (e) {}
       await client.from('profiles').insert({
         id: user.id,
         theme: startTheme,

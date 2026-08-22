@@ -4,11 +4,16 @@
 
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
-  theme text not null default 'light' check (theme in ('light', 'dark')),
+  theme text not null default 'light' check (theme in ('light', 'dark', 'classic')),
   display_name text,
   avatar_url text,
   updated_at timestamptz not null default now()
 );
+
+-- widen the allowed values if this table was already created by an earlier
+-- version of this script (light/dark only, before "classic" existed)
+alter table public.profiles drop constraint if exists profiles_theme_check;
+alter table public.profiles add constraint profiles_theme_check check (theme in ('light', 'dark', 'classic'));
 
 alter table public.profiles enable row level security;
 
