@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="ka">
 <head>
+<script>
+  (function(){try{if(localStorage.getItem('gm_theme')==='dark'){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();
+</script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>GoodMotoway — Admin</title>
@@ -10,213 +13,182 @@
 </script>
 <script defer src="/_vercel/insights/script.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script defer src="auth.js"></script>
+<link rel="stylesheet" href="auth.css" />
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800&display=swap');
 
   :root {
     --ink: #14171C;
-    --panel: #1B1F26;
     --paper: #F3F1EB;
     --red: #D8253B;
     --red-dark: #A60F1E;
     --sage: #5F7052;
     --line-light: #E4E1D8;
     --slate: #8A93A0;
-    --steel: #3A414D;
+    --surface: #ffffff;
+    --text: var(--ink);
+  }
+  :root[data-theme="dark"] {
+    --paper: #14171C;
+    --surface: #1B1F26;
+    --text: #F3F1EB;
+    --line-light: #262B33;
   }
   * { box-sizing: border-box; }
   body {
-    margin: 0; font-family: 'Noto Sans Georgian', sans-serif; background: var(--paper); color: var(--ink);
+    margin: 0; font-family: 'Noto Sans Georgian', sans-serif; background: var(--paper); color: var(--text);
     -webkit-font-smoothing: antialiased;
   }
   a { text-decoration: none; }
-  .display { font-family: 'Rajdhani', 'Noto Sans Georgian', sans-serif; font-weight: 700; letter-spacing: 0.3px; }
+  .display { font-weight: 700; letter-spacing: -0.01em; }
   ::selection { background: rgba(216,37,59,0.22); }
 
   /* ---- Topbar ---- */
   .topbar {
-    background: var(--ink); color: #fff; padding: 14px 24px; display: flex;
+    background: var(--paper); color: var(--text); padding: 18px 32px; display: flex;
     align-items: center; justify-content: space-between; gap: 12px;
-    position: sticky; top: 0; z-index: 20; border-bottom: 3px solid var(--red);
+    position: sticky; top: 0; z-index: 20; border-bottom: 1px solid var(--line-light);
   }
   .brand { display: flex; align-items: center; gap: 10px; }
-  .brand-text { font-weight: 700; font-size: 19px; letter-spacing: 0.2px; }
+  .brand-text { font-weight: 700; font-size: 17px; letter-spacing: -0.01em; }
   .brand-text b { color: var(--red); }
   .brand-tag {
-    font-family: 'Rajdhani', 'Noto Sans Georgian', sans-serif; font-weight: 700; font-size: 11px;
-    letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink); background: var(--red);
-    padding: 3px 8px; border-radius: 4px;
+    font-weight: 700; font-size: 11px;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--slate); background: var(--surface);
+    border: 1px solid var(--line-light); padding: 3px 8px; border-radius: 4px;
   }
-  .top-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .top-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
   /* ---- Buttons ---- */
   .btn {
     border: none; border-radius: 8px; padding: 10px 16px; cursor: pointer; font-weight: 700;
-    font-size: 13.5px; font-family: 'Noto Sans Georgian', sans-serif; transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    font-size: 13.5px; font-family: 'Noto Sans Georgian', sans-serif; transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
   }
-  .btn:hover { transform: translateY(-1px); }
-  .btn:active { transform: translateY(0); }
   .btn:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
-  .btn.red { background: var(--red); color: #fff; box-shadow: 0 6px 16px rgba(216,37,59,0.28); }
-  .btn.red:hover { box-shadow: 0 8px 20px rgba(216,37,59,0.36); }
-  .btn.dark { background: var(--ink); color: #fff; border: 1px solid var(--steel); }
-  .btn.dark:hover { border-color: var(--red); }
+  .btn.red { background: var(--red); color: #fff; }
+  .btn.red:hover { background: var(--red-dark); }
+  .btn.dark { background: var(--ink); color: #fff; }
+  .btn.dark:hover { background: var(--red-dark); }
   .btn.ghost { background: transparent; color: var(--slate); border: 1px solid var(--line-light); }
-  .btn.ghost:hover { color: var(--ink); border-color: var(--slate); }
+  .btn.ghost:hover { color: var(--text); border-color: var(--text); }
 
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 26px 24px 60px; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 32px 32px 60px; }
 
-  /* ---- Login gate: dark access panel ---- */
+  /* ---- Login gate ---- */
   .admin-login {
-    max-width: 380px; margin: 40px auto; background: var(--panel); color: #F3F1EB;
-    border-radius: 16px; padding: 28px 26px; box-shadow: 0 20px 50px rgba(20,23,28,0.28);
-    border-top: 3px solid var(--red); text-align: center;
+    max-width: 380px; margin: 60px auto; background: var(--surface); color: var(--text);
+    border-radius: 16px; padding: 32px 28px; border: 1px solid var(--line-light); text-align: center;
   }
   .admin-login .eyebrow {
     display: inline-flex; align-items: center; gap: 8px; color: var(--red); font-size: 12px;
-    font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; margin-bottom: 6px;
+    font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; margin-bottom: 8px;
   }
-  .admin-login .eyebrow::before { content: ""; width: 20px; height: 2px; background: var(--red); display: block; }
-  .admin-login h2 { margin: 0 0 18px; font-size: 20px; font-weight: 700; }
+  .admin-login .eyebrow::before { content: ""; width: 18px; height: 1px; background: var(--red); display: block; }
+  .admin-login h2 { margin: 0 0 20px; font-size: 20px; font-weight: 700; }
   .admin-login .field { text-align: left; margin-bottom: 14px; }
-  .admin-login label { color: #B7BAC1; }
-  .admin-login input {
-    background: var(--ink); border: 1px solid var(--steel); color: #F3F1EB;
-  }
-  .admin-login input:focus { box-shadow: 0 0 0 3px rgba(216,37,59,0.3); }
-  .admin-login .btn.red { width: 100%; padding: 12px; font-size: 14px; }
+  .admin-login label { color: var(--slate); }
+  .admin-login input { background: var(--surface); border: 1px solid var(--line-light); color: var(--text); }
+  .admin-login .btn.red { width: 100%; padding: 13px; font-size: 14px; }
 
   /* ---- Form fields ---- */
   .field { flex: 1 1 220px; }
   label { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 700; color: var(--slate); letter-spacing: 0.2px; }
   input, textarea, select {
     width: 100%; border: 1px solid var(--line-light); border-radius: 8px; padding: 10px 12px;
-    font-size: 14px; color: var(--ink); background: #fff; transition: 0.2s ease;
+    font-size: 14px; color: var(--text); background: var(--surface); transition: border-color 0.2s ease;
     font-family: 'Noto Sans Georgian', sans-serif;
   }
-  input:focus, textarea:focus, select:focus {
-    outline: none; border-color: var(--red); box-shadow: 0 0 0 3px rgba(216,37,59,0.15);
-  }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--text); }
   textarea { min-height: 90px; resize: vertical; }
-  input.invalid, textarea.invalid {
-    border-color: var(--red-dark); background: #fdf2f3;
-  }
+  input.invalid, textarea.invalid { border-color: var(--red-dark); background: #fdf2f3; }
 
   /* ---- Workspace ---- */
   .admin-body {
     display: none; grid-template-columns: 1.05fr 0.95fr; gap: 20px;
-    margin-top: 4px; align-items: start;
+    margin-top: 8px; align-items: start;
   }
-  .panel {
-    background: #fff; border: 1px solid var(--line-light); border-radius: 16px;
-    padding: 20px; box-shadow: 0 10px 28px rgba(20,23,28,0.06);
-  }
-  .panel-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; }
-  .panel-head h3 { margin: 0; font-size: 15px; }
-  .panel-head .count {
-    font-family: 'Rajdhani', 'Noto Sans Georgian', sans-serif; font-weight: 700; color: var(--slate); font-size: 13px;
-  }
+  .panel { background: var(--surface); border: 1px solid var(--line-light); border-radius: 16px; padding: 22px; }
+  .panel-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; }
+  .panel-head h3 { margin: 0; font-size: 15px; font-weight: 700; }
+  .panel-head .count { font-weight: 700; color: var(--slate); font-size: 13px; }
 
   .group-label {
-    display: flex; align-items: center; gap: 8px; margin: 18px 0 10px;
-    font-size: 11px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--red-dark);
+    display: flex; align-items: center; gap: 8px; margin: 20px 0 12px;
+    font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--red-dark);
   }
   .group-label:first-child { margin-top: 4px; }
   .group-label::after { content: ""; flex: 1; height: 1px; background: var(--line-light); }
 
   .admin-form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
   .admin-form .full { grid-column: 1 / -1; }
-  .form-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line-light); }
+  .form-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line-light); }
 
   .upload-shell {
     display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-    padding: 14px; border-radius: 14px; background: linear-gradient(135deg, #fdf2f3, #fff);
-    border: 1.5px dashed rgba(216,37,59,0.35);
+    padding: 16px; border-radius: 14px; background: var(--paper);
+    border: 1px dashed var(--line-light);
   }
   .upload-preview {
-    width: 76px; height: 76px; border-radius: 12px; overflow: hidden; flex-shrink: 0;
-    background: #f2ecea; border: 1px solid var(--line-light); display: flex; align-items: center; justify-content: center;
+    width: 72px; height: 72px; border-radius: 10px; overflow: hidden; flex-shrink: 0;
+    background: var(--surface); border: 1px solid var(--line-light); display: flex; align-items: center; justify-content: center;
   }
-  .upload-preview img {
-    width: 100%; height: 100%; object-fit: cover; display: none;
-  }
+  .upload-preview img { width: 100%; height: 100%; object-fit: cover; display: none; }
   .upload-meta { flex: 1 1 220px; }
   .upload-label {
     display: inline-flex; align-items: center; gap: 8px;
-    padding: 10px 14px; border-radius: 999px; background: var(--red); color: #fff;
-    font-weight: 700; font-size: 13.5px; cursor: pointer; box-shadow: 0 8px 18px rgba(216,37,59,0.24);
-    transition: transform 0.15s ease;
+    padding: 10px 14px; border-radius: 999px; background: var(--ink); color: #fff;
+    font-weight: 700; font-size: 13.5px; cursor: pointer;
   }
-  .upload-label:hover { transform: translateY(-1px); }
-  .upload-hint {
-    margin-top: 8px; font-size: 12px; color: var(--slate);
-  }
-  .upload-input {
-    position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none;
-  }
+  .upload-label:hover { background: var(--red-dark); }
+  .upload-hint { margin-top: 8px; font-size: 12px; color: var(--slate); }
+  .upload-input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 
   .feedback {
     margin-top: 14px; font-size: 12.5px; font-weight: 600; color: var(--red-dark);
-    padding: 9px 12px; border-radius: 8px; background: rgba(166,15,30,0.07);
-    border-left: 3px solid var(--red-dark); min-height: 14px; display: none;
+    padding: 10px 12px; border-radius: 8px; background: rgba(166,15,30,0.06);
+    min-height: 14px; display: none;
   }
   .feedback:not(:empty) { display: block; }
-  .feedback.success { color: #3f5836; background: rgba(95,112,82,0.1); border-left-color: var(--sage); }
+  .feedback.success { color: #3f5836; background: rgba(95,112,82,0.1); }
 
   /* ---- Product list ---- */
-  .product-list {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;
-    max-height: none; overflow: visible;
-  }
+  .product-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
   .product-item {
     display: flex; flex-direction: column;
-    border: 1px solid var(--line-light); border-radius: 14px; background: #fff; overflow: hidden;
-    box-shadow: 0 8px 20px rgba(20, 23, 28, 0.05); transition: box-shadow 0.2s ease, transform 0.2s ease;
+    border: 1px solid var(--line-light); border-radius: 14px; background: var(--surface); overflow: hidden;
+    transition: border-color 0.2s ease;
   }
-  .product-item:hover { box-shadow: 0 14px 30px rgba(20,23,28,0.1); transform: translateY(-2px); }
-  .product-media {
-    position: relative; width: 100%; aspect-ratio: 4 / 3; background: #f2ecea; overflow: hidden;
-  }
-  .product-media img {
-    width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;
-  }
+  .product-item:hover { border-color: var(--text); }
+  .product-media { position: relative; width: 100%; aspect-ratio: 4 / 3; background: var(--paper); overflow: hidden; }
+  .product-media img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
   .product-ribbon {
-    position: absolute; top: 10px; left: -30px; width: 130px; text-align: center;
-    background: var(--red-dark); color: #fff; font-size: 10.5px; font-weight: 700;
-    letter-spacing: 0.3px; padding: 4px 0; transform: rotate(-45deg);
-    box-shadow: 0 3px 8px rgba(0,0,0,0.22);
+    position: absolute; top: 10px; left: 10px; text-align: center;
+    background: var(--ink); color: #fff; font-size: 10.5px; font-weight: 700;
+    letter-spacing: 0.3px; padding: 4px 10px; border-radius: 999px;
   }
-  .product-body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 6px; }
-  .product-title { margin: 0; font-size: 17px; }
+  .product-body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 6px; }
+  .product-title { margin: 0; font-size: 16px; font-weight: 700; }
   .product-desc {
-    margin: 0; color: #5b6470; font-size: 12.5px; line-height: 1.45;
+    margin: 0; color: var(--slate); font-size: 12.5px; line-height: 1.45;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   }
-  .product-meta {
-    display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
-    flex-wrap: wrap;
-  }
-  .product-price {
-    font-family: 'Rajdhani', 'Noto Sans Georgian', sans-serif; font-weight: 700; color: var(--red-dark); font-size: 19px;
-  }
-  .product-speedline {
-    font-family: 'Rajdhani', 'Noto Sans Georgian', sans-serif; font-weight: 600; font-size: 12.5px; color: var(--slate);
-  }
+  .product-meta { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+  .product-price { font-weight: 700; color: var(--red-dark); font-size: 18px; }
+  .product-speedline { font-weight: 600; font-size: 12px; color: var(--slate); }
   .product-specs {
     display: grid; grid-template-columns: 1fr 1fr; gap: 5px 10px;
-    font-size: 11.5px; color: #49515b; padding-top: 6px; border-top: 1px dashed var(--line-light);
-    font-family: 'Rajdhani', 'Noto Sans Georgian', sans-serif; font-weight: 600;
+    font-size: 11.5px; color: var(--slate); padding-top: 8px; border-top: 1px solid var(--line-light);
+    font-weight: 600;
   }
-  .product-specs span {
-    display: inline-flex; gap: 5px; align-items: center;
-  }
-  .product-actions {
-    display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;
-  }
+  .product-specs span { display: inline-flex; gap: 5px; align-items: center; }
+  .product-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
   .product-actions .btn { padding: 8px 12px; font-size: 12.5px; flex: 1 1 auto; }
-  .small { font-size: 12px; color: #5b6470; }
+  .small { font-size: 12px; color: var(--slate); }
 
   @media (max-width: 800px) {
+    .topbar { padding: 16px 20px; }
+    .wrap { padding: 24px 20px 60px; }
     .admin-body { grid-template-columns: 1fr; }
   }
 
@@ -224,7 +196,7 @@
   .color-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
   .color-chip {
     display: flex; align-items: center; gap: 6px; padding: 5px 8px 5px 5px; border-radius: 999px;
-    background: #fff; border: 1px solid var(--line-light); font-size: 12.5px; font-weight: 600;
+    background: var(--surface); border: 1px solid var(--line-light); font-size: 12.5px; font-weight: 600;
   }
   .color-chip .swatch { width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.15); flex-shrink: 0; }
   .color-chip button {
@@ -234,7 +206,7 @@
   .color-chip button:hover { color: var(--red-dark); }
   .add-color-btn {
     display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px;
-    border: 1.5px dashed rgba(216,37,59,0.4); background: #fff; color: var(--red-dark); font-weight: 700; font-size: 12.5px;
+    border: 1px dashed var(--slate); background: var(--surface); color: var(--text); font-weight: 700; font-size: 12.5px;
   }
 
   .color-modal-overlay {
@@ -242,9 +214,9 @@
     align-items: center; justify-content: center; padding: 16px;
   }
   .color-modal-overlay.show { display: flex; }
-  .color-modal { background: #fff; border-radius: 16px; padding: 20px; max-width: 460px; width: 100%; max-height: 90vh; overflow: auto; }
-  .color-modal h4 { margin: 0 0 12px; font-size: 15px; }
-  .color-modal-canvas-wrap { position: relative; border-radius: 10px; overflow: hidden; background: #f2ecea; }
+  .color-modal { background: var(--surface); border-radius: 16px; padding: 22px; max-width: 460px; width: 100%; max-height: 90vh; overflow: auto; }
+  .color-modal h4 { margin: 0 0 12px; font-size: 15px; font-weight: 700; }
+  .color-modal-canvas-wrap { position: relative; border-radius: 10px; overflow: hidden; background: var(--paper); }
   #colorCanvas { width: 100%; display: block; cursor: crosshair; touch-action: none; }
   .color-live-preview {
     position: absolute; top: 8px; right: 8px; display: flex; align-items: center; gap: 6px;
@@ -269,6 +241,7 @@
     <span class="brand-tag">Admin</span>
   </div>
   <div class="top-actions">
+    <div id="authSlot"></div>
     <a class="btn ghost" href="index.html">საიტის დაბრუნება</a>
     <button class="btn dark" id="logoutBtn" type="button" style="display:none;">გასვლა</button>
   </div>

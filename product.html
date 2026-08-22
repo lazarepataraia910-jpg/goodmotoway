@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="ka">
 <head>
+<script>
+  (function(){try{if(localStorage.getItem('gm_theme')==='dark'){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();
+</script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>GoodMotoway — პროდუქტის გალერეა</title>
@@ -9,58 +12,66 @@
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 </script>
 <script defer src="/_vercel/insights/script.js"></script>
+<link rel="stylesheet" href="auth.css" />
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800&display=swap');
 
   :root {
     --ink: #14171C;
-    --panel: #1B1F26;
     --paper: #F3F1EB;
     --red: #D8253B;
     --red-dark: #A60F1E;
     --sage: #5F7052;
     --line-light: #E4E1D8;
     --slate: #8A93A0;
+    --surface: #ffffff;
+    --text: var(--ink);
+  }
+  :root[data-theme="dark"] {
+    --paper: #14171C;
+    --surface: #1B1F26;
+    --text: #F3F1EB;
+    --line-light: #262B33;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; font-family: 'Noto Sans Georgian', sans-serif; background: var(--paper); color: var(--ink); }
+  body { margin: 0; font-family: 'Noto Sans Georgian', sans-serif; background: var(--paper); color: var(--text); }
   button, a { font-family: 'Noto Sans Georgian', sans-serif; }
   button { cursor: pointer; }
-  .display { font-family: 'Rajdhani', 'Noto Sans Georgian', sans-serif; font-weight: 700; letter-spacing: 0.3px; }
+  .display { font-weight: 700; letter-spacing: -0.01em; }
   .icon { width: 15px; height: 15px; display: inline-block; vertical-align: -3px; flex-shrink: 0; }
   a { text-decoration: none; color: inherit; }
 
   header {
-    background: var(--ink); color: #F3F1EB; padding: 14px 24px;
+    background: var(--paper); color: var(--text); padding: 20px 32px;
     display: flex; align-items: center; justify-content: space-between;
-    position: sticky; top: 0; z-index: 20; border-bottom: 3px solid var(--red);
+    position: sticky; top: 0; z-index: 20; border-bottom: 1px solid var(--line-light);
   }
-  .logo-text { font-size: 20px; letter-spacing: 0.5px; }
+  .logo-text { font-size: 18px; letter-spacing: -0.01em; font-weight: 700; }
   .logo-text b { color: var(--red); }
+  .header-actions { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
   .back-link {
     display: flex; align-items: center; gap: 7px; background: transparent;
-    border: 1px solid #3A414D; color: #F3F1EB; border-radius: 8px; padding: 9px 14px; font-size: 14px; font-weight: 700;
-    transition: 0.2s ease;
+    color: var(--slate); border-radius: 8px; padding: 9px 12px; font-size: 13.5px; font-weight: 600;
+    transition: color 0.15s ease, background 0.15s ease;
   }
-  .back-link:hover { background: rgba(216,37,59,0.15); border-color: var(--red); }
+  .back-link:hover { color: var(--text); background: rgba(20,23,28,0.05); }
 
   .breadcrumb {
-    max-width: 1160px; margin: 22px auto 0; padding: 0 24px; font-size: 13px; color: var(--slate);
+    max-width: 1160px; margin: 24px auto 0; padding: 0 32px; font-size: 13px; color: var(--slate);
     display: flex; align-items: center; gap: 6px;
   }
   .breadcrumb a { color: var(--slate); }
   .breadcrumb a:hover { color: var(--red-dark); }
-  .breadcrumb span.current { color: var(--ink); font-weight: 600; }
+  .breadcrumb span.current { color: var(--text); font-weight: 600; }
 
-  main { max-width: 1160px; margin: 0 auto; padding: 16px 24px 70px; }
+  main { max-width: 1160px; margin: 0 auto; padding: 20px 32px 80px; }
 
   .detail-card {
-    background: #fff; border: 1px solid var(--line-light); border-radius: 18px; overflow: hidden;
-    box-shadow: 0 16px 40px rgba(20,23,28,0.06);
+    background: var(--surface); border: 1px solid var(--line-light); border-radius: 20px; overflow: hidden;
   }
   .detail-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; }
 
-  .gallery-side { padding: 28px; border-right: 1px solid var(--line-light); }
+  .gallery-side { padding: 32px; border-right: 1px solid var(--line-light); }
   .main-image {
     width: 100%; aspect-ratio: 4 / 3; background: #EFECE3; border-radius: 14px; overflow: hidden;
     position: relative; cursor: zoom-in;
@@ -68,7 +79,7 @@
   .main-image img {
     width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.35s ease;
   }
-  .main-image:hover img { transform: scale(1.06); }
+  .main-image:hover img { transform: scale(1.04); }
   .img-counter {
     position: absolute; bottom: 12px; right: 12px; background: rgba(20,23,28,0.75); color: #fff;
     font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 999px;
@@ -84,25 +95,25 @@
   .thumb:hover { border-color: var(--line-light); }
   .thumb.active { border-color: var(--red); }
 
-  .info-side { padding: 32px; display: flex; flex-direction: column; }
+  .info-side { padding: 36px; display: flex; flex-direction: column; }
   .eyebrow-tag {
     display: inline-flex; align-self: flex-start; align-items: center; gap: 6px;
-    background: #FBEAEA; color: var(--red-dark); font-size: 12px; font-weight: 700;
+    background: var(--paper); color: var(--red-dark); font-size: 11.5px; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.5px; padding: 6px 12px; border-radius: 999px; margin-bottom: 14px;
   }
   .stock-tag {
     display: inline-flex; align-self: flex-start; align-items: center; gap: 6px;
-    background: #EDF4EA; color: var(--sage, #5F7052); font-size: 12px; font-weight: 700;
+    background: var(--paper); color: var(--sage); font-size: 11.5px; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.5px; padding: 6px 12px; border-radius: 999px;
     margin-bottom: 14px; margin-left: 8px;
   }
-  .stock-tag.out { background: #F0F0EE; color: var(--slate); }
-  .product-title { font-size: 32px; margin: 0 0 6px; line-height: 1.15; }
+  .stock-tag.out { color: var(--slate); }
+  .product-title { font-size: 32px; margin: 0 0 6px; line-height: 1.15; font-weight: 700; letter-spacing: -0.01em; }
   .warranty-note { color: var(--sage); font-size: 13px; font-weight: 600; margin-bottom: 18px; display: flex; align-items: center; gap: 6px; }
 
   .color-picker { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
   .color-picker-label { font-size: 12px; font-weight: 700; color: var(--slate); text-transform: uppercase; letter-spacing: 0.4px; }
-  .color-picker-label b { color: var(--ink); text-transform: none; letter-spacing: normal; }
+  .color-picker-label b { color: var(--text); text-transform: none; letter-spacing: normal; }
   .color-swatch-row { display: flex; gap: 8px; flex-wrap: wrap; }
   .color-swatch-btn {
     width: 28px; height: 28px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1.5px var(--line-light);
@@ -112,64 +123,65 @@
   .color-swatch-btn.active { box-shadow: 0 0 0 2px var(--red); }
 
   .price-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 20px; }
-  .price { font-family: 'Rajdhani', sans-serif; font-size: 38px; font-weight: 700; color: var(--ink); }
+  .price { font-size: 36px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
   .price small { font-size: 13px; color: var(--slate); font-weight: 500; }
 
-  .desc-text { color: #40474F; font-size: 14.5px; line-height: 1.65; margin-bottom: 22px; white-space: pre-line; }
+  .desc-text { color: var(--slate); font-size: 14.5px; line-height: 1.65; margin-bottom: 22px; white-space: pre-line; }
 
   .spec-grid {
     display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px;
-    padding: 16px 0; border-top: 1px dashed var(--line-light); border-bottom: 1px dashed var(--line-light);
+    padding: 18px 0; border-top: 1px solid var(--line-light); border-bottom: 1px solid var(--line-light);
     margin-bottom: 24px;
   }
-  .spec-item { display: flex; align-items: flex-start; gap: 8px; font-size: 12.5px; color: #40474F; }
+  .spec-item { display: flex; align-items: flex-start; gap: 8px; font-size: 12.5px; color: var(--slate); }
   .spec-item svg { margin-top: 2px; color: var(--red-dark); flex-shrink: 0; }
-  .sv-label { display: block; color: #8A93A0; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.3px; }
-  .sv-value { font-weight: 600; color: var(--ink); }
+  .sv-label { display: block; color: var(--slate); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.3px; }
+  .sv-value { font-weight: 600; color: var(--text); }
 
   .cta-row { display: flex; gap: 10px; margin-top: auto; flex-wrap: wrap; }
   .btn-primary {
-    flex: 1 1 180px; border: none; background: var(--red); color: #fff; border-radius: 10px;
-    padding: 14px 18px; font-size: 15px; font-weight: 700; transition: 0.2s ease;
+    flex: 1 1 180px; border: none; background: var(--ink); color: #fff; border-radius: 10px;
+    padding: 14px 18px; font-size: 15px; font-weight: 700; transition: background 0.15s ease;
   }
   .btn-primary:hover { background: var(--red-dark); }
   .btn-secondary {
-    flex: 1 1 140px; border: 1px solid var(--line-light); background: #fff; color: var(--ink); border-radius: 10px;
+    flex: 1 1 140px; border: 1px solid var(--line-light); background: var(--surface); color: var(--text); border-radius: 10px;
     padding: 14px 18px; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;
   }
   .btn-secondary:hover { background: var(--paper); }
 
   /* empty / not found state */
   .empty-wrap {
-    text-align: center; padding: 80px 24px; background: #fff; border: 1px dashed var(--line-light);
-    border-radius: 18px; color: var(--slate);
+    text-align: center; padding: 80px 24px; background: var(--surface); border: 1px solid var(--line-light);
+    border-radius: 20px; color: var(--slate);
   }
   .empty-wrap .ok-icon {
-    width: 56px; height: 56px; border-radius: 50%; background: var(--paper); color: var(--red-dark);
+    width: 52px; height: 52px; border-radius: 50%; background: var(--paper); color: var(--red-dark);
     display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;
   }
-  .empty-wrap h2 { color: var(--ink); font-size: 20px; margin-bottom: 8px; }
+  .empty-wrap h2 { color: var(--text); font-size: 19px; margin-bottom: 8px; font-weight: 700; }
   .empty-wrap a.btn-primary { display: inline-flex; align-items: center; justify-content: center; margin-top: 16px; text-decoration: none; max-width: 220px; }
 
-  footer { background: var(--ink); color: #8A93A0; padding: 22px 24px; font-size: 13px; text-align: center; margin-top: 40px; }
+  footer { background: var(--paper); color: var(--slate); padding: 32px 24px; font-size: 13px; text-align: center; margin-top: 48px; border-top: 1px solid var(--line-light); }
   footer b { color: var(--red); }
 
   @media (max-width: 860px) {
     .detail-grid { grid-template-columns: 1fr; }
     .gallery-side { border-right: none; border-bottom: 1px solid var(--line-light); }
     .product-title { font-size: 26px; }
-    .price { font-size: 30px; }
+    .price { font-size: 28px; }
+    header { padding: 16px 20px; }
+    main { padding: 16px 20px 60px; }
+    .breadcrumb { padding: 0 20px; }
   }
 
   .whatsapp-float {
-    position: fixed; right: 20px; bottom: 20px; width: 58px; height: 58px; border-radius: 50%;
+    position: fixed; right: 20px; bottom: 20px; width: 56px; height: 56px; border-radius: 50%;
     background: #25D366; display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 8px 20px rgba(37,211,102,0.4); z-index: 50; transition: transform 0.15s ease;
+    box-shadow: 0 4px 14px rgba(37,211,102,0.3); z-index: 50; transition: transform 0.15s ease;
   }
-  .whatsapp-float:hover { transform: scale(1.06); }
-  .whatsapp-float svg { width: 30px; height: 30px; fill: #fff; }
-
-  .header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+  .whatsapp-float:hover { transform: scale(1.05); }
+  .whatsapp-float svg { width: 28px; height: 28px; fill: #fff; }
 </style>
 </head>
 <body>
@@ -181,6 +193,7 @@
 <header>
   <div class="logo-text display">Good<b>Motoway</b></div>
   <div class="header-actions">
+    <div id="authSlot"></div>
     <a class="back-link" href="faq.html">კითხვები</a>
     <a class="back-link" href="compare.html">შედარება</a>
     <a class="back-link" href="support.html">მხარდაჭერა</a>
@@ -204,6 +217,7 @@
 <footer>Good<b>Motoway</b> · ელექტრო მოპედების ავტორიზებული დილერი · უნივერსიტეტის ქუჩა N6 · 551 48 48 83</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="auth.js"></script>
 <script>
 (async function () {
   const SUPABASE_URL = 'https://lceebrhbvnyzoxkauugo.supabase.co';
