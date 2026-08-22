@@ -91,6 +91,18 @@
   .theme-option .to-check { color: var(--red); display: none; }
   .theme-option.active .to-check { display: inline; }
 
+  .theme-save-row { display: flex; align-items: center; gap: 14px; margin-top: 16px; }
+  .btn-save-theme {
+    border: none; background: var(--ink); color: #fff; border-radius: 10px;
+    padding: 12px 20px; font-size: 14px; font-weight: 700; transition: background 0.15s ease;
+  }
+  .btn-save-theme:hover { background: var(--red-dark); }
+  .btn-save-theme:disabled { opacity: 0.6; cursor: default; }
+  .save-feedback {
+    font-size: 13px; font-weight: 700; color: var(--sage); opacity: 0; transition: opacity 0.2s ease;
+  }
+  .save-feedback.show { opacity: 1; }
+
   .signout-btn {
     border: 1px solid var(--line-light); background: var(--surface); color: var(--red-dark);
     border-radius: 10px; padding: 12px 18px; font-size: 14px; font-weight: 700;
@@ -190,6 +202,10 @@
             <span class="to-label"><span class="to-check">✓</span> დიფოლტი</span>
           </button>
         </div>
+        <div class="theme-save-row">
+          <button type="button" class="btn-save-theme" id="saveThemeBtn">შენახვა</button>
+          <span class="save-feedback" id="saveThemeFeedback">შენახულია ✓</span>
+        </div>
       </div>
 
       <button type="button" class="signout-btn" id="signOutBtn">გასვლა</button>
@@ -203,12 +219,27 @@
     markActive(theme);
 
     document.querySelectorAll('.theme-option').forEach(btn => {
-      btn.addEventListener('click', async () => {
+      btn.addEventListener('click', () => {
         const choice = btn.dataset.themeChoice;
         markActive(choice);
         window.gmApplyTheme(choice);
-        await window.gmAuthClient.from('profiles').update({ theme: choice, updated_at: new Date().toISOString() }).eq('id', user.id);
       });
+    });
+
+    const saveBtn = document.getElementById('saveThemeBtn');
+    const saveFeedback = document.getElementById('saveThemeFeedback');
+    let saveFeedbackTimer = null;
+    saveBtn.addEventListener('click', async () => {
+      const active = document.querySelector('.theme-option.active');
+      const choice = active ? active.dataset.themeChoice : 'light';
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'ინახება...';
+      await window.gmAuthClient.from('profiles').update({ theme: choice, updated_at: new Date().toISOString() }).eq('id', user.id);
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'შენახვა';
+      saveFeedback.classList.add('show');
+      clearTimeout(saveFeedbackTimer);
+      saveFeedbackTimer = setTimeout(() => saveFeedback.classList.remove('show'), 2200);
     });
 
     document.getElementById('signOutBtn').addEventListener('click', async () => {
@@ -223,7 +254,7 @@
     cta.innerHTML = `
       <button type="button" class="auth-chip auth-login-btn" id="profileGoogleLoginBtn">
         <svg viewBox="0 0 24 24" width="16" height="16"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.7-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"/><path fill="#34A853" d="M12 24c3.2 0 5.9-1.1 7.9-2.9l-3.9-3c-1.1.7-2.4 1.1-4 1.1-3.1 0-5.7-2.1-6.6-4.9H1.4v3.1C3.4 21.3 7.4 24 12 24z"/><path fill="#FBBC05" d="M5.4 14.3c-.2-.7-.4-1.5-.4-2.3s.1-1.6.4-2.3V6.6H1.4C.5 8.3 0 10.1 0 12s.5 3.7 1.4 5.4l4-3.1z"/><path fill="#EA4335" d="M12 4.8c1.7 0 3.3.6 4.5 1.7l3.4-3.4C17.9 1.2 15.2 0 12 0 7.4 0 3.4 2.7 1.4 6.6l4 3.1c.9-2.8 3.5-4.9 6.6-4.9z"/></svg>
-        Google-ით შესვლა
+        შესვლა
       </button>
     `;
     document.getElementById('profileGoogleLoginBtn').addEventListener('click', () => {
