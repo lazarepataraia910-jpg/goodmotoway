@@ -102,6 +102,7 @@
     font-size: 13px; font-weight: 700; color: var(--sage); opacity: 0; transition: opacity 0.2s ease;
   }
   .save-feedback.show { opacity: 1; }
+  .save-feedback.error { color: var(--red-dark); }
 
   .signout-btn {
     border: 1px solid var(--line-light); background: var(--surface); color: var(--red-dark);
@@ -234,10 +235,18 @@
       const choice = active ? active.dataset.themeChoice : 'light';
       saveBtn.disabled = true;
       saveBtn.textContent = 'ინახება...';
-      await window.gmAuthClient.from('profiles').update({ theme: choice, updated_at: new Date().toISOString() }).eq('id', user.id);
+      const { error } = await window.gmAuthClient.from('profiles').update({ theme: choice, updated_at: new Date().toISOString() }).eq('id', user.id);
       saveBtn.disabled = false;
       saveBtn.textContent = 'შენახვა';
-      saveFeedback.classList.add('show');
+      if (error) {
+        console.error('Failed to save theme', error);
+        saveFeedback.textContent = 'შენახვა ვერ მოხერხდა — სცადე თავიდან';
+        saveFeedback.classList.add('show', 'error');
+      } else {
+        saveFeedback.textContent = 'შენახულია ✓';
+        saveFeedback.classList.remove('error');
+        saveFeedback.classList.add('show');
+      }
       clearTimeout(saveFeedbackTimer);
       saveFeedbackTimer = setTimeout(() => saveFeedback.classList.remove('show'), 2200);
     });
