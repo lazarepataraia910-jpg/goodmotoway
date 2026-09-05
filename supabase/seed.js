@@ -2,6 +2,13 @@
 // uploads their base64 images to Supabase Storage, and inserts rows into
 // the `products` table. Run once after applying schema.sql.
 //
+// NOTE: since migration_lock_admin_writes.sql, storage uploads and product
+// inserts require an authenticated admin session (RLS checks the caller's
+// email) — a bare anon key can no longer write. Set SUPABASE_ANON_KEY to an
+// admin user's access token instead (sign into admin.html, copy the
+// `access_token` out of the sb-*-auth-token entry in localStorage) if you
+// need to run this again.
+//
 // Usage:
 //   $env:SUPABASE_URL = "https://xxxx.supabase.co"
 //   $env:SUPABASE_ANON_KEY = "eyJ..."

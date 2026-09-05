@@ -4,6 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>მოდელების შედარება — GoodMotoway</title>
+<meta name="description" content="შეადარე GoodMotoway-ს ელექტრო მოპედების მოდელები მახასიათებლების მიხედვით და აირჩიე შენთვის საუკეთესო ვარიანტი." />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
 <!-- Vercel Web Analytics -->
 <script>
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
@@ -176,7 +178,7 @@
 </a>
 
 <header>
-  <div class="logo-text display">Good<b>Motoway</b></div>
+  <a href="index.html" class="logo-text display">Good<b>Motoway</b></a>
   <div class="header-right-mini">
     <div class="header-actions" id="navLinks">
       <a class="back-link" href="faq.html">კითხვები</a>
@@ -238,7 +240,7 @@
   </div>
 </main>
 
-<footer>Good<b>Motoway</b> · ელექტრო მოპედების ავტორიზებული დილერი · უნივერსიტეტის ქუჩა N6 · 551 48 48 83</footer>
+<footer>Good<b>Motoway</b> · ელექტრო მოპედების ავტორიზებული დილერი · უნივერსიტეტის ქუჩა N6 · <a href="tel:551484883">551 48 48 83</a> · © <span id="gmYear"></span> GoodMotoway</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="auth.js"></script>
@@ -331,12 +333,13 @@
     modelGrid.innerHTML = PRODUCTS.map(p => {
       const isSelected = selected.includes(p.id);
       const isDisabled = !isSelected && selected.length >= targetCount;
+      const esc = window.gmEscapeHtml;
       return `
         <button type="button" class="model-card ${isSelected ? 'selected' : ''}" data-id="${p.id}" ${isDisabled ? 'disabled' : ''}>
           <span class="check">${isSelected ? '✓' : ''}</span>
-          <img src="${p.img}" alt="${p.name}" />
+          <img src="${esc(p.img)}" alt="${esc(p.name)}" />
           <div class="mc-body">
-            <div class="mc-name">${p.name}</div>
+            <div class="mc-name">${esc(p.name)}</div>
             <div class="mc-price">${formatPrice(p.price)} ₾</div>
           </div>
         </button>
@@ -384,6 +387,7 @@
 
   function renderComparison() {
     const chosen = selected.map(id => PRODUCTS.find(p => p.id === id)).filter(Boolean);
+    const esc = window.gmEscapeHtml;
     compareTableWrap.innerHTML = `
       <table class="compare-table">
         <thead>
@@ -392,8 +396,8 @@
             ${chosen.map(p => `
               <th>
                 <div class="compare-col-head">
-                  <img src="${p.img}" alt="${p.name}" />
-                  <span class="cc-name">${p.name}</span>
+                  <img src="${esc(p.img)}" alt="${esc(p.name)}" />
+                  <span class="cc-name">${esc(p.name)}</span>
                   <span class="cc-price">${formatPrice(p.price)} ₾</span>
                   <a href="product.html?id=${p.id}">დეტალურად →</a>
                 </div>
@@ -405,7 +409,7 @@
           ${SPEC_ROWS.map(row => `
             <tr>
               <td class="spec-col">${row.label}</td>
-              ${chosen.map(p => `<td>${row.fn(p)}</td>`).join('')}
+              ${chosen.map(p => `<td>${esc(row.fn(p))}</td>`).join('')}
             </tr>
           `).join('')}
         </tbody>

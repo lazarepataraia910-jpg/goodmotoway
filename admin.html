@@ -4,6 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>GoodMotoway — Admin</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
 <!-- Vercel Web Analytics -->
 <script>
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
@@ -48,7 +50,7 @@
     position: sticky; top: 0; z-index: 20; border-bottom: 1px solid var(--line-light);
   }
   .brand { display: flex; align-items: center; gap: 10px; }
-  .brand-text { font-weight: 700; font-size: 17px; letter-spacing: -0.01em; }
+  .brand-text { font-weight: 700; font-size: 17px; letter-spacing: -0.01em; color: inherit; }
   .brand-text b { color: var(--red); }
   .brand-tag {
     font-weight: 700; font-size: 11px;
@@ -250,7 +252,7 @@
 <body>
 <header class="topbar">
   <div class="brand">
-    <div class="brand-text">Good<b>Motoway</b></div>
+    <a href="index.html" class="brand-text">Good<b>Motoway</b></a>
     <span class="brand-tag">Admin</span>
   </div>
   <div class="top-actions">
@@ -264,11 +266,11 @@
     <div class="admin-login" id="adminLoginBox">
       <div class="eyebrow">წვდომა შეზღუდულია</div>
       <h2>ადმინისტრირების პანელი</h2>
-      <div class="field">
-        <label for="adminPassword">პაროლი</label>
-        <input type="password" id="adminPassword" placeholder="შეიყვანე პაროლი" />
-      </div>
-      <button class="btn red" id="adminLoginSubmit" type="button">შესვლა</button>
+      <p style="color:var(--slate);font-size:13px;margin:0 0 18px;line-height:1.5;">წვდომა შესაძლებელია მხოლოდ ადმინისტრატორის Google ანგარიშით.</p>
+      <button class="btn red" id="adminGoogleLoginBtn" type="button" style="display:flex;align-items:center;justify-content:center;gap:8px;">
+        <svg viewBox="0 0 24 24" width="16" height="16"><path fill="#fff" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.7-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"/><path fill="#fff" d="M12 24c3.2 0 5.9-1.1 7.9-2.9l-3.9-3c-1.1.7-2.4 1.1-4 1.1-3.1 0-5.7-2.1-6.6-4.9H1.4v3.1C3.4 21.3 7.4 24 12 24z" opacity="0.85"/><path fill="#fff" d="M5.4 14.3c-.2-.7-.4-1.5-.4-2.3s.1-1.6.4-2.3V6.6H1.4C.5 8.3 0 10.1 0 12s.5 3.7 1.4 5.4l4-3.1z" opacity="0.7"/><path fill="#fff" d="M12 4.8c1.7 0 3.3.6 4.5 1.7l3.4-3.4C17.9 1.2 15.2 0 12 0 7.4 0 3.4 2.7 1.4 6.6l4 3.1c.9-2.8 3.5-4.9 6.6-4.9z" opacity="0.55"/></svg>
+        Google ანგარიშით შესვლა
+      </button>
       <div class="feedback" id="adminFeedback"></div>
     </div>
 
@@ -429,7 +431,13 @@
   const SUPABASE_URL = 'https://lceebrhbvnyzoxkauugo.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxjZWVicmhidm55em94a2F1dWdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU3ODkyNzAsImV4cCI6MjEwMTM2NTI3MH0.IeGvLg09wjni7OJdiLeAiO3pvrXxIUgzISNKnVKpXYI';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  const ADMIN_PASSWORD = 'xtrl123';
+  const ADMIN_EMAIL = 'lazarepataraia910@gmail.com';
+
+  function escapeHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
 
   function normalizeProduct(row) {
     const images = Array.isArray(row.images) ? row.images.filter(Boolean) : [];
@@ -485,7 +493,6 @@
 
   const adminLoginBox = document.getElementById('adminLoginBox');
   const adminBody = document.getElementById('adminBody');
-  const adminPasswordEl = document.getElementById('adminPassword');
   const adminFeedbackEl = document.getElementById('adminFeedback');
   const adminProductList = document.getElementById('adminProductList');
   const productCountEl = document.getElementById('productCount');
@@ -531,8 +538,8 @@
   function renderColorList() {
     colorListEl.innerHTML = currentColors.map((c, i) => `
       <span class="color-chip">
-        <span class="swatch" style="background:${c.hex}"></span>
-        ${c.name || c.hex}
+        <span class="swatch" style="background:${escapeHtml(c.hex)}"></span>
+        ${escapeHtml(c.name || c.hex)}
         <span style="color:var(--slate);font-weight:500;">· ${(c.images || []).length} ფოტო</span>
         <button type="button" data-add-photo="${i}" aria-label="ფოტოს დამატება" title="ფოტოს დამატება">+</button>
         <button type="button" data-remove-color="${i}" aria-label="წაშლა">×</button>
@@ -728,22 +735,22 @@
     adminProductList.innerHTML = PRODUCTS.map(p => `
       <div class="product-item">
         <div class="product-media">
-          <img src="${p.img}" alt="${p.name}" />
-          <span class="product-ribbon">${p.tag}</span>
+          <img src="${escapeHtml(p.img)}" alt="${escapeHtml(p.name)}" />
+          <span class="product-ribbon">${escapeHtml(p.tag)}</span>
         </div>
         <div class="product-body">
-          <h4 class="product-title">${p.name}</h4>
-          <p class="product-desc">${p.desc}</p>
+          <h4 class="product-title">${escapeHtml(p.name)}</h4>
+          <p class="product-desc">${escapeHtml(p.desc)}</p>
           <div class="product-meta">
             <div class="product-price">${p.price} ₾</div>
             <div class="product-speedline">${p.speed} კმ/სთ · ${p.motor}W</div>
             <div style="font-size:11px;font-weight:700;color:${p.inStock ? 'var(--sage)' : 'var(--red-dark)'};">${p.inStock ? '● მარაგშია' : '● არ არის მარაგში'}</div>
           </div>
           <div class="product-specs">
-            <span>🔋 ${p.battery}</span>
-            <span>🛞 ${p.tyres}</span>
-            <span>🧯 ${p.brakes}</span>
-            <span>📏 ${p.dims}</span>
+            <span>🔋 ${escapeHtml(p.battery)}</span>
+            <span>🛞 ${escapeHtml(p.tyres)}</span>
+            <span>🧯 ${escapeHtml(p.brakes)}</span>
+            <span>📏 ${escapeHtml(p.dims)}</span>
           </div>
           <div class="product-actions">
             <button class="btn dark" type="button" data-edit="${p.id}">რედაქტირება</button>
@@ -811,11 +818,7 @@
     setFeedback('პროდუქტი წაშლილია', true);
   }
 
-  async function handleAdminLogin() {
-    if (adminPasswordEl.value.trim() !== ADMIN_PASSWORD) {
-      setFeedback('პაროლი არასწორია');
-      return;
-    }
+  async function unlockAdmin() {
     adminLoginBox.style.display = 'none';
     adminBody.style.display = 'grid';
     logoutBtn.style.display = 'inline-block';
@@ -823,6 +826,27 @@
     PRODUCTS = await loadProducts();
     renderAdminProducts();
     setFeedback('შესვლა წარმატებულია', true);
+  }
+
+  function isAdminUser(user) {
+    return !!user && typeof user.email === 'string' && user.email.toLowerCase() === ADMIN_EMAIL;
+  }
+
+  async function checkAdminSession() {
+    const { data } = await supabaseClient.auth.getSession();
+    const user = data.session && data.session.user;
+    if (isAdminUser(user)) {
+      unlockAdmin();
+      return;
+    }
+    adminLoginBox.style.display = 'block';
+    adminBody.style.display = 'none';
+    if (user) {
+      logoutBtn.style.display = 'inline-block';
+      setFeedback('ეს Google ანგარიში არ არის ადმინისტრატორი');
+    } else {
+      logoutBtn.style.display = 'none';
+    }
   }
 
   function compressImage(file, maxDim = 700, quality = 0.6) {
@@ -884,10 +908,11 @@
     }
   });
 
-  document.getElementById('adminLoginSubmit').addEventListener('click', handleAdminLogin);
-  adminPasswordEl.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') handleAdminLogin();
+  document.getElementById('adminGoogleLoginBtn').addEventListener('click', () => {
+    supabaseClient.auth.signInWithOAuth({ provider: 'google' });
   });
+  supabaseClient.auth.onAuthStateChange(() => { checkAdminSession(); });
+  checkAdminSession();
 
   productForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -985,7 +1010,8 @@
     setFeedback('რედაქტირება გაუქმებულია');
   });
 
-  logoutBtn.addEventListener('click', () => {
+  logoutBtn.addEventListener('click', async () => {
+    await supabaseClient.auth.signOut();
     window.location.href = 'index.html';
   });
 

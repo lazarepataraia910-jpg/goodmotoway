@@ -24,8 +24,21 @@ create table public.products (
   img text,
   images text[] not null default '{}',
   colors jsonb not null default '[]'::jsonb,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
+
+create or replace function public.set_products_updated_at()
+returns trigger as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$ language plpgsql;
+
+create trigger products_set_updated_at
+  before update on public.products
+  for each row execute function public.set_products_updated_at();
 
 alter table public.products enable row level security;
 
@@ -33,15 +46,17 @@ alter table public.products enable row level security;
 create policy "Public read access" on public.products
   for select using (true);
 
--- Open write access (admin gate is enforced client-side only, by choice)
-create policy "Public insert access" on public.products
-  for insert with check (true);
+-- Writes are restricted to the admin account (Google sign-in gate in
+-- admin.html). Change the email below if the admin account changes.
+create policy "Admin insert access" on public.products
+  for insert with check (lower(auth.jwt() ->> 'email') = 'lazarepataraia910@gmail.com');
 
-create policy "Public update access" on public.products
-  for update using (true) with check (true);
+create policy "Admin update access" on public.products
+  for update using (lower(auth.jwt() ->> 'email') = 'lazarepataraia910@gmail.com')
+  with check (lower(auth.jwt() ->> 'email') = 'lazarepataraia910@gmail.com');
 
-create policy "Public delete access" on public.products
-  for delete using (true);
+create policy "Admin delete access" on public.products
+  for delete using (lower(auth.jwt() ->> 'email') = 'lazarepataraia910@gmail.com');
 
 -- Storage bucket for product images
 insert into storage.buckets (id, name, public)
@@ -55,8 +70,14 @@ drop policy if exists "Public delete product images" on storage.objects;
 create policy "Public read product images" on storage.objects
   for select using (bucket_id = 'product-images');
 
-create policy "Public upload product images" on storage.objects
-  for insert with check (bucket_id = 'product-images');
+create policy "Admin upload product images" on storage.objects
+  for insert with check (
+    bucket_id = 'product-images'
+    and lower(auth.jwt() ->> 'email') = 'lazarepataraia910@gmail.com'
+  );
 
-create policy "Public delete product images" on storage.objects
-  for delete using (bucket_id = 'product-images');
+create policy "Admin delete product images" on storage.objects
+  for delete using (
+    bucket_id = 'product-images'
+    and lower(auth.jwt() ->> 'email') = 'lazarepataraia910@gmail.com'
+  );

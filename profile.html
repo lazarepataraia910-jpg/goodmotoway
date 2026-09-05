@@ -10,6 +10,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>პროფილი — GoodMotoway</title>
+<meta name="description" content="მართე შენი GoodMotoway პროფილი და დიზაინის პარამეტრები." />
+<meta name="robots" content="noindex, nofollow" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
 <!-- Vercel Web Analytics -->
 <script>
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
@@ -143,7 +146,7 @@
 </a>
 
 <header>
-  <div class="logo-text display">Good<b>Motoway</b></div>
+  <a href="index.html" class="logo-text display">Good<b>Motoway</b></a>
   <div class="header-actions">
     <a class="back-link" href="support.html">მხარდაჭერა</a>
     <a class="back-link" href="index.html">
@@ -166,7 +169,7 @@
   </div>
 </main>
 
-<footer>Good<b>Motoway</b> · ელექტრო მოპედების ავტორიზებული დილერი · უნივერსიტეტის ქუჩა N6 · 551 48 48 83</footer>
+<footer>Good<b>Motoway</b> · ელექტრო მოპედების ავტორიზებული დილერი · უნივერსიტეტის ქუჩა N6 · <a href="tel:551484883">551 48 48 83</a> · © <span id="gmYear"></span> GoodMotoway</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="auth.js"></script>
@@ -176,13 +179,14 @@
     const name = (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) || user.email || 'მომხმარებელი';
     const avatar = user.user_metadata && user.user_metadata.avatar_url;
     const email = user.email || '';
+    const esc = window.gmEscapeHtml;
 
     document.getElementById('profileContent').innerHTML = `
       <div class="profile-card">
-        ${avatar ? `<img src="${avatar}" alt="" />` : ''}
+        ${avatar ? `<img src="${esc(avatar)}" alt="" />` : ''}
         <div>
-          <div class="pc-name">${name}</div>
-          <div class="pc-email">${email}</div>
+          <div class="pc-name">${esc(name)}</div>
+          <div class="pc-email">${esc(email)}</div>
         </div>
       </div>
 

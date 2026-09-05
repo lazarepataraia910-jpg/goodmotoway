@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<script>
+  (function(){try{
+    var t = localStorage.getItem('gm_theme');
+    if (t === 'dark') { document.documentElement.setAttribute('data-theme','dark'); }
+  }catch(e){}})();
+</script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>გვერდი ვერ მოიძებნა — GoodMotoway</title>
+<meta name="description" content="მოთხოვნილი გვერდი ვერ მოიძებნა GoodMotoway-ს საიტზე." />
+<meta name="robots" content="noindex, nofollow" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --ink: #14171C;
+    --paper: #F3F1EB;
+    --red: #D8253B;
+    --red-dark: #A60F1E;
+    --line-light: #E4E1D8;
+    --slate: #8A93A0;
+    --surface: #ffffff;
+    --text: var(--ink);
+  }
+  :root[data-theme="dark"] {
+    --paper: #14171C;
+    --surface: #1B1F26;
+    --text: #F3F1EB;
+    --line-light: #262B33;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: 'Noto Sans Georgian', sans-serif; background: var(--paper); color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { text-decoration: none; color: inherit; }
+  .display { font-weight: 700; letter-spacing: -0.01em; }
+
+  header {
+    padding: 20px 32px; border-bottom: 1px solid var(--line-light);
+  }
+  .logo-text { font-size: 18px; letter-spacing: -0.01em; font-weight: 700; }
+  .logo-text b { color: var(--red); }
+
+  main {
+    min-height: calc(100vh - 140px); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center; padding: 60px 24px;
+  }
+  .code { font-size: 80px; font-weight: 800; color: var(--red); line-height: 1; margin-bottom: 12px; }
+  h1 { margin: 0 0 10px; font-size: 22px; }
+  p { margin: 0 0 28px; color: var(--slate); max-width: 420px; line-height: 1.6; }
+  .btn-primary {
+    background: var(--red); color: #fff; border: none; border-radius: 10px;
+    padding: 13px 26px; font-size: 14px; font-weight: 700; display: inline-block;
+  }
+  .btn-primary:hover { background: var(--red-dark); }
+
+  footer {
+    text-align: center; padding: 20px; color: var(--slate); font-size: 13px;
+    border-top: 1px solid var(--line-light);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo-text display">Good<b>Motoway</b></a>
+</header>
+
+<main>
+  <div class="code">404</div>
+  <h1>გვერდი ვერ მოიძებნა</h1>
+  <p>შესაძლოა ბმული მოძველებულია, ან გვერდი გადატანილია. დაბრუნდი მთავარ გვერდზე და სცადე თავიდან.</p>
+  <a class="btn-primary" href="index.html">მთავარ გვერდზე დაბრუნება</a>
+</main>
+
+<footer>Good<b>Motoway</b> · ელექტრო მოპედების ავტორიზებული დილერი · უნივერსიტეტის ქუჩა N6 · <a href="tel:551484883">551 48 48 83</a> · © <span id="gmYear"></span> GoodMotoway</footer>
+
+<script>
+  document.getElementById('gmYear').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>

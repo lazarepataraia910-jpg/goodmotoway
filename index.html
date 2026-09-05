@@ -4,6 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>GoodMotoway — ელექტრო მოპედები</title>
+<meta name="description" content="GoodMotoway — ელექტრო მოპედების ავტორიზებული დილერი. დაათვალიერე მოდელები, შეადარე მახასიათებლები და შეუკვეთე შენთვის საუკეთესო ელექტრო მოპედი." />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
 <!-- Vercel Web Analytics -->
 <script>
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
@@ -146,6 +148,10 @@
   .empty-state p:first-child { font-size: 16px; margin-bottom: 12px; color: var(--text); font-weight: 600; }
   .empty-state button { padding: 11px 18px; border-radius: 8px; border: none; background: var(--ink); color: #fff; font-size: 14px; font-weight: 700; }
 
+  .loading-state { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 60px 24px; color: var(--slate); font-size: 14px; }
+  .loading-spinner { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--line-light); border-top-color: var(--red); animation: gm-spin 0.7s linear infinite; }
+  @keyframes gm-spin { to { transform: rotate(360deg); } }
+
   #grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; align-items: stretch; }
   .card {
     display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line-light);
@@ -230,10 +236,10 @@
 <body>
 
 <header>
-  <div class="logo">
+  <a href="index.html" class="logo">
     <img src="data:image/jpeg;base64,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" alt="GoodMotoway" />
     <span class="logo-text display">Good<b>Motoway</b></span>
-  </div>
+  </a>
   <div class="header-right">
     <div class="nav-links" id="navLinks">
       <a id="adminLoginBtn" class="admin-link" href="admin.html" aria-label="Admin panel">
@@ -329,6 +335,11 @@
     <button id="resetFiltersEmpty">ფილტრების გასუფთავება</button>
   </div>
 
+  <div class="loading-state" id="loadingState">
+    <span class="loading-spinner"></span>
+    მოდელები იტვირთება...
+  </div>
+
   <div id="grid"></div>
 
   <div class="contact-strip">
@@ -349,7 +360,7 @@
   </div>
 </main>
 
-<footer>Good<b>Motoway</b> · ელექტრო მოპედების ავტორიზებული დილერი · უნივერსიტეტის ქუჩა N6 · 551 48 48 83</footer>
+<footer>Good<b>Motoway</b> · ელექტრო მოპედების ავტორიზებული დილერი · უნივერსიტეტის ქუჩა N6 · <a href="tel:551484883">551 48 48 83</a> · © <span id="gmYear"></span> GoodMotoway</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="auth.js"></script>
@@ -445,7 +456,7 @@
   function specItem(iconPath, label, value) {
     return `<div class="spec-item">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${iconPath}</svg>
-      <span><span class="sv-label">${label}</span><span class="sv-value">${value}</span></span>
+      <span><span class="sv-label">${label}</span><span class="sv-value">${window.gmEscapeHtml(value)}</span></span>
     </div>`;
   }
 
@@ -467,13 +478,14 @@
     grid.innerHTML = list.map(p => {
       const isFav = favorites.has(p.id);
       const primaryImage = p.images && p.images[0] ? p.images[0] : p.img;
+      const esc = window.gmEscapeHtml;
       return `
         <div class="card">
           <div class="card-media">
-            <a class="card-media-link" href="product.html?id=${p.id}" aria-label="${p.name} ფოტოების ნახვა">
-              <img src="${primaryImage}" alt="${p.name}" loading="lazy" />
+            <a class="card-media-link" href="product.html?id=${p.id}" aria-label="${esc(p.name)} ფოტოების ნახვა">
+              <img src="${esc(primaryImage)}" alt="${esc(p.name)}" loading="lazy" />
             </a>
-            <span class="badge-tag">${p.tag}</span>
+            <span class="badge-tag">${esc(p.tag)}</span>
             <span class="badge-stock ${p.inStock ? '' : 'out'}">${p.inStock ? 'მარაგშია' : 'არ არის მარაგში'}</span>
             <button class="fav-btn" data-id="${p.id}" aria-label="favorite">
               <svg class="icon" style="width:16px;height:16px;" viewBox="0 0 24 24" fill="${isFav ? '#D8253B' : 'none'}" stroke="#D8253B" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
@@ -481,8 +493,8 @@
           </div>
           <div class="card-body">
             <div class="card-meta">GoodMotoway</div>
-            <h3 class="card-title display">${p.name}</h3>
-            <p class="card-desc">${p.desc}</p>
+            <h3 class="card-title display">${esc(p.name)}</h3>
+            <p class="card-desc">${esc(p.desc)}</p>
             <div class="spec-grid">
               ${specItem('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>', 'მაქს. სიჩქარე', p.speed + ' კმ/სთ')}
               ${specItem('<path d="M3 12h18M9 6l-6 6 6 6M15 6l6 6-6 6"/>', 'გარბენი', p.rangeMin + '-' + p.rangeMax + ' კმ')}
@@ -558,6 +570,7 @@
 
   (async function init() {
     PRODUCTS = await loadProducts();
+    document.getElementById("loadingState").style.display = "none";
     render();
   })();
 })();
