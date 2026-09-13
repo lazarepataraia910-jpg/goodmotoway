@@ -120,6 +120,10 @@
 <script>
   (function(){try{
     var t = localStorage.getItem('gm_theme');
+    // one-time reset: a choice stored before the redesign predates the new
+    // default, so clear it once and let the new look through
+    if (t && !localStorage.getItem('gm_theme_v2')) { localStorage.removeItem('gm_theme'); t = null; }
+    localStorage.setItem('gm_theme_v2', '1');
     if (t === 'dark') { document.documentElement.setAttribute('data-theme','dark'); }
     else if (!t || t === 'moto') {
       var k = (location.pathname.split('/').pop() || 'index').replace(/.html$/, '') || 'index';
