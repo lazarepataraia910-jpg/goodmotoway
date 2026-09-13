@@ -95,7 +95,7 @@
   .pill-done { background: rgba(20,23,28,0.1); color: var(--text); }
   .pill-cancelled { background: rgba(138,147,160,0.18); color: var(--slate); }
 
-  .theme-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .theme-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; }
   .theme-option {
     border: 2px solid var(--line-light); border-radius: 12px; padding: 16px; text-align: left;
     background: var(--paper); display: flex; flex-direction: column; gap: 10px; transition: border-color 0.15s ease;
@@ -106,6 +106,7 @@
   .theme-preview.light-preview { background: linear-gradient(135deg, #F3F1EB 60%, #ffffff 60%); }
   .theme-preview.dark-preview { background: linear-gradient(135deg, #14171C 60%, #1B1F26 60%); }
   .theme-preview.classic-preview { background: linear-gradient(135deg, #14171C 55%, #D8253B 55%); }
+  .theme-preview.moto-preview { background: linear-gradient(180deg, #0b0c0e 62%, #e11414 62%); }
   .theme-option .to-label { font-weight: 700; font-size: 13.5px; display: flex; align-items: center; gap: 6px; }
   .theme-option .to-check { color: var(--red); display: none; }
   .theme-option.active .to-check { display: inline; }
@@ -264,6 +265,10 @@
             <div class="theme-preview classic-preview"></div>
             <span class="to-label"><span class="to-check">✓</span> დიფოლტი</span>
           </button>
+          <button type="button" class="theme-option" data-theme-choice="moto">
+            <div class="theme-preview moto-preview"></div>
+            <span class="to-label"><span class="to-check">✓</span> სპორტული</span>
+          </button>
         </div>
         <div class="theme-save-row">
           <button type="button" class="btn-save-theme" id="saveThemeBtn">შენახვა</button>
@@ -350,7 +355,7 @@
     const user = data.session && data.session.user;
     if (user) {
       const { data: profile } = await window.gmAuthClient.from('profiles').select('theme').eq('id', user.id).maybeSingle();
-      renderLoggedIn(user, (profile && profile.theme) || 'light');
+      renderLoggedIn(user, (profile && profile.theme) || 'moto');
     }
   }
 

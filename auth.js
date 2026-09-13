@@ -14,45 +14,63 @@
   var yearEl = document.getElementById('gmYear');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
+  // Keyed without the extension: a static host may serve either /product.html
+  // or the clean /product, and both have to resolve to the same stylesheet.
+  function pageKey() {
+    var file = window.location.pathname.split('/').pop() || 'index';
+    return file.replace(/\.html$/, '') || 'index';
+  }
+
   var CLASSIC_CSS_BY_PAGE = {
-    'index.html': 'classic-index.css',
-    '': 'classic-index.css',
-    'product.html': 'classic-product.css',
-    'admin.html': 'classic-admin.css',
-    'admin-orders.html': 'classic-admin.css',
+    'index': 'classic-index.css',
+    'product': 'classic-product.css',
+    'admin': 'classic-admin.css',
     'admin-orders': 'classic-admin.css',
-    'admin-stats.html': 'classic-admin.css',
     'admin-stats': 'classic-admin.css',
-    'faq.html': 'classic-faq.css',
-    'support.html': 'classic-support.css',
-    'compare.html': 'classic-compare.css'
+    'faq': 'classic-faq.css',
+    'support': 'classic-support.css',
+    'compare': 'classic-compare.css'
   };
 
-  function classicHrefForCurrentPage() {
-    var file = window.location.pathname.split('/').pop();
-    return CLASSIC_CSS_BY_PAGE[file] || null;
+  // The "moto" theme ships as one stylesheet for every public page.
+  var MOTO_CSS_BY_PAGE = {
+    'index': 'moto.css',
+    'product': 'moto.css',
+    'faq': 'moto.css',
+    'support': 'moto.css',
+    'compare': 'moto.css'
+  };
+
+  var THEME_CSS_BY_PAGE = { classic: CLASSIC_CSS_BY_PAGE, moto: MOTO_CSS_BY_PAGE };
+  var DEFAULT_THEME = 'moto';
+
+  function themeHrefForCurrentPage(theme) {
+    var map = THEME_CSS_BY_PAGE[theme];
+    return (map && map[pageKey()]) || null;
   }
 
   function applyTheme(theme) {
+    if (!theme) theme = DEFAULT_THEME;
     try { localStorage.setItem('gm_theme', theme); } catch (e) {}
     document.documentElement.removeAttribute('data-theme');
-    var existingClassic = document.getElementById('gmClassicTheme');
 
-    if (theme === 'classic') {
-      if (!existingClassic) {
-        var href = classicHrefForCurrentPage();
-        if (href) {
-          var link = document.createElement('link');
-          link.id = 'gmClassicTheme';
-          link.rel = 'stylesheet';
-          link.href = href;
-          document.head.appendChild(link);
-        }
+    var existingSheet = document.getElementById('gmClassicTheme');
+    var href = themeHrefForCurrentPage(theme);
+
+    if (href) {
+      if (existingSheet) {
+        if (existingSheet.getAttribute('href') !== href) existingSheet.setAttribute('href', href);
+      } else {
+        var link = document.createElement('link');
+        link.id = 'gmClassicTheme';
+        link.rel = 'stylesheet';
+        link.href = href;
+        document.head.appendChild(link);
       }
       return;
     }
 
-    if (existingClassic) existingClassic.remove();
+    if (existingSheet) existingSheet.remove();
     if (theme === 'dark') {
       document.documentElement.setAttribute('data-theme', 'dark');
     }
@@ -68,10 +86,10 @@
   async function ensureProfile(user) {
     const { data } = await client.from('profiles').select('id, theme').eq('id', user.id).maybeSingle();
     if (!data) {
-      let startTheme = 'light';
+      let startTheme = DEFAULT_THEME;
       try {
         const saved = localStorage.getItem('gm_theme');
-        if (saved === 'dark' || saved === 'classic') startTheme = saved;
+        if (saved === 'light' || saved === 'dark' || saved === 'classic' || saved === 'moto') startTheme = saved;
       } catch (e) {}
       await client.from('profiles').insert({
         id: user.id,
