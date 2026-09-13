@@ -242,7 +242,9 @@ footer a { color: #8b9099; }
   font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
 }
 .stock-tag.out { background: #0b0c0e; color: #ff3b3b; border-color: #ff3b3b; }
-.product-title {
+/* scoped to the product page: admin.html reuses .product-title for its much
+   smaller list cards, and an unscoped clamp() blew those up to 42px */
+.info-side .product-title {
   font-family: 'Archivo Black', 'Noto Sans Georgian', sans-serif; font-weight: 800; font-synthesis-weight: none; text-transform: uppercase;
   font-size: clamp(26px, 4vw, 42px); line-height: 1.02; letter-spacing: -0.02em; color: #fff;
 }
@@ -408,9 +410,9 @@ label {
   background: #0b0c0e; border: 1px solid #2a2f36; color: var(--red);
   font-family: 'JetBrains Mono', monospace; font-weight: 400; letter-spacing: 0.14em;
 }
-.product-title {
+.product-body .product-title {
   font-family: 'Archivo Black', 'Noto Sans Georgian', sans-serif; font-synthesis-weight: none;
-  text-transform: uppercase; color: #fff;
+  text-transform: uppercase; color: #fff; font-size: 14px; line-height: 1.25; letter-spacing: 0;
 }
 .product-desc, .small { color: #8b9099; }
 .product-price { color: #fff; font-family: 'Archivo Black', 'Noto Sans Georgian', sans-serif; font-synthesis-weight: none; }
@@ -442,7 +444,6 @@ table.orders-table td { border-bottom: 1px solid #1e2126; }
 }
 .stat-card.accent .sc-value { color: var(--red); }
 .drawer-panel { background: #101216; border-left: 1px solid #23272d; }
-.empty-wrap { background: transparent; }
 
 /* pills share one palette across the admin table and the profile list */
 .pill { font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; }
