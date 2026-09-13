@@ -345,3 +345,140 @@ summary .chev { color: #6d737c; }
   .logo-text, .logo-text.display { font-size: 13px; letter-spacing: 0; }
   .logo img { width: 28px; height: 28px; }
 }
+
+/* ================= admin.html / admin-orders.html / admin-stats.html ================= */
+/* The admin pages are already token-driven, so most of the work is done by the
+   :root block above. These rules fix the places that hardcode a light colour
+   or lean on --ink, which is now the same near-black as the page itself. */
+
+.topbar { background: #0b0c0e; border-bottom: 1px solid #1e2126; }
+.brand-text {
+  font-family: 'Archivo Black', 'Noto Sans Georgian', sans-serif; font-synthesis-weight: none;
+  text-transform: uppercase; letter-spacing: 0.02em; color: #fff;
+}
+.brand-text b { color: var(--red); font-weight: 400; }
+.brand-tag {
+  font-family: 'JetBrains Mono', monospace; font-weight: 400; letter-spacing: 0.16em;
+  background: transparent; border: 1px solid #2a2f36; color: #6d737c;
+}
+
+.btn.dark { background: transparent; border: 1px solid #3a3f47; color: #f2f3f4; }
+.btn.dark:hover { background: transparent; border-color: #fff; }
+.btn.ghost { border-color: #2a2f36; color: #8b9099; }
+.btn.ghost:hover { color: #fff; border-color: #fff; }
+
+.admin-tab { background: #101216; border-color: #1e2126; color: #8b9099; }
+.admin-tab:hover { color: #fff; border-color: #3a3f47; }
+.admin-tab.active { background: var(--red); border-color: var(--red); color: #fff; }
+
+.admin-login { background: #101216; border: 1px solid #1e2126; }
+.admin-login .eyebrow {
+  font-family: 'JetBrains Mono', monospace; font-weight: 400; letter-spacing: 0.22em; color: var(--red);
+}
+.admin-login .eyebrow::before { content: none; }
+
+label {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: #6d737c;
+}
+:root input, :root textarea, :root select { background: #0b0c0e; border-color: #2a2f36; color: #f2f3f4; }
+:root input:focus, :root textarea:focus, :root select:focus { border-color: var(--red); }
+:root input.invalid, :root textarea.invalid { border-color: #ff3b3b; background: rgba(255, 59, 59, 0.08); }
+
+.panel { background: #101216; border: 1px solid #1e2126; }
+.panel-head h3 { font-weight: 900; letter-spacing: -0.01em; }
+.group-label {
+  font-family: 'JetBrains Mono', monospace; font-weight: 400; letter-spacing: 0.18em; color: var(--red);
+}
+.group-label::after { background: #1e2126; }
+
+.feedback { color: #ff3b3b; background: rgba(255, 59, 59, 0.08); }
+.feedback.success { color: #35c46a; background: rgba(53, 196, 106, 0.1); }
+
+.upload-shell { background: #0b0c0e; border: 1px dashed #2a2f36; }
+.upload-preview { background: #101216; border: 1px solid #2a2f36; }
+.upload-label { background: var(--red); color: #fff; font-weight: 700; }
+.upload-label:hover { background: #ff2a2a; }
+.upload-hint { color: #6d737c; }
+
+.product-item { background: #101216; border: 1px solid #1e2126; }
+.product-item:hover { border-color: var(--red); }
+.product-media { background: #0b0c0e; }
+.product-ribbon {
+  background: #0b0c0e; border: 1px solid #2a2f36; color: var(--red);
+  font-family: 'JetBrains Mono', monospace; font-weight: 400; letter-spacing: 0.14em;
+}
+.product-title {
+  font-family: 'Archivo Black', 'Noto Sans Georgian', sans-serif; font-synthesis-weight: none;
+  text-transform: uppercase; color: #fff;
+}
+.product-desc, .small { color: #8b9099; }
+.product-price { color: #fff; font-family: 'Archivo Black', 'Noto Sans Georgian', sans-serif; font-synthesis-weight: none; }
+.product-speedline, .product-specs { color: #6d737c; }
+.product-specs { border-top: 1px solid #1e2126; }
+
+.color-chip { background: #0b0c0e; border: 1px solid #2a2f36; }
+.add-color-btn { background: transparent; border: 1px dashed #3a3f47; color: #c4c8ce; }
+.color-modal { background: #101216; border: 1px solid #23272d; }
+.color-confirm-card { background: #0b0c0e; border: 1px solid #1e2126; }
+.color-modal-canvas-wrap { background: #0b0c0e; }
+
+/* orders table */
+table.orders-table th {
+  font-family: 'JetBrains Mono', monospace; font-weight: 400; letter-spacing: 0.12em; color: #6d737c;
+  border-bottom: 1px solid #1e2126;
+}
+table.orders-table td { border-bottom: 1px solid #1e2126; }
+.order-code { font-family: 'JetBrains Mono', monospace; color: #fff; }
+.order-muted { color: #6d737c; }
+.phone-cell a { color: #c4c8ce; }
+.phone-cell a:hover { color: var(--red); }
+.stat-card { background: #101216; border: 1px solid #1e2126; }
+.stat-card .sc-label {
+  font-family: 'JetBrains Mono', monospace; font-weight: 400; letter-spacing: 0.14em; color: #6d737c;
+}
+.stat-card .sc-value {
+  font-family: 'Archivo Black', 'Noto Sans Georgian', sans-serif; font-synthesis-weight: none; color: #fff;
+}
+.stat-card.accent .sc-value { color: var(--red); }
+.drawer-panel { background: #101216; border-left: 1px solid #23272d; }
+.empty-wrap { background: transparent; }
+
+/* pills share one palette across the admin table and the profile list */
+.pill { font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; }
+.pill-new { background: rgba(225, 20, 20, 0.14); color: #ff3b3b; }
+.pill-confirmed { background: rgba(53, 196, 106, 0.14); color: #35c46a; }
+.pill-done { background: rgba(196, 200, 206, 0.12); color: #c4c8ce; }
+.pill-cancelled { background: rgba(109, 115, 124, 0.16); color: #8b9099; }
+
+/* stats page chart + bars */
+.chart-area { fill: rgba(225, 20, 20, 0.14); }
+.chart-grid-line { stroke: #1e2126; }
+.chart-label { fill: #6d737c; font-family: 'JetBrains Mono', monospace; }
+.bar-row .bar-track { background: rgba(225, 20, 20, 0.14); }
+.bar-row .bar-pct { color: #6d737c; font-family: 'JetBrains Mono', monospace; }
+.range-btn { background: #101216; border-color: #2a2f36; color: #8b9099; }
+.range-btn.active { background: var(--red); border-color: var(--red); color: #fff; }
+.setup-note { background: #101216; border: 1px solid #1e2126; }
+.setup-note code { background: #0b0c0e; border: 1px solid #2a2f36; color: #c4c8ce; }
+.panel-empty, .loading-note { color: #6d737c; }
+
+/* ================= profile.html ================= */
+.profile-card, .section-card { background: #101216; border: 1px solid #1e2126; }
+.profile-card .pc-name { color: #fff; font-weight: 700; }
+.profile-card .pc-email { color: #6d737c; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+.section-card h3 { color: #fff; font-weight: 900; letter-spacing: -0.01em; }
+.section-card .sc-sub { color: #8b9099; }
+.theme-option { background: #0b0c0e; border: 2px solid #1e2126; }
+.theme-option:hover { border-color: #3a3f47; }
+.theme-option.active { border-color: var(--red); }
+.theme-preview { border: 1px solid #2a2f36; }
+.btn-save-theme { background: var(--red); color: #fff; min-height: 44px; }
+.btn-save-theme:hover { background: #ff2a2a; }
+.signout-btn { background: transparent; border: 1px solid #3a3f47; color: #ff3b3b; min-height: 44px; }
+.signout-btn:hover { background: transparent; border-color: #ff3b3b; }
+.order-row { border: 1px solid #1e2126; }
+.order-row-name { color: #fff; }
+.order-row-meta, .order-row-top, .order-empty { color: #6d737c; }
+.save-feedback { color: #35c46a; }
+.save-feedback.error { color: #ff3b3b; }

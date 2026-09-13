@@ -38,7 +38,11 @@
     'product': 'moto.css',
     'faq': 'moto.css',
     'support': 'moto.css',
-    'compare': 'moto.css'
+    'compare': 'moto.css',
+    'admin': 'moto.css',
+    'admin-orders': 'moto.css',
+    'admin-stats': 'moto.css',
+    'profile': 'moto.css'
   };
 
   var THEME_CSS_BY_PAGE = { classic: CLASSIC_CSS_BY_PAGE, moto: MOTO_CSS_BY_PAGE };

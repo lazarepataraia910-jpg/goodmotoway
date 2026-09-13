@@ -1,12 +1,6 @@
 <!DOCTYPE html>
 <html lang="ka">
 <head>
-<script>
-  (function(){try{
-    var t = localStorage.getItem('gm_theme');
-    if (t === 'dark') { document.documentElement.setAttribute('data-theme','dark'); }
-  }catch(e){}})();
-</script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>პროფილი — GoodMotoway</title>
@@ -155,6 +149,34 @@
     .theme-grid { grid-template-columns: 1fr; }
   }
 </style>
+<script>
+  (function(){try{
+    var t = localStorage.getItem('gm_theme');
+    // one-time reset: a choice stored before the redesign predates the new
+    // default, so clear it once and let the new look through
+    if (t && !localStorage.getItem('gm_theme_v2')) { localStorage.removeItem('gm_theme'); t = null; }
+    localStorage.setItem('gm_theme_v2', '1');
+    var k = (location.pathname.split('/').pop() || 'index').replace(/\.html$/, '') || 'index';
+    if (t === 'dark') { document.documentElement.setAttribute('data-theme','dark'); }
+    else if (!t || t === 'moto') {
+      var ml = {'index':1,'product':1,'faq':1,'support':1,'compare':1,'admin':1,'admin-orders':1,'admin-stats':1,'profile':1};
+      if (ml[k]) {
+        var mlink = document.createElement('link');
+        mlink.id = 'gmClassicTheme'; mlink.rel = 'stylesheet'; mlink.href = 'moto.css';
+        document.head.appendChild(mlink);
+      }
+    }
+    else if (t === 'classic') {
+      var m = {'index':'classic-index.css','product':'classic-product.css','admin':'classic-admin.css','admin-orders':'classic-admin.css','admin-stats':'classic-admin.css','faq':'classic-faq.css','support':'classic-support.css','compare':'classic-compare.css'};
+      var href = m[k];
+      if (href) {
+        var l = document.createElement('link');
+        l.id = 'gmClassicTheme'; l.rel = 'stylesheet'; l.href = href;
+        document.head.appendChild(l);
+      }
+    }
+  }catch(e){}})();
+</script>
 </head>
 <body>
 
