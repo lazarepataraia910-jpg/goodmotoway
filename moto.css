@@ -114,10 +114,10 @@ main { padding: 72px 48px; }
   font-size: 11px; font-weight: 400; letter-spacing: 0.16em; text-transform: uppercase; padding: 6px 10px;
 }
 .badge-stock {
-  background: #0b0c0e; color: #9aa2ab; font-family: 'JetBrains Mono', monospace;
-  font-size: 11px; font-weight: 400; letter-spacing: 0.1em; padding: 6px 10px; border: 1px solid #2a2f36;
+  background: #0b0c0e; color: #35c46a; font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.1em; padding: 6px 10px; border: 1px solid #35c46a;
 }
-.badge-stock.out { color: #6d737c; }
+.badge-stock.out { color: #ff3b3b; border-color: #ff3b3b; }
 .fav-btn { background: #0b0c0e; border: 1px solid #2a2f36; width: 34px; height: 34px; }
 .fav-btn:hover { border-color: var(--red); }
 
@@ -236,10 +236,10 @@ footer a { color: #8b9099; }
   font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 400; letter-spacing: 0.16em;
 }
 .stock-tag {
-  background: transparent; border: 1px solid #2a2f36; color: #9aa2ab;
-  font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 400; letter-spacing: 0.1em;
+  background: transparent; border: 1px solid #35c46a; color: #35c46a;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
 }
-.stock-tag.out { color: #6d737c; }
+.stock-tag.out { color: #ff3b3b; border-color: #ff3b3b; }
 .product-title {
   font-family: 'Archivo Black', 'Noto Sans Georgian', sans-serif; font-weight: 800; font-synthesis-weight: none; text-transform: uppercase;
   font-size: clamp(26px, 4vw, 42px); line-height: 1.02; letter-spacing: -0.02em; color: #fff;
