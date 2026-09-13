@@ -451,19 +451,21 @@
       note: fields.note || null
     };
 
-    let savedId = null;
+    // No .select() here: RETURNING needs SELECT rights, and guests deliberately
+    // have no select policy on orders, so asking for the row back fails the insert.
+    let saved = false;
     let saveError = null;
     try {
-      const { data, error } = await supabaseClient.from('orders').insert(row).select().single();
+      const { error } = await supabaseClient.from('orders').insert(row);
       if (error) throw error;
-      savedId = data.id;
+      saved = true;
     } catch (err) {
       saveError = err;
       console.error('Could not save order', err);
     }
 
     gmOrderStore.add({
-      code, id: savedId, ownerId: userId,
+      code, saved, ownerId: userId,
       name: currentProduct.name, qty: currentQty, total,
       date: fields.date, time: fields.time,
       status: 'new', createdAt: Date.now(), waLinkOrder: orderForWa

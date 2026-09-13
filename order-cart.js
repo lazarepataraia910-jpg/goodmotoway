@@ -147,8 +147,8 @@
       currentUserId = data.session && data.session.user ? data.session.user.id : null;
     } catch (e) {}
 
-    if (currentUserId && order.ownerId === currentUserId && order.id) {
-      const { error } = await supabaseClient.from('orders').update({ status: 'cancelled' }).eq('id', order.id);
+    if (currentUserId && order.ownerId === currentUserId && order.saved) {
+      const { error } = await supabaseClient.from('orders').update({ status: 'cancelled' }).eq('order_code', order.code);
       if (error) console.error('Could not cancel order', error);
     } else {
       gm.notify(TEXT.guestRemoveNote);
