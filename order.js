@@ -26,6 +26,7 @@
     dateLabel: 'თარიღი',
     timeLabel: 'დრო',
     timeChoose: 'აირჩიეთ დრო',
+    noSlotsToday: 'ამ დღეს თავისუფალი დრო აღარ არის — აირჩიეთ სხვა თარიღი',
     nameLabel: 'სახელი',
     namePlaceholder: 'თქვენი სახელი და გვარი',
     phoneLabel: 'ტელეფონი',
@@ -138,6 +139,7 @@
     .gm-field.invalid input, .gm-field.invalid select, .gm-field.invalid textarea { border-color: var(--red-dark, #A60F1E); }
     .gm-field-error { color: var(--red-dark, #A60F1E); font-size: 12px; font-weight: 600; display: none; }
     .gm-field.invalid .gm-field-error { display: block; }
+    .gm-field-note { color: var(--slate, #8A93A0); font-size: 11.5px; font-weight: 600; line-height: 1.35; }
     .gm-swatch-row { display: flex; gap: 8px; flex-wrap: wrap; }
     .gm-swatch-btn { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1.5px var(--line-light, #E4E1D8); cursor: pointer; padding: 0; }
     .gm-swatch-btn.active { box-shadow: 0 0 0 2px var(--red, #D8253B); }
@@ -248,13 +250,14 @@
       <div class="gm-field-row">
         <div class="gm-field">
           <label for="gmDateInput">${TEXT.dateLabel}</label>
-          <input type="date" id="gmDateInput" min="${todayISO}" max="${maxISODate()}" value="${todayISO}" />
+          <input type="date" id="gmDateInput" min="${todayISO}" max="${maxISODate()}" value="${firstSelectableDate()}" />
           <span class="gm-field-error">${TEXT.errDate}</span>
         </div>
         <div class="gm-field">
           <label for="gmTimeInput">${TEXT.timeLabel}</label>
           <select id="gmTimeInput"><option value="">${TEXT.timeChoose}</option></select>
           <span class="gm-field-error">${TEXT.errTime}</span>
+          <span class="gm-field-note" id="gmTimeNote" hidden>${TEXT.noSlotsToday}</span>
         </div>
       </div>
       <div class="gm-field">
@@ -318,6 +321,7 @@
         return `<option value="${slot}" ${disabled ? 'disabled' : ''}>${slot}</option>`;
       }).join('');
       if (currentValue && !isSlotDisabled(dateInput.value, currentValue)) timeSelect.value = currentValue;
+      document.getElementById('gmTimeNote').hidden = hasFreeSlot(dateInput.value);
     }
     dateInput.addEventListener('change', rebuildTimeOptions);
     rebuildTimeOptions();
@@ -348,6 +352,22 @@
     const slotDate = new Date();
     slotDate.setHours(h, m, 0, 0);
     return slotDate.getTime() < Date.now() + 60 * 60 * 1000;
+  }
+
+  function hasFreeSlot(dateStr) {
+    return GM_TIME_SLOTS.some((slot) => !isSlotDisabled(dateStr, slot));
+  }
+
+  // After the last slot of the day there is nothing left to pick, so open on the
+  // next day that still has one instead of a dropdown where everything is greyed out.
+  function firstSelectableDate() {
+    const d = new Date();
+    for (let i = 0; i <= GM_DAYS_AHEAD; i++) {
+      const iso = toISODate(d);
+      if (hasFreeSlot(iso)) return iso;
+      d.setDate(d.getDate() + 1);
+    }
+    return todayISODate();
   }
 
   function setFieldInvalid(fieldId, invalid) {
