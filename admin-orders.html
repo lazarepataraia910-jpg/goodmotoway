@@ -219,6 +219,12 @@
     else if (!t || t === 'moto') {
       var ml = {'index':1,'product':1,'faq':1,'support':1,'compare':1,'admin':1,'admin-orders':1,'admin-stats':1,'profile':1};
       if (ml[k]) {
+        // paint the dark ground immediately; moto.css still has to come off the
+        // network and the page's own <style> would flash light until it lands
+        var mcrit = document.createElement('style');
+        mcrit.id = 'gmThemeCritical';
+        mcrit.textContent = ':root{--ink:#0b0c0e;--paper:#0b0c0e;--surface:#101216;--text:#f2f3f4;--line-light:#1e2126;--red:#e11414;--red-dark:#ff2a2a;--slate:#8b9099;--sage:#9aa2ab}html,body{background:#0b0c0e;color:#f2f3f4}';
+        document.head.appendChild(mcrit);
         var mlink = document.createElement('link');
         mlink.id = 'gmClassicTheme'; mlink.rel = 'stylesheet'; mlink.href = 'moto.css';
         document.head.appendChild(mlink);

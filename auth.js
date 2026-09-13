@@ -61,6 +61,11 @@
     var existingSheet = document.getElementById('gmClassicTheme');
     var href = themeHrefForCurrentPage(theme);
 
+    // the inline block the page injects to avoid a light flash before moto.css
+    // lands; it has to go when switching to any other theme
+    var critical = document.getElementById('gmThemeCritical');
+    if (critical && theme !== 'moto') critical.remove();
+
     if (href) {
       if (existingSheet) {
         if (existingSheet.getAttribute('href') !== href) existingSheet.setAttribute('href', href);
