@@ -127,7 +127,12 @@
     .gm-field input[type="text"], .gm-field input[type="date"], .gm-field select, .gm-field textarea {
       width: 100%; border: 1px solid var(--line-light, #E4E1D8); border-radius: 8px; padding: 10px 12px;
       font-size: 14px; color: var(--text, #14171C); background: var(--surface, #fff); font-family: inherit;
+      /* index.html styles its filter selects with flex:1 1 150px; inside this
+         column layout that basis would stretch the control to 150px tall. */
+      flex: none; height: auto;
     }
+    .gm-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 420px) { .gm-field-row { grid-template-columns: 1fr; } }
     .gm-field textarea { min-height: 64px; resize: vertical; }
     .gm-field input:focus, .gm-field select:focus, .gm-field textarea:focus { outline: none; border-color: var(--red, #D8253B); }
     .gm-field.invalid input, .gm-field.invalid select, .gm-field.invalid textarea { border-color: var(--red-dark, #A60F1E); }
@@ -240,15 +245,17 @@
         <label>${TEXT.pickupPointLabel}</label>
         <div class="gm-order-product-line"><span>${esc(GM_PICKUP_POINT)}</span></div>
       </div>
-      <div class="gm-field">
-        <label for="gmDateInput">${TEXT.dateLabel}</label>
-        <input type="date" id="gmDateInput" min="${todayISO}" max="${maxISODate()}" value="${todayISO}" />
-        <span class="gm-field-error">${TEXT.errDate}</span>
-      </div>
-      <div class="gm-field">
-        <label for="gmTimeInput">${TEXT.timeLabel}</label>
-        <select id="gmTimeInput"><option value="">${TEXT.timeChoose}</option></select>
-        <span class="gm-field-error">${TEXT.errTime}</span>
+      <div class="gm-field-row">
+        <div class="gm-field">
+          <label for="gmDateInput">${TEXT.dateLabel}</label>
+          <input type="date" id="gmDateInput" min="${todayISO}" max="${maxISODate()}" value="${todayISO}" />
+          <span class="gm-field-error">${TEXT.errDate}</span>
+        </div>
+        <div class="gm-field">
+          <label for="gmTimeInput">${TEXT.timeLabel}</label>
+          <select id="gmTimeInput"><option value="">${TEXT.timeChoose}</option></select>
+          <span class="gm-field-error">${TEXT.errTime}</span>
+        </div>
       </div>
       <div class="gm-field">
         <label for="gmNameInput">${TEXT.nameLabel}</label>
