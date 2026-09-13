@@ -117,7 +117,9 @@ main { padding: 72px 48px; }
   background: #0b0c0e; color: #35c46a; font-family: 'JetBrains Mono', monospace;
   font-size: 11px; font-weight: 700; letter-spacing: 0.1em; padding: 6px 10px; border: 1px solid #35c46a;
 }
-.badge-stock.out { color: #ff3b3b; border-color: #ff3b3b; }
+/* the page's own .badge-stock.out sets a slate background and outranks the
+   single-class rule above, so the black has to be restated here */
+.badge-stock.out { background: #0b0c0e; color: #ff3b3b; border-color: #ff3b3b; }
 .fav-btn { background: #0b0c0e; border: 1px solid #2a2f36; width: 34px; height: 34px; }
 .fav-btn:hover { border-color: var(--red); }
 
@@ -239,7 +241,7 @@ footer a { color: #8b9099; }
   background: transparent; border: 1px solid #35c46a; color: #35c46a;
   font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
 }
-.stock-tag.out { color: #ff3b3b; border-color: #ff3b3b; }
+.stock-tag.out { background: #0b0c0e; color: #ff3b3b; border-color: #ff3b3b; }
 .product-title {
   font-family: 'Archivo Black', 'Noto Sans Georgian', sans-serif; font-weight: 800; font-synthesis-weight: none; text-transform: uppercase;
   font-size: clamp(26px, 4vw, 42px); line-height: 1.02; letter-spacing: -0.02em; color: #fff;
