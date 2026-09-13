@@ -74,6 +74,23 @@
 
   .wrap { max-width: 1180px; margin: 0 auto; padding: 32px 32px 60px; }
 
+  /* ---- Admin tabs ---- */
+  .admin-tabs {
+    max-width: 1180px; margin: 0 auto; padding: 16px 32px 0; display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .admin-tab {
+    display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 999px;
+    border: 1px solid var(--line-light); background: var(--surface); color: var(--slate);
+    font-size: 13.5px; font-weight: 700; transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .admin-tab:hover { color: var(--text); border-color: var(--text); }
+  .admin-tab.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .admin-tab .tab-badge {
+    min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--red); color: #fff;
+    font-size: 11px; display: none; align-items: center; justify-content: center;
+  }
+  .admin-tab .tab-badge.show { display: inline-flex; }
+
   /* ---- Login gate ---- */
   .admin-login {
     max-width: 380px; margin: 60px auto; background: var(--surface); color: var(--text);
@@ -261,6 +278,15 @@
     <button class="btn dark" id="logoutBtn" type="button" style="display:none;">გასვლა</button>
   </div>
 </header>
+
+<nav class="admin-tabs">
+  <a class="admin-tab active" href="admin.html">პროდუქტები</a>
+  <a class="admin-tab" href="admin-orders.html">
+    შეკვეთები
+    <span class="tab-badge" id="newOrdersBadge">0</span>
+  </a>
+  <a class="admin-tab" href="admin-stats.html">სტატისტიკა</a>
+</nav>
 
 <div class="wrap">
     <div class="admin-login" id="adminLoginBox">
@@ -818,6 +844,17 @@
     setFeedback('პროდუქტი წაშლილია', true);
   }
 
+  async function loadNewOrdersBadge() {
+    const { count, error } = await supabaseClient
+      .from('orders')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'new');
+    if (error) return;
+    const badge = document.getElementById('newOrdersBadge');
+    badge.textContent = count || 0;
+    badge.classList.toggle('show', (count || 0) > 0);
+  }
+
   async function unlockAdmin() {
     adminLoginBox.style.display = 'none';
     adminBody.style.display = 'grid';
@@ -825,6 +862,7 @@
     setFeedback('იტვირთება...');
     PRODUCTS = await loadProducts();
     renderAdminProducts();
+    loadNewOrdersBadge();
     setFeedback('შესვლა წარმატებულია', true);
   }
 

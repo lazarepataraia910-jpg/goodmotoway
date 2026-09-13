@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GoodMotoway — სტატისტიკა</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<!-- Vercel Web Analytics -->
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script defer src="auth.js"></script>
+<link rel="stylesheet" href="auth.css" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --ink: #14171C;
+    --paper: #F3F1EB;
+    --red: #D8253B;
+    --red-dark: #A60F1E;
+    --sage: #5F7052;
+    --line-light: #E4E1D8;
+    --slate: #8A93A0;
+    --surface: #ffffff;
+    --text: var(--ink);
+  }
+  :root[data-theme="dark"] {
+    --paper: #14171C;
+    --surface: #1B1F26;
+    --text: #F3F1EB;
+    --line-light: #262B33;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: 'Noto Sans Georgian', sans-serif; background: var(--paper); color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { text-decoration: none; }
+  .display { font-weight: 700; letter-spacing: -0.01em; }
+  ::selection { background: rgba(216,37,59,0.22); }
+
+  /* ---- Topbar ---- */
+  .topbar {
+    background: var(--paper); color: var(--text); padding: 18px 32px; display: flex;
+    align-items: center; justify-content: space-between; gap: 12px;
+    position: sticky; top: 0; z-index: 20; border-bottom: 1px solid var(--line-light);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-text { font-weight: 700; font-size: 17px; letter-spacing: -0.01em; color: inherit; }
+  .brand-text b { color: var(--red); }
+  .brand-tag {
+    font-weight: 700; font-size: 11px;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--slate); background: var(--surface);
+    border: 1px solid var(--line-light); padding: 3px 8px; border-radius: 4px;
+  }
+  .top-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  /* ---- Buttons ---- */
+  .btn {
+    border: none; border-radius: 8px; padding: 10px 16px; cursor: pointer; font-weight: 700;
+    font-size: 13.5px; font-family: 'Noto Sans Georgian', sans-serif; transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .btn:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+  .btn.red { background: var(--red); color: #fff; }
+  .btn.red:hover { background: var(--red-dark); }
+  .btn.dark { background: var(--ink); color: #fff; }
+  .btn.dark:hover { background: var(--red-dark); }
+  .btn.ghost { background: transparent; color: var(--slate); border: 1px solid var(--line-light); }
+  .btn.ghost:hover { color: var(--text); border-color: var(--text); }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 32px 32px 60px; }
+
+  /* ---- Admin tabs ---- */
+  .admin-tabs {
+    max-width: 1180px; margin: 0 auto; padding: 16px 32px 0; display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .admin-tab {
+    display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 999px;
+    border: 1px solid var(--line-light); background: var(--surface); color: var(--slate);
+    font-size: 13.5px; font-weight: 700; transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .admin-tab:hover { color: var(--text); border-color: var(--text); }
+  .admin-tab.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .admin-tab .tab-badge {
+    min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--red); color: #fff;
+    font-size: 11px; display: none; align-items: center; justify-content: center;
+  }
+  .admin-tab .tab-badge.show { display: inline-flex; }
+
+  /* ---- Login gate ---- */
+  .admin-login {
+    max-width: 380px; margin: 60px auto; background: var(--surface); color: var(--text);
+    border-radius: 16px; padding: 32px 28px; border: 1px solid var(--line-light); text-align: center;
+  }
+  .admin-login .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px; color: var(--red); font-size: 12px;
+    font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; margin-bottom: 8px;
+  }
+  .admin-login .eyebrow::before { content: ""; width: 18px; height: 1px; background: var(--red); display: block; }
+  .admin-login h2 { margin: 0 0 20px; font-size: 20px; font-weight: 700; }
+  .admin-login .btn.red { width: 100%; padding: 13px; font-size: 14px; }
+
+  .feedback {
+    margin-top: 14px; font-size: 12.5px; font-weight: 600; color: var(--red-dark);
+    padding: 10px 12px; border-radius: 8px; background: rgba(166,15,30,0.06);
+    min-height: 14px; display: none;
+  }
+  .feedback:not(:empty) { display: block; }
+  .feedback.success { color: #3f5836; background: rgba(95,112,82,0.1); }
+
+  /* ---- Stats workspace ---- */
+  .stats-body { display: none; }
+
+  .range-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+  .range-row .spacer { flex: 1; }
+  .range-btn {
+    border: 1px solid var(--line-light); background: var(--surface); color: var(--slate);
+    border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 700;
+    font-family: 'Noto Sans Georgian', sans-serif; cursor: pointer;
+  }
+  .range-btn.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 18px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--line-light); border-radius: 14px; padding: 16px 18px; }
+  .stat-card .sc-label { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--slate); }
+  .stat-card .sc-value { font-size: 28px; font-weight: 700; margin-top: 6px; letter-spacing: -0.01em; }
+
+  .panel { background: var(--surface); border: 1px solid var(--line-light); border-radius: 16px; padding: 22px; }
+  .panel-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; gap: 10px; }
+  .panel-head h3 { margin: 0; font-size: 14px; font-weight: 700; }
+  .panel-head .unit { font-size: 10.5px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: var(--slate); }
+
+  .chart-panel { margin-bottom: 18px; }
+  .chart-wrap { width: 100%; overflow: hidden; }
+  .chart-wrap svg { width: 100%; height: 240px; display: block; }
+  .chart-grid-line { stroke: var(--line-light); stroke-width: 1; }
+  .chart-area { fill: rgba(216,37,59,0.12); }
+  .chart-line { fill: none; stroke: var(--red); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .chart-dot { fill: var(--red); }
+  .chart-label { fill: var(--slate); font-size: 11px; font-family: 'Noto Sans Georgian', sans-serif; }
+
+  .panel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+  .bar-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; font-size: 13px; position: relative; }
+  .bar-row .bar-track {
+    position: absolute; left: 0; top: 3px; bottom: 3px; border-radius: 6px;
+    background: rgba(216,37,59,0.10); z-index: 0;
+  }
+  .bar-row .bar-label {
+    position: relative; z-index: 1; flex: 1; padding-left: 8px; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
+  }
+  .bar-row .bar-value { position: relative; z-index: 1; font-weight: 700; padding-right: 6px; }
+  .bar-row .bar-pct { position: relative; z-index: 1; color: var(--slate); font-size: 11.5px; min-width: 38px; text-align: right; }
+  .panel-empty { color: var(--slate); font-size: 13px; padding: 18px 0; text-align: center; }
+
+  .setup-note {
+    background: var(--surface); border: 1px solid var(--line-light); border-radius: 16px;
+    padding: 24px; color: var(--text); font-size: 13.5px; line-height: 1.7;
+  }
+  .setup-note h3 { margin: 0 0 10px; font-size: 15px; }
+  .setup-note code {
+    background: var(--paper); border: 1px solid var(--line-light); border-radius: 6px;
+    padding: 2px 6px; font-size: 12.5px;
+  }
+  .setup-note ol { margin: 10px 0 0; padding-left: 20px; }
+  .setup-note li { margin-bottom: 6px; }
+
+  @media (max-width: 800px) {
+    .topbar { padding: 16px 20px; }
+    .wrap { padding: 24px 20px 60px; }
+    .admin-tabs { padding: 16px 20px 0; }
+    .panel-grid { grid-template-columns: 1fr; }
+  }
+</style>
+<script>
+  (function(){try{
+    var t = localStorage.getItem('gm_theme');
+    if (t === 'dark') { document.documentElement.setAttribute('data-theme','dark'); }
+    else if (t === 'classic') {
+      var f = location.pathname.split('/').pop();
+      var m = {'index.html':'classic-index.css','':'classic-index.css','product.html':'classic-product.css','admin.html':'classic-admin.css','admin-orders.html':'classic-admin.css','admin-orders':'classic-admin.css','admin-stats.html':'classic-admin.css','admin-stats':'classic-admin.css','faq.html':'classic-faq.css','support.html':'classic-support.css','compare.html':'classic-compare.css'};
+      var href = m[f];
+      if (href) {
+        var l = document.createElement('link');
+        l.id = 'gmClassicTheme'; l.rel = 'stylesheet'; l.href = href;
+        document.head.appendChild(l);
+      }
+    }
+  }catch(e){}})();
+</script>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <a href="index.html" class="brand-text">Good<b>Motoway</b></a>
+    <span class="brand-tag">Admin</span>
+  </div>
+  <div class="top-actions">
+    <div id="authSlot"></div>
+    <a class="btn ghost" href="index.html">საიტის დაბრუნება</a>
+    <button class="btn dark" id="logoutBtn" type="button" style="display:none;">გასვლა</button>
+  </div>
+</header>
+
+<nav class="admin-tabs">
+  <a class="admin-tab" href="admin.html">პროდუქტები</a>
+  <a class="admin-tab" href="admin-orders.html">
+    შეკვეთები
+    <span class="tab-badge" id="newOrdersBadge">0</span>
+  </a>
+  <a class="admin-tab active" href="admin-stats.html">სტატისტიკა</a>
+</nav>
+
+<div class="wrap">
+  <div class="admin-login" id="adminLoginBox">
+    <div class="eyebrow">წვდომა შეზღუდულია</div>
+    <h2>სტატისტიკა</h2>
+    <p style="color:var(--slate);font-size:13px;margin:0 0 18px;line-height:1.5;">წვდომა შესაძლებელია მხოლოდ ადმინისტრატორის Google ანგარიშით.</p>
+    <button class="btn red" id="adminGoogleLoginBtn" type="button" style="display:flex;align-items:center;justify-content:center;gap:8px;">
+      <svg viewBox="0 0 24 24" width="16" height="16"><path fill="#fff" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.7-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"/><path fill="#fff" d="M12 24c3.2 0 5.9-1.1 7.9-2.9l-3.9-3c-1.1.7-2.4 1.1-4 1.1-3.1 0-5.7-2.1-6.6-4.9H1.4v3.1C3.4 21.3 7.4 24 12 24z" opacity="0.85"/><path fill="#fff" d="M5.4 14.3c-.2-.7-.4-1.5-.4-2.3s.1-1.6.4-2.3V6.6H1.4C.5 8.3 0 10.1 0 12s.5 3.7 1.4 5.4l4-3.1z" opacity="0.7"/><path fill="#fff" d="M12 4.8c1.7 0 3.3.6 4.5 1.7l3.4-3.4C17.9 1.2 15.2 0 12 0 7.4 0 3.4 2.7 1.4 6.6l4 3.1c.9-2.8 3.5-4.9 6.6-4.9z" opacity="0.55"/></svg>
+      Google ანგარიშით შესვლა
+    </button>
+    <div class="feedback" id="adminFeedback"></div>
+  </div>
+
+  <div class="stats-body" id="statsBody">
+    <div class="range-row">
+      <button class="range-btn active" type="button" data-days="7">7 დღე</button>
+      <button class="range-btn" type="button" data-days="30">30 დღე</button>
+      <button class="range-btn" type="button" data-days="90">90 დღე</button>
+      <span class="spacer"></span>
+      <button class="btn ghost" type="button" id="refreshBtn">განახლება</button>
+    </div>
+
+    <div id="statsContent"></div>
+    <div class="feedback" id="statsFeedback"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const SUPABASE_URL = 'https://lceebrhbvnyzoxkauugo.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxjZWVicmhidm55em94a2F1dWdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU3ODkyNzAsImV4cCI6MjEwMTM2NTI3MH0.IeGvLg09wjni7OJdiLeAiO3pvrXxIUgzISNKnVKpXYI';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const ADMIN_EMAIL = 'lazarepataraia910@gmail.com';
+
+  const COUNTRY_NAME = {
+    GE: 'საქართველო', US: 'აშშ', GB: 'დიდი ბრიტანეთი', DE: 'გერმანია', FR: 'საფრანგეთი',
+    IT: 'იტალია', ES: 'ესპანეთი', NL: 'ნიდერლანდები', PL: 'პოლონეთი', TR: 'თურქეთი',
+    RU: 'რუსეთი', UA: 'უკრაინა', AZ: 'აზერბაიჯანი', AM: 'სომხეთი', CN: 'ჩინეთი',
+    IN: 'ინდოეთი', IL: 'ისრაელი', GR: 'საბერძნეთი', CA: 'კანადა', AE: 'არაბთა საამიროები'
+  };
+  const DEVICE_NAME = { mobile: 'მობილური', desktop: 'დესკტოპი', tablet: 'ტაბლეტი', wearable: 'სამაჯური', console: 'კონსოლი', smarttv: 'სმარტ ტვ' };
+
+  function escapeHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+  function formatNumber(n) { return new Intl.NumberFormat('ka-GE').format(Number(n) || 0); }
+  function pad2(n) { return String(n).padStart(2, '0'); }
+  function shortDate(iso) {
+    const d = new Date(iso);
+    return pad2(d.getDate()) + '.' + pad2(d.getMonth() + 1);
+  }
+
+  let currentDays = 7;
+
+  const adminLoginBox = document.getElementById('adminLoginBox');
+  const statsBody = document.getElementById('statsBody');
+  const statsContent = document.getElementById('statsContent');
+  const adminFeedbackEl = document.getElementById('adminFeedback');
+  const statsFeedbackEl = document.getElementById('statsFeedback');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  function setFeedback(el, text, success = false) {
+    el.className = 'feedback' + (success ? ' success' : '');
+    el.textContent = text;
+  }
+
+  function chartSvg(series) {
+    if (!series.length) return '<div class="panel-empty">მონაცემები არ არის</div>';
+
+    const width = 900, height = 240;
+    const padLeft = 44, padRight = 12, padTop = 14, padBottom = 26;
+    const innerW = width - padLeft - padRight;
+    const innerH = height - padTop - padBottom;
+    const max = Math.max(1, ...series.map((p) => p.visitors));
+    const stepX = series.length > 1 ? innerW / (series.length - 1) : 0;
+    const x = (i) => padLeft + (series.length > 1 ? i * stepX : innerW / 2);
+    const y = (v) => padTop + innerH - (v / max) * innerH;
+
+    const points = series.map((p, i) => [x(i), y(p.visitors)]);
+    const line = points.map(([px, py], i) => (i ? 'L' : 'M') + px.toFixed(1) + ' ' + py.toFixed(1)).join(' ');
+    const area = line + ' L' + x(series.length - 1).toFixed(1) + ' ' + (padTop + innerH) + ' L' + x(0).toFixed(1) + ' ' + (padTop + innerH) + ' Z';
+
+    const gridValues = [0, Math.round(max / 2), max];
+    const grid = gridValues.map((value) => {
+      const gy = y(value);
+      return `<line class="chart-grid-line" x1="${padLeft}" y1="${gy.toFixed(1)}" x2="${width - padRight}" y2="${gy.toFixed(1)}" />
+              <text class="chart-label" x="${padLeft - 8}" y="${(gy + 4).toFixed(1)}" text-anchor="end">${formatNumber(value)}</text>`;
+    }).join('');
+
+    const labelEvery = Math.max(1, Math.ceil(series.length / 7));
+    const xLabels = series.map((p, i) => {
+      if (i % labelEvery !== 0 && i !== series.length - 1) return '';
+      return `<text class="chart-label" x="${x(i).toFixed(1)}" y="${height - 6}" text-anchor="middle">${escapeHtml(shortDate(p.timestamp))}</text>`;
+    }).join('');
+
+    const dots = points.map(([px, py]) => `<circle class="chart-dot" cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="2.5" />`).join('');
+
+    return `<div class="chart-wrap">
+      <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="ვიზიტორები დღეების მიხედვით">
+        ${grid}
+        <path class="chart-area" d="${area}" />
+        <path class="chart-line" d="${line}" />
+        ${dots}
+        ${xLabels}
+      </svg>
+    </div>`;
+  }
+
+  function panelHtml(title, rows, renameFn) {
+    const total = rows.reduce((sum, r) => sum + r.pageviews, 0);
+    const max = Math.max(1, ...rows.map((r) => r.pageviews));
+    const body = rows.length
+      ? rows.map((r) => {
+          const label = renameFn ? renameFn(r.label) : r.label;
+          const pct = total ? Math.round((r.pageviews / total) * 100) : 0;
+          return `<div class="bar-row">
+            <span class="bar-track" style="width:${((r.pageviews / max) * 100).toFixed(1)}%"></span>
+            <span class="bar-label" title="${escapeHtml(label)}">${escapeHtml(label)}</span>
+            <span class="bar-value">${formatNumber(r.pageviews)}</span>
+            <span class="bar-pct">${pct}%</span>
+          </div>`;
+        }).join('')
+      : '<div class="panel-empty">მონაცემები არ არის</div>';
+
+    return `<div class="panel">
+      <div class="panel-head"><h3>${escapeHtml(title)}</h3><span class="unit">ნახვები</span></div>
+      ${body}
+    </div>`;
+  }
+
+  function renderStats(payload) {
+    const viewsPerVisitor = payload.totals.visitors
+      ? (payload.totals.pageviews / payload.totals.visitors).toFixed(1)
+      : '0';
+
+    statsContent.innerHTML = `
+      <div class="stat-grid">
+        <div class="stat-card"><div class="sc-label">ვიზიტორები</div><div class="sc-value">${formatNumber(payload.totals.visitors)}</div></div>
+        <div class="stat-card"><div class="sc-label">გვერდის ნახვები</div><div class="sc-value">${formatNumber(payload.totals.pageviews)}</div></div>
+        <div class="stat-card"><div class="sc-label">ნახვა / ვიზიტორზე</div><div class="sc-value">${escapeHtml(viewsPerVisitor)}</div></div>
+      </div>
+
+      <div class="panel chart-panel">
+        <div class="panel-head"><h3>ვიზიტორები დღეების მიხედვით</h3><span class="unit">${payload.range.days} დღე</span></div>
+        ${chartSvg(payload.series)}
+      </div>
+
+      <div class="panel-grid">
+        ${panelHtml('გვერდები', payload.pages)}
+        ${panelHtml('წყაროები', payload.referrers)}
+        ${panelHtml('ქვეყნები', payload.countries, (code) => COUNTRY_NAME[code] || code)}
+        ${panelHtml('მოწყობილობები', payload.devices, (d) => DEVICE_NAME[String(d).toLowerCase()] || d)}
+        ${panelHtml('ბრაუზერები', payload.browsers)}
+        ${panelHtml('ოპერაციული სისტემები', payload.systems)}
+      </div>
+    `;
+  }
+
+  function renderSetupNote() {
+    statsContent.innerHTML = `
+      <div class="setup-note">
+        <h3>სტატისტიკა ჯერ არ არის დაკავშირებული</h3>
+        <p style="margin:0;color:var(--slate);">Vercel-ის Web Analytics-ის წასაკითხად სერვერს სჭირდება ტოკენი. დაამატე ეს ცვლადები Vercel-ზე (Project → Settings → Environment Variables) და გააკეთე redeploy:</p>
+        <ol>
+          <li><code>VERCEL_ANALYTICS_TOKEN</code> — Vercel-ის access token (Account Settings → Tokens)</li>
+          <li><code>VERCEL_PROJECT_ID</code> — პროექტის ID (Project → Settings → General)</li>
+          <li><code>VERCEL_TEAM_ID</code> — მხოლოდ თუ პროექტი გუნდზეა და არა პირად ანგარიშზე</li>
+        </ol>
+      </div>
+    `;
+  }
+
+  async function loadStats() {
+    setFeedback(statsFeedbackEl, 'იტვირთება...');
+    const { data } = await supabaseClient.auth.getSession();
+    const token = data.session && data.session.access_token;
+    if (!token) return;
+
+    try {
+      const response = await fetch('/api/stats?days=' + currentDays, {
+        headers: { Authorization: 'Bearer ' + token }
+      });
+
+      if (response.status === 503) {
+        renderSetupNote();
+        setFeedback(statsFeedbackEl, '');
+        return;
+      }
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        console.error('Stats request failed', response.status, body);
+        setFeedback(statsFeedbackEl, 'სტატისტიკის წამოღება ვერ მოხერხდა (' + response.status + ')');
+        return;
+      }
+
+      renderStats(await response.json());
+      setFeedback(statsFeedbackEl, '');
+    } catch (e) {
+      console.error('Stats request failed', e);
+      setFeedback(statsFeedbackEl, 'სტატისტიკის წამოღება ვერ მოხერხდა');
+    }
+  }
+
+  async function loadNewOrdersBadge() {
+    const { count, error } = await supabaseClient
+      .from('orders')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'new');
+    if (error) return;
+    const badge = document.getElementById('newOrdersBadge');
+    badge.textContent = count || 0;
+    badge.classList.toggle('show', (count || 0) > 0);
+  }
+
+  document.querySelectorAll('.range-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.range-btn').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentDays = Number(btn.dataset.days);
+      loadStats();
+    });
+  });
+  document.getElementById('refreshBtn').addEventListener('click', loadStats);
+
+  async function unlockAdmin() {
+    adminLoginBox.style.display = 'none';
+    statsBody.style.display = 'block';
+    logoutBtn.style.display = 'inline-block';
+    loadNewOrdersBadge();
+    loadStats();
+  }
+
+  function isAdminUser(user) {
+    return !!user && typeof user.email === 'string' && user.email.toLowerCase() === ADMIN_EMAIL;
+  }
+
+  async function checkAdminSession() {
+    const { data } = await supabaseClient.auth.getSession();
+    const user = data.session && data.session.user;
+    if (isAdminUser(user)) {
+      unlockAdmin();
+      return;
+    }
+    adminLoginBox.style.display = 'block';
+    statsBody.style.display = 'none';
+    statsContent.innerHTML = '';
+    if (user) {
+      logoutBtn.style.display = 'inline-block';
+      setFeedback(adminFeedbackEl, 'ეს Google ანგარიში არ არის ადმინისტრატორი');
+    } else {
+      logoutBtn.style.display = 'none';
+    }
+  }
+
+  document.getElementById('adminGoogleLoginBtn').addEventListener('click', () => {
+    supabaseClient.auth.signInWithOAuth({ provider: 'google' });
+  });
+  logoutBtn.addEventListener('click', async () => {
+    await supabaseClient.auth.signOut();
+    window.location.href = 'index.html';
+  });
+  supabaseClient.auth.onAuthStateChange(() => { checkAdminSession(); });
+  checkAdminSession();
+})();
+</script>
+</body>
+</html>

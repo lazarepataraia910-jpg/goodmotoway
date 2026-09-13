@@ -19,6 +19,10 @@
     '': 'classic-index.css',
     'product.html': 'classic-product.css',
     'admin.html': 'classic-admin.css',
+    'admin-orders.html': 'classic-admin.css',
+    'admin-orders': 'classic-admin.css',
+    'admin-stats.html': 'classic-admin.css',
+    'admin-stats': 'classic-admin.css',
     'faq.html': 'classic-faq.css',
     'support.html': 'classic-support.css',
     'compare.html': 'classic-compare.css'
@@ -124,7 +128,7 @@
   });
 
   var currentFile = window.location.pathname.split('/').pop() || 'index.html';
-  var isAdminPage = currentFile === 'admin.html' || currentFile === 'admin';
+  var isAdminPage = /^admin(-orders|-stats)?(\.html)?$/.test(currentFile);
 
   var chromeStyle = document.createElement('style');
   chromeStyle.textContent =

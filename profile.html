@@ -79,6 +79,22 @@
   .section-card h3 { margin: 0 0 4px; font-size: 15px; font-weight: 700; }
   .section-card .sc-sub { color: var(--slate); font-size: 13px; margin-bottom: 18px; }
 
+  .order-list { display: flex; flex-direction: column; gap: 10px; }
+  .order-row {
+    border: 1px solid var(--line-light); border-radius: 12px; padding: 14px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .order-row-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 12.5px; color: var(--slate); }
+  .order-row-name { font-weight: 700; font-size: 14.5px; }
+  .order-row-meta { font-size: 12.5px; color: var(--slate); }
+  .order-row-total { font-weight: 700; font-size: 14px; }
+  .order-empty { color: var(--slate); font-size: 13.5px; }
+  .pill { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+  .pill-new { background: rgba(216,37,59,0.12); color: var(--red-dark); }
+  .pill-confirmed { background: rgba(95,112,82,0.15); color: var(--sage); }
+  .pill-done { background: rgba(20,23,28,0.1); color: var(--text); }
+  .pill-cancelled { background: rgba(138,147,160,0.18); color: var(--slate); }
+
   .theme-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
   .theme-option {
     border: 2px solid var(--line-light); border-radius: 12px; padding: 16px; text-align: left;
@@ -175,6 +191,48 @@
 <script src="auth.js"></script>
 <script>
 (function () {
+  const STATUS_LABEL = { new: 'ახალი', confirmed: 'დადასტურებული', done: 'შესრულებული', cancelled: 'გაუქმებული' };
+  function formatPrice(n) { return new Intl.NumberFormat('ka-GE').format(Number(n) || 0); }
+  function formatDMY(iso) {
+    if (!iso) return '';
+    const [y, m, d] = String(iso).slice(0, 10).split('-');
+    return `${d}.${m}.${y}`;
+  }
+
+  async function renderMyOrders(user) {
+    const listEl = document.getElementById('myOrdersList');
+    if (!listEl) return;
+    const esc = window.gmEscapeHtml;
+
+    const { data, error } = await window.gmAuthClient
+      .from('orders')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Could not load orders', error);
+      listEl.innerHTML = '<div class="order-empty">შეკვეთების ჩატვირთვა ვერ მოხერხდა</div>';
+      return;
+    }
+    if (!data.length) {
+      listEl.innerHTML = '<div class="order-empty">ჯერ არ გაქვს შეკვეთები</div>';
+      return;
+    }
+
+    listEl.innerHTML = data.map((o) => `
+      <div class="order-row">
+        <div class="order-row-top">
+          <span>${esc(o.order_code)}</span>
+          <span class="pill pill-${esc(o.status)}">${esc(STATUS_LABEL[o.status] || o.status)}</span>
+        </div>
+        <div class="order-row-name">${esc(o.product_name)} × ${o.quantity}</div>
+        <div class="order-row-meta">${esc(formatDMY(o.pickup_date))} ${esc(o.pickup_time || '')}</div>
+        <div class="order-row-total">${formatPrice(o.total)} ₾</div>
+      </div>
+    `).join('');
+  }
+
   function renderLoggedIn(user, theme) {
     const name = (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) || user.email || 'მომხმარებელი';
     const avatar = user.user_metadata && user.user_metadata.avatar_url;
@@ -213,8 +271,18 @@
         </div>
       </div>
 
+      <div class="section-card">
+        <h3>ჩემი შეკვეთები</h3>
+        <div class="sc-sub">შენი შეკვეთების ისტორია და მიმდინარე სტატუსი.</div>
+        <div class="order-list" id="myOrdersList">
+          <div class="order-empty">იტვირთება...</div>
+        </div>
+      </div>
+
       <button type="button" class="signout-btn" id="signOutBtn">გასვლა</button>
     `;
+
+    renderMyOrders(user);
 
     function markActive(theme) {
       document.querySelectorAll('.theme-option').forEach(btn => {

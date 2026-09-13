@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GoodMotoway — შეკვეთები</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<!-- Vercel Web Analytics -->
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script defer src="auth.js"></script>
+<link rel="stylesheet" href="auth.css" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --ink: #14171C;
+    --paper: #F3F1EB;
+    --red: #D8253B;
+    --red-dark: #A60F1E;
+    --sage: #5F7052;
+    --line-light: #E4E1D8;
+    --slate: #8A93A0;
+    --surface: #ffffff;
+    --text: var(--ink);
+  }
+  :root[data-theme="dark"] {
+    --paper: #14171C;
+    --surface: #1B1F26;
+    --text: #F3F1EB;
+    --line-light: #262B33;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: 'Noto Sans Georgian', sans-serif; background: var(--paper); color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { text-decoration: none; }
+  .display { font-weight: 700; letter-spacing: -0.01em; }
+  ::selection { background: rgba(216,37,59,0.22); }
+
+  /* ---- Topbar ---- */
+  .topbar {
+    background: var(--paper); color: var(--text); padding: 18px 32px; display: flex;
+    align-items: center; justify-content: space-between; gap: 12px;
+    position: sticky; top: 0; z-index: 20; border-bottom: 1px solid var(--line-light);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-text { font-weight: 700; font-size: 17px; letter-spacing: -0.01em; color: inherit; }
+  .brand-text b { color: var(--red); }
+  .brand-tag {
+    font-weight: 700; font-size: 11px;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--slate); background: var(--surface);
+    border: 1px solid var(--line-light); padding: 3px 8px; border-radius: 4px;
+  }
+  .top-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  /* ---- Buttons ---- */
+  .btn {
+    border: none; border-radius: 8px; padding: 10px 16px; cursor: pointer; font-weight: 700;
+    font-size: 13.5px; font-family: 'Noto Sans Georgian', sans-serif; transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .btn:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+  .btn.red { background: var(--red); color: #fff; }
+  .btn.red:hover { background: var(--red-dark); }
+  .btn.dark { background: var(--ink); color: #fff; }
+  .btn.dark:hover { background: var(--red-dark); }
+  .btn.ghost { background: transparent; color: var(--slate); border: 1px solid var(--line-light); }
+  .btn.ghost:hover { color: var(--text); border-color: var(--text); }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 32px 32px 60px; }
+
+  /* ---- Admin tabs ---- */
+  .admin-tabs {
+    max-width: 1180px; margin: 0 auto; padding: 16px 32px 0; display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .admin-tab {
+    display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 999px;
+    border: 1px solid var(--line-light); background: var(--surface); color: var(--slate);
+    font-size: 13.5px; font-weight: 700; transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .admin-tab:hover { color: var(--text); border-color: var(--text); }
+  .admin-tab.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .admin-tab .tab-badge {
+    min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--red); color: #fff;
+    font-size: 11px; display: none; align-items: center; justify-content: center;
+  }
+  .admin-tab .tab-badge.show { display: inline-flex; }
+
+  /* ---- Login gate ---- */
+  .admin-login {
+    max-width: 380px; margin: 60px auto; background: var(--surface); color: var(--text);
+    border-radius: 16px; padding: 32px 28px; border: 1px solid var(--line-light); text-align: center;
+  }
+  .admin-login .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px; color: var(--red); font-size: 12px;
+    font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; margin-bottom: 8px;
+  }
+  .admin-login .eyebrow::before { content: ""; width: 18px; height: 1px; background: var(--red); display: block; }
+  .admin-login h2 { margin: 0 0 20px; font-size: 20px; font-weight: 700; }
+  .admin-login .btn.red { width: 100%; padding: 13px; font-size: 14px; }
+
+  /* ---- Form fields ---- */
+  .field { flex: 1 1 180px; }
+  label { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 700; color: var(--slate); letter-spacing: 0.2px; }
+  input, textarea, select {
+    width: 100%; border: 1px solid var(--line-light); border-radius: 8px; padding: 10px 12px;
+    font-size: 14px; color: var(--text); background: var(--surface); transition: border-color 0.2s ease;
+    font-family: 'Noto Sans Georgian', sans-serif;
+  }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--text); }
+
+  .panel { background: var(--surface); border: 1px solid var(--line-light); border-radius: 16px; padding: 22px; }
+  .panel-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; gap: 10px; flex-wrap: wrap; }
+  .panel-head h3 { margin: 0; font-size: 15px; font-weight: 700; }
+  .panel-head .count { font-weight: 700; color: var(--slate); font-size: 13px; }
+
+  .feedback {
+    margin-top: 14px; font-size: 12.5px; font-weight: 600; color: var(--red-dark);
+    padding: 10px 12px; border-radius: 8px; background: rgba(166,15,30,0.06);
+    min-height: 14px; display: none;
+  }
+  .feedback:not(:empty) { display: block; }
+  .feedback.success { color: #3f5836; background: rgba(95,112,82,0.1); }
+
+  /* ---- Orders workspace ---- */
+  .orders-body { display: none; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 20px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--line-light); border-radius: 14px; padding: 16px 18px; }
+  .stat-card .sc-label { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--slate); }
+  .stat-card .sc-value { font-size: 26px; font-weight: 700; margin-top: 6px; letter-spacing: -0.01em; }
+  .stat-card.accent .sc-value { color: var(--red-dark); }
+
+  .filters-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; align-items: flex-end; }
+  .filters-row .field { flex: 1 1 170px; }
+
+  .orders-table-wrap { overflow-x: auto; }
+  table.orders-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.orders-table th {
+    text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--slate);
+    font-weight: 700; padding: 10px 8px; border-bottom: 1px solid var(--line-light); white-space: nowrap;
+  }
+  table.orders-table td { padding: 12px 8px; border-bottom: 1px solid var(--line-light); vertical-align: middle; }
+  table.orders-table tr:last-child td { border-bottom: none; }
+  .order-code { font-weight: 700; }
+  .order-muted { color: var(--slate); font-size: 12px; }
+  .phone-cell { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .phone-cell a { color: var(--text); font-weight: 600; }
+  .phone-cell a:hover { color: var(--red-dark); }
+  .wa-mini {
+    width: 26px; height: 26px; border-radius: 50%; background: #25D366; display: inline-flex;
+    align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .wa-mini svg { width: 14px; height: 14px; fill: #fff; }
+  .status-select { padding: 7px 8px; font-size: 12.5px; font-weight: 700; border-radius: 8px; min-width: 130px; }
+  .status-select[data-status="new"] { border-color: var(--red); color: var(--red-dark); }
+  .status-select[data-status="confirmed"] { border-color: var(--sage); color: var(--sage); }
+  .status-select[data-status="cancelled"] { color: var(--slate); }
+  .row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .row-actions .btn { padding: 7px 11px; font-size: 12px; }
+
+  .empty-wrap {
+    text-align: center; padding: 60px 24px; background: var(--surface); border: 1px solid var(--line-light);
+    border-radius: 18px; color: var(--slate);
+  }
+  .empty-wrap h2 { color: var(--text); font-size: 19px; margin-bottom: 10px; font-weight: 700; }
+
+  /* ---- Details drawer ---- */
+  .drawer-overlay { position: fixed; inset: 0; background: rgba(20,23,28,0.5); z-index: 210; display: flex; justify-content: flex-end; }
+  .drawer-overlay[hidden] { display: none; }
+  .drawer {
+    background: var(--surface); color: var(--text); width: 100%; max-width: 400px; height: 100%;
+    overflow: auto; padding: 24px; display: flex; flex-direction: column; gap: 14px;
+  }
+  .drawer-head { display: flex; align-items: center; justify-content: space-between; }
+  .drawer-head h3 { margin: 0; font-size: 16px; }
+  .drawer-row { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line-light); font-size: 13.5px; }
+  .drawer-row span:first-child { color: var(--slate); font-weight: 600; flex-shrink: 0; }
+  .drawer-row span:last-child { text-align: right; word-break: break-word; }
+
+  .pill { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+  .pill-new { background: rgba(216,37,59,0.12); color: var(--red-dark); }
+  .pill-confirmed { background: rgba(95,112,82,0.15); color: var(--sage); }
+  .pill-done { background: rgba(20,23,28,0.1); color: var(--text); }
+  .pill-cancelled { background: rgba(138,147,160,0.18); color: var(--slate); }
+
+  @media (max-width: 800px) {
+    .topbar { padding: 16px 20px; }
+    .wrap { padding: 24px 20px 60px; }
+    .admin-tabs { padding: 16px 20px 0; }
+
+    table.orders-table thead { display: none; }
+    table.orders-table, table.orders-table tbody, table.orders-table tr, table.orders-table td { display: block; width: 100%; }
+    table.orders-table tr {
+      border: 1px solid var(--line-light); border-radius: 14px; padding: 12px; margin-bottom: 12px;
+    }
+    table.orders-table td { border: none; padding: 6px 0; display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+    table.orders-table td::before {
+      content: attr(data-label); color: var(--slate); font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.4px; flex-shrink: 0;
+    }
+    .row-actions { justify-content: flex-end; }
+  }
+</style>
+<script>
+  (function(){try{
+    var t = localStorage.getItem('gm_theme');
+    if (t === 'dark') { document.documentElement.setAttribute('data-theme','dark'); }
+    else if (t === 'classic') {
+      var f = location.pathname.split('/').pop();
+      var m = {'index.html':'classic-index.css','':'classic-index.css','product.html':'classic-product.css','admin.html':'classic-admin.css','admin-orders.html':'classic-admin.css','admin-orders':'classic-admin.css','faq.html':'classic-faq.css','support.html':'classic-support.css','compare.html':'classic-compare.css'};
+      var href = m[f];
+      if (href) {
+        var l = document.createElement('link');
+        l.id = 'gmClassicTheme'; l.rel = 'stylesheet'; l.href = href;
+        document.head.appendChild(l);
+      }
+    }
+  }catch(e){}})();
+</script>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <a href="index.html" class="brand-text">Good<b>Motoway</b></a>
+    <span class="brand-tag">Admin</span>
+  </div>
+  <div class="top-actions">
+    <div id="authSlot"></div>
+    <a class="btn ghost" href="index.html">საიტის დაბრუნება</a>
+    <button class="btn dark" id="logoutBtn" type="button" style="display:none;">გასვლა</button>
+  </div>
+</header>
+
+<nav class="admin-tabs">
+  <a class="admin-tab" href="admin.html">პროდუქტები</a>
+  <a class="admin-tab active" href="admin-orders.html">
+    შეკვეთები
+    <span class="tab-badge" id="newOrdersBadge">0</span>
+  </a>
+  <a class="admin-tab" href="admin-stats.html">სტატისტიკა</a>
+</nav>
+
+<div class="wrap">
+  <div class="admin-login" id="adminLoginBox">
+    <div class="eyebrow">წვდომა შეზღუდულია</div>
+    <h2>შეკვეთების პანელი</h2>
+    <p style="color:var(--slate);font-size:13px;margin:0 0 18px;line-height:1.5;">წვდომა შესაძლებელია მხოლოდ ადმინისტრატორის Google ანგარიშით.</p>
+    <button class="btn red" id="adminGoogleLoginBtn" type="button" style="display:flex;align-items:center;justify-content:center;gap:8px;">
+      <svg viewBox="0 0 24 24" width="16" height="16"><path fill="#fff" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.7-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"/><path fill="#fff" d="M12 24c3.2 0 5.9-1.1 7.9-2.9l-3.9-3c-1.1.7-2.4 1.1-4 1.1-3.1 0-5.7-2.1-6.6-4.9H1.4v3.1C3.4 21.3 7.4 24 12 24z" opacity="0.85"/><path fill="#fff" d="M5.4 14.3c-.2-.7-.4-1.5-.4-2.3s.1-1.6.4-2.3V6.6H1.4C.5 8.3 0 10.1 0 12s.5 3.7 1.4 5.4l4-3.1z" opacity="0.7"/><path fill="#fff" d="M12 4.8c1.7 0 3.3.6 4.5 1.7l3.4-3.4C17.9 1.2 15.2 0 12 0 7.4 0 3.4 2.7 1.4 6.6l4 3.1c.9-2.8 3.5-4.9 6.6-4.9z" opacity="0.55"/></svg>
+      Google ანგარიშით შესვლა
+    </button>
+    <div class="feedback" id="adminFeedback"></div>
+  </div>
+
+  <div class="orders-body" id="ordersBody">
+    <div class="stat-grid">
+      <div class="stat-card"><div class="sc-label">დღეს</div><div class="sc-value" id="statToday">0</div></div>
+      <div class="stat-card accent"><div class="sc-label">ახალი</div><div class="sc-value" id="statNew">0</div></div>
+      <div class="stat-card"><div class="sc-label">ამ თვეში</div><div class="sc-value" id="statMonth">0</div></div>
+      <div class="stat-card"><div class="sc-label">ჯამური თანხა</div><div class="sc-value" id="statTotal">0 ₾</div></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h3>შეკვეთები</h3>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <span class="count" id="ordersCount"></span>
+          <button class="btn ghost" type="button" id="exportCsvBtn">CSV ექსპორტი</button>
+          <button class="btn ghost" type="button" id="refreshBtn">განახლება</button>
+        </div>
+      </div>
+
+      <div class="filters-row">
+        <div class="field">
+          <label for="statusFilter">სტატუსი</label>
+          <select id="statusFilter">
+            <option value="all">ყველა</option>
+            <option value="new">ახალი</option>
+            <option value="confirmed">დადასტურებული</option>
+            <option value="done">შესრულებული</option>
+            <option value="cancelled">გაუქმებული</option>
+          </select>
+        </div>
+        <div class="field" style="flex:2 1 240px;">
+          <label for="searchFilter">ძებნა</label>
+          <input type="text" id="searchFilter" placeholder="სახელი, ტელეფონი, კოდი ან პროდუქტი" />
+        </div>
+        <div class="field">
+          <label for="dateFrom">აღების თარიღი დან</label>
+          <input type="date" id="dateFrom" />
+        </div>
+        <div class="field">
+          <label for="dateTo">აღების თარიღი მდე</label>
+          <input type="date" id="dateTo" />
+        </div>
+        <div class="field" style="flex:0 0 auto;">
+          <button class="btn ghost" type="button" id="resetFiltersBtn">გასუფთავება</button>
+        </div>
+      </div>
+
+      <div class="orders-table-wrap" id="ordersTableWrap"></div>
+      <div class="feedback" id="ordersFeedback"></div>
+    </div>
+  </div>
+</div>
+
+<div class="drawer-overlay" id="drawerOverlay" hidden>
+  <div class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+    <div class="drawer-head">
+      <h3 id="drawerTitle">შეკვეთის დეტალები</h3>
+      <button class="btn ghost" type="button" id="drawerCloseBtn">დახურვა</button>
+    </div>
+    <div id="drawerContent"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const SUPABASE_URL = 'https://lceebrhbvnyzoxkauugo.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxjZWVicmhidm55em94a2F1dWdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU3ODkyNzAsImV4cCI6MjEwMTM2NTI3MH0.IeGvLg09wjni7OJdiLeAiO3pvrXxIUgzISNKnVKpXYI';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const ADMIN_EMAIL = 'lazarepataraia910@gmail.com';
+
+  const STATUS_LABEL = { new: 'ახალი', confirmed: 'დადასტურებული', done: 'შესრულებული', cancelled: 'გაუქმებული' };
+
+  function escapeHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+  function formatPrice(n) { return new Intl.NumberFormat('ka-GE').format(Number(n) || 0); }
+  function pad2(n) { return String(n).padStart(2, '0'); }
+  function toISODate(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+  function formatDMY(iso) {
+    if (!iso) return '';
+    const [y, m, d] = String(iso).slice(0, 10).split('-');
+    return `${d}.${m}.${y}`;
+  }
+  function formatDateTime(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return `${pad2(d.getDate())}.${pad2(d.getMonth() + 1)}.${d.getFullYear()} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+  }
+
+  let ORDERS = [];
+  let pollTimer = null;
+
+  const adminLoginBox = document.getElementById('adminLoginBox');
+  const ordersBody = document.getElementById('ordersBody');
+  const adminFeedbackEl = document.getElementById('adminFeedback');
+  const ordersFeedbackEl = document.getElementById('ordersFeedback');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const tableWrap = document.getElementById('ordersTableWrap');
+  const statusFilter = document.getElementById('statusFilter');
+  const searchFilter = document.getElementById('searchFilter');
+  const dateFrom = document.getElementById('dateFrom');
+  const dateTo = document.getElementById('dateTo');
+  const drawerOverlay = document.getElementById('drawerOverlay');
+
+  function setFeedback(el, text, success = false) {
+    el.className = 'feedback' + (success ? ' success' : '');
+    el.textContent = text;
+  }
+
+  async function loadOrders() {
+    const { data, error } = await supabaseClient.from('orders').select('*').order('created_at', { ascending: false });
+    if (error) {
+      console.error('Could not load orders', error);
+      setFeedback(ordersFeedbackEl, 'შეკვეთების ჩატვირთვა ვერ მოხერხდა');
+      return [];
+    }
+    return data;
+  }
+
+  function getFiltered() {
+    const q = searchFilter.value.trim().toLowerCase();
+    return ORDERS.filter((o) => {
+      if (statusFilter.value !== 'all' && o.status !== statusFilter.value) return false;
+      if (dateFrom.value && o.pickup_date < dateFrom.value) return false;
+      if (dateTo.value && o.pickup_date > dateTo.value) return false;
+      if (q) {
+        const hay = `${o.customer_name} ${o.customer_phone} ${o.order_code} ${o.product_name}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+  }
+
+  function renderStats() {
+    const today = toISODate(new Date());
+    const monthPrefix = today.slice(0, 7);
+    const todayCount = ORDERS.filter((o) => String(o.created_at).slice(0, 10) === today).length;
+    const newCount = ORDERS.filter((o) => o.status === 'new').length;
+    const monthCount = ORDERS.filter((o) => String(o.created_at).slice(0, 7) === monthPrefix).length;
+    const totalSum = ORDERS.filter((o) => o.status !== 'cancelled').reduce((sum, o) => sum + (Number(o.total) || 0), 0);
+
+    document.getElementById('statToday').textContent = todayCount;
+    document.getElementById('statNew').textContent = newCount;
+    document.getElementById('statMonth').textContent = monthCount;
+    document.getElementById('statTotal').textContent = formatPrice(totalSum) + ' ₾';
+
+    const badge = document.getElementById('newOrdersBadge');
+    badge.textContent = newCount;
+    badge.classList.toggle('show', newCount > 0);
+  }
+
+  function renderTable() {
+    const list = getFiltered();
+    document.getElementById('ordersCount').textContent = list.length + ' შეკვეთა';
+
+    if (!list.length) {
+      tableWrap.innerHTML = `
+        <div class="empty-wrap">
+          <h2>შეკვეთები ვერ მოიძებნა</h2>
+          <p>${ORDERS.length ? 'შეცვალე ფილტრები ან გაასუფთავე ძებნა.' : 'ახალი შეკვეთები აქ ავტომატურად გამოჩნდება.'}</p>
+        </div>`;
+      return;
+    }
+
+    tableWrap.innerHTML = `
+      <table class="orders-table">
+        <thead>
+          <tr>
+            <th>კოდი</th><th>მიღებულია</th><th>მომხმარებელი</th><th>ტელეფონი</th><th>პროდუქტი</th>
+            <th>რაოდ.</th><th>აღება</th><th>ჯამი</th><th>სტატუსი</th><th>მოქმედებები</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${list.map((o) => `
+            <tr>
+              <td data-label="კოდი"><span class="order-code">${escapeHtml(o.order_code)}</span></td>
+              <td data-label="მიღებულია"><span class="order-muted">${escapeHtml(formatDateTime(o.created_at))}</span></td>
+              <td data-label="მომხმარებელი">${escapeHtml(o.customer_name)}</td>
+              <td data-label="ტელეფონი">
+                <span class="phone-cell">
+                  <a href="tel:${escapeHtml(o.customer_phone)}">${escapeHtml(o.customer_phone)}</a>
+                  <a class="wa-mini" href="https://wa.me/${escapeHtml(String(o.customer_phone).replace(/\D/g, ''))}" target="_blank" rel="noopener" aria-label="WhatsApp">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.4 5.2L2 22l4.9-1.3C8.5 21.6 10.2 22 12 22c5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.2c-1.6 0-3.1-.4-4.5-1.2l-.3-.2-3.3.9.9-3.2-.2-.3C3.7 14.7 3.2 13.4 3.2 12 3.2 7.1 7.1 3.2 12 3.2S20.8 7.1 20.8 12 16.9 20.2 12 20.2z"/></svg>
+                  </a>
+                </span>
+              </td>
+              <td data-label="პროდუქტი">
+                ${escapeHtml(o.product_name)}
+                ${o.product_color ? `<div class="order-muted">${escapeHtml(o.product_color)}</div>` : ''}
+              </td>
+              <td data-label="რაოდ.">${o.quantity}</td>
+              <td data-label="აღება">${escapeHtml(formatDMY(o.pickup_date))} ${escapeHtml(o.pickup_time || '')}</td>
+              <td data-label="ჯამი">${formatPrice(o.total)} ₾</td>
+              <td data-label="სტატუსი">
+                <select class="status-select" data-status="${escapeHtml(o.status)}" data-status-for="${o.id}">
+                  ${Object.keys(STATUS_LABEL).map((key) => `<option value="${key}" ${o.status === key ? 'selected' : ''}>${STATUS_LABEL[key]}</option>`).join('')}
+                </select>
+              </td>
+              <td data-label="მოქმედებები">
+                <div class="row-actions">
+                  <button class="btn ghost" type="button" data-details="${o.id}">დეტალები</button>
+                  <button class="btn red" type="button" data-delete="${o.id}">წაშლა</button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>`;
+
+    tableWrap.querySelectorAll('[data-status-for]').forEach((select) => {
+      select.addEventListener('change', () => changeStatus(Number(select.dataset.statusFor), select));
+    });
+    tableWrap.querySelectorAll('[data-details]').forEach((btn) => {
+      btn.addEventListener('click', () => openDetails(Number(btn.dataset.details)));
+    });
+    tableWrap.querySelectorAll('[data-delete]').forEach((btn) => {
+      btn.addEventListener('click', () => deleteOrder(Number(btn.dataset.delete)));
+    });
+  }
+
+  function render() {
+    renderStats();
+    renderTable();
+  }
+
+  async function changeStatus(id, select) {
+    const order = ORDERS.find((o) => o.id === id);
+    if (!order) return;
+    const previous = order.status;
+    const next = select.value;
+
+    order.status = next;
+    select.dataset.status = next;
+    renderStats();
+
+    const { error } = await supabaseClient.from('orders').update({ status: next }).eq('id', id);
+    if (error) {
+      console.error('Could not update status', error);
+      order.status = previous;
+      select.value = previous;
+      select.dataset.status = previous;
+      renderStats();
+      setFeedback(ordersFeedbackEl, 'სტატუსის შეცვლა ვერ მოხერხდა');
+      return;
+    }
+    setFeedback(ordersFeedbackEl, 'სტატუსი განახლდა', true);
+  }
+
+  async function deleteOrder(id) {
+    if (!window.confirm('ნამდვილად გსურთ ამ შეკვეთის წაშლა?')) return;
+    const { error } = await supabaseClient.from('orders').delete().eq('id', id);
+    if (error) {
+      console.error('Could not delete order', error);
+      setFeedback(ordersFeedbackEl, 'წაშლა ვერ მოხერხდა');
+      return;
+    }
+    ORDERS = ORDERS.filter((o) => o.id !== id);
+    render();
+    setFeedback(ordersFeedbackEl, 'შეკვეთა წაშლილია', true);
+  }
+
+  function drawerRow(label, value) {
+    if (!value) return '';
+    return `<div class="drawer-row"><span>${label}</span><span>${escapeHtml(value)}</span></div>`;
+  }
+
+  function openDetails(id) {
+    const o = ORDERS.find((item) => item.id === id);
+    if (!o) return;
+    document.getElementById('drawerContent').innerHTML = `
+      <div class="drawer-row">
+        <span>სტატუსი</span>
+        <span><span class="pill pill-${escapeHtml(o.status)}">${escapeHtml(STATUS_LABEL[o.status] || o.status)}</span></span>
+      </div>
+      ${drawerRow('კოდი', o.order_code)}
+      ${drawerRow('მიღებულია', formatDateTime(o.created_at))}
+      ${drawerRow('პროდუქტი', o.product_name)}
+      ${drawerRow('ფერი', o.product_color)}
+      ${drawerRow('ერთეულის ფასი', formatPrice(o.unit_price) + ' ₾')}
+      ${drawerRow('რაოდენობა', String(o.quantity))}
+      ${drawerRow('ჯამი', formatPrice(o.total) + ' ₾')}
+      ${drawerRow('აღების თარიღი', formatDMY(o.pickup_date) + ' ' + (o.pickup_time || ''))}
+      ${drawerRow('სახელი', o.customer_name)}
+      ${drawerRow('ტელეფონი', o.customer_phone)}
+      ${drawerRow('კომენტარი', o.note)}
+    `;
+    drawerOverlay.hidden = false;
+  }
+
+  function closeDrawer() { drawerOverlay.hidden = true; }
+  document.getElementById('drawerCloseBtn').addEventListener('click', closeDrawer);
+  drawerOverlay.addEventListener('mousedown', (e) => { if (e.target === drawerOverlay) closeDrawer(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !drawerOverlay.hidden) closeDrawer(); });
+
+  function exportCsv() {
+    const list = getFiltered();
+    if (!list.length) return;
+    const headers = ['კოდი', 'მიღებულია', 'სახელი', 'ტელეფონი', 'პროდუქტი', 'ფერი', 'რაოდენობა', 'ერთეულის ფასი', 'ჯამი', 'აღების თარიღი', 'დრო', 'კომენტარი', 'სტატუსი'];
+    const rows = list.map((o) => [
+      o.order_code, formatDateTime(o.created_at), o.customer_name, o.customer_phone, o.product_name,
+      o.product_color || '', o.quantity, o.unit_price, o.total,
+      formatDMY(o.pickup_date), o.pickup_time || '', o.note || '', STATUS_LABEL[o.status] || o.status
+    ]);
+    const csv = [headers, ...rows]
+      .map((row) => row.map((cell) => `"${String(cell == null ? '' : cell).replace(/"/g, '""')}"`).join(','))
+      .join('\r\n');
+
+    // BOM keeps Georgian readable when the file is opened in Excel.
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `goodmotoway-orders-${toISODate(new Date())}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function refresh() {
+    ORDERS = await loadOrders();
+    render();
+  }
+
+  function startPolling() {
+    if (pollTimer) return;
+    pollTimer = setInterval(refresh, 30000);
+  }
+
+  function subscribeToOrders() {
+    let subscribed = false;
+    supabaseClient
+      .channel('orders')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, refresh)
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') subscribed = true;
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') startPolling();
+      });
+    // If Realtime is not enabled for public.orders, fall back to polling.
+    setTimeout(() => { if (!subscribed) startPolling(); }, 5000);
+  }
+
+  statusFilter.addEventListener('change', renderTable);
+  searchFilter.addEventListener('input', renderTable);
+  dateFrom.addEventListener('change', renderTable);
+  dateTo.addEventListener('change', renderTable);
+  document.getElementById('resetFiltersBtn').addEventListener('click', () => {
+    statusFilter.value = 'all';
+    searchFilter.value = '';
+    dateFrom.value = '';
+    dateTo.value = '';
+    renderTable();
+  });
+  document.getElementById('exportCsvBtn').addEventListener('click', exportCsv);
+  document.getElementById('refreshBtn').addEventListener('click', refresh);
+
+  async function unlockAdmin() {
+    adminLoginBox.style.display = 'none';
+    ordersBody.style.display = 'block';
+    logoutBtn.style.display = 'inline-block';
+    await refresh();
+    subscribeToOrders();
+  }
+
+  function isAdminUser(user) {
+    return !!user && typeof user.email === 'string' && user.email.toLowerCase() === ADMIN_EMAIL;
+  }
+
+  async function checkAdminSession() {
+    const { data } = await supabaseClient.auth.getSession();
+    const user = data.session && data.session.user;
+    if (isAdminUser(user)) {
+      unlockAdmin();
+      return;
+    }
+    adminLoginBox.style.display = 'block';
+    ordersBody.style.display = 'none';
+    ORDERS = [];
+    if (user) {
+      logoutBtn.style.display = 'inline-block';
+      setFeedback(adminFeedbackEl, 'ეს Google ანგარიში არ არის ადმინისტრატორი');
+    } else {
+      logoutBtn.style.display = 'none';
+    }
+  }
+
+  document.getElementById('adminGoogleLoginBtn').addEventListener('click', () => {
+    supabaseClient.auth.signInWithOAuth({ provider: 'google' });
+  });
+  logoutBtn.addEventListener('click', async () => {
+    await supabaseClient.auth.signOut();
+    window.location.href = 'index.html';
+  });
+  supabaseClient.auth.onAuthStateChange(() => { checkAdminSession(); });
+  checkAdminSession();
+})();
+</script>
+</body>
+</html>
