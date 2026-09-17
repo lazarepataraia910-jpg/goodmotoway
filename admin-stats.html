@@ -425,7 +425,10 @@
       if (!response.ok) {
         const body = await response.json().catch(() => ({}));
         console.error('Stats request failed', response.status, body);
-        setFeedback(statsFeedbackEl, 'სტატისტიკის წამოღება ვერ მოხერხდა (' + response.status + ')');
+        // the detail comes from Vercel's own error response and is what tells
+        // a wrong token apart from a project the token cannot reach
+        const detail = body.message || body.error || '';
+        setFeedback(statsFeedbackEl, 'სტატისტიკის წამოღება ვერ მოხერხდა (' + response.status + ')' + (detail ? ' — ' + detail : ''));
         return;
       }
 
