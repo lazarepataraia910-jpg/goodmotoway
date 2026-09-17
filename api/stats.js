@@ -69,7 +69,13 @@ module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
 
   if (!process.env.VERCEL_ANALYTICS_TOKEN || !process.env.VERCEL_PROJECT_ID) {
-    res.status(503).json({ error: 'not_configured' });
+    // names only — never the values — so a misconfigured deployment can say
+    // which variable it is missing
+    res.status(503).json({
+      error: 'not_configured',
+      missing: ['VERCEL_ANALYTICS_TOKEN', 'VERCEL_PROJECT_ID', 'VERCEL_TEAM_ID'].filter((n) => !process.env[n]),
+      runtimeHasSystemEnv: !!process.env.VERCEL_ENV
+    });
     return;
   }
 
