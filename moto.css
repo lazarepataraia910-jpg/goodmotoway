@@ -529,3 +529,9 @@ table.orders-table td { border-bottom: 1px solid #1e2126; }
 }
 .model-option .mo-price { font-family: 'JetBrains Mono', monospace; color: #8b9099; }
 .model-picker.invalid { border-color: #ff3b3b; }
+.model-option .mo-sale { background: var(--red); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.04em; }
+.model-option .mo-sale.scheduled { background: #2a2f36; color: #c4c8ce; }
+.current-sale { background: #0b0c0e; border-color: #2a2f36; color: #8b9099; }
+.current-sale b { color: #fff; font-family: 'JetBrains Mono', monospace; }
+.btn.danger { border-color: rgba(255, 59, 59, 0.45); color: #ff3b3b; }
+.btn.danger:hover { background: var(--red); border-color: var(--red); color: #fff; }

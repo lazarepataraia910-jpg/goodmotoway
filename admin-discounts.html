@@ -73,6 +73,8 @@
   .btn.ghost { background: transparent; color: var(--slate); border: 1px solid var(--line-light); }
   .btn.ghost:hover { color: var(--text); border-color: var(--text); }
   .btn.small { padding: 7px 12px; font-size: 12.5px; }
+  .btn.danger { background: transparent; color: var(--red-dark); border: 1px solid rgba(166,15,30,0.35); }
+  .btn.danger:hover { background: var(--red-dark); color: #fff; border-color: var(--red-dark); }
 
   .wrap { max-width: 1180px; margin: 0 auto; padding: 32px 32px 60px; }
 
@@ -160,6 +162,18 @@
     display: none; align-items: center; justify-content: center;
   }
   .model-option.selected .mo-check { display: flex; }
+  .model-option .mo-sale {
+    position: absolute; top: 6px; left: 6px; padding: 2px 7px; border-radius: 999px;
+    background: var(--red); color: #fff; font-size: 11px; font-weight: 800; line-height: 1.4;
+  }
+  .model-option .mo-sale.scheduled { background: var(--ink); }
+  .current-sales { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+  .current-sales:empty { display: none; }
+  .current-sale {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+    padding: 9px 12px; border: 1px solid var(--line-light); border-radius: 10px; font-size: 12.5px; color: var(--slate);
+  }
+  .current-sale b { color: var(--text); }
   .field-hint { margin-top: 6px; font-size: 12px; color: var(--slate); min-height: 16px; }
   .field-hint b { color: var(--text); }
   .field-hint .save { color: var(--sage); font-weight: 700; }
@@ -304,6 +318,7 @@
           <label id="dProductLabel">მოდელი</label>
           <div class="model-picker" id="modelPicker" role="radiogroup" aria-labelledby="dProductLabel"></div>
           <div class="field-hint" id="dProductHint"></div>
+          <div class="current-sales" id="dCurrentSales"></div>
         </div>
         <div class="full">
           <label for="dPrice">ახალი ფასი (₾)</label>
@@ -340,6 +355,7 @@
       <div class="panel-head">
         <h3>ფასდაკლებების სია</h3>
         <span class="count" id="discountCount"></span>
+        <button class="btn danger small" type="button" id="clearExpiredBtn" style="display:none;"></button>
       </div>
       <div class="discount-list" id="discountList"></div>
       <div class="feedback" id="listFeedback"></div>
@@ -411,6 +427,13 @@
     el.textContent = text;
   }
   function productById(id) { return PRODUCTS.find((p) => p.id === Number(id)); }
+  // sales a model still has ahead of it: running now, then waiting to start
+  function openSalesOf(productId, now) {
+    return DISCOUNTS
+      .map((d) => ({ d, status: statusOf(d, now) }))
+      .filter((x) => x.d.product_id === productId && (x.status === 'live' || x.status === 'scheduled'))
+      .sort((a, b) => ((a.status === 'live' ? 0 : 1) - (b.status === 'live' ? 0 : 1)) || (new Date(a.d.starts_at) - new Date(b.d.starts_at)));
+  }
 
   // A missing table is the one failure the admin can fix without us, so it
   // gets its own instructions instead of a bare error.
@@ -470,7 +493,34 @@
     pickerEl.classList.remove('invalid');
     const p = productById(id);
     document.getElementById('dProductHint').innerHTML = p ? '<b>' + escapeHtml(p.name) + '</b> · ახლანდელი ფასი: <b>' + formatPrice(p.price) + ' ₾</b>' : '';
+    renderCurrentSales();
     updatePriceHint();
+  }
+
+  // Picking a model that already has a sale shows it right there, so it can be
+  // removed without hunting for it in the list.
+  function renderCurrentSales() {
+    const box = document.getElementById('dCurrentSales');
+    if (!selectedProductId) { box.innerHTML = ''; return; }
+    box.innerHTML = openSalesOf(selectedProductId, new Date()).map(({ d, status }) => `
+      <div class="current-sale">
+        <span>${status === 'live' ? 'ამ მოდელზე მოქმედებს აქცია' : 'დაგეგმილი აქცია'}: <b>${formatPrice(d.sale_price)} ₾</b> · ${escapeHtml(status === 'live' ? formatWhen(d.ends_at) + '-მდე' : formatWhen(d.starts_at) + '-დან')}</span>
+        <button class="btn danger small" type="button" data-delete="${d.id}">აქციის წაშლა</button>
+      </div>`).join('');
+  }
+
+  function renderSaleTags() {
+    const now = new Date();
+    pickerEl.querySelectorAll('.model-option').forEach((b) => {
+      const p = productById(b.dataset.id);
+      const open = p ? openSalesOf(p.id, now) : [];
+      let tag = b.querySelector('.mo-sale');
+      if (!open.length) { if (tag) tag.remove(); return; }
+      if (!tag) { tag = document.createElement('span'); b.appendChild(tag); }
+      const first = open[0];
+      tag.className = 'mo-sale' + (first.status === 'scheduled' ? ' scheduled' : '');
+      tag.textContent = first.status === 'live' ? '−' + percentOff(p.price, first.d.sale_price) + '%' : 'დაგეგმილი';
+    });
   }
 
   function renderPicker() {
@@ -484,6 +534,7 @@
           <span class="mo-price">${formatPrice(p.price)} ₾</span>
         </span>
       </button>`).join('');
+    renderSaleTags();
     if (selectedProductId) selectProduct(selectedProductId);
   }
 
@@ -552,6 +603,12 @@
   /* ---------- list ---------- */
   function renderList() {
     const now = new Date();
+    renderSaleTags();
+    renderCurrentSales();
+    const expiredCount = DISCOUNTS.filter((d) => statusOf(d, now) === 'expired').length;
+    const clearBtn = document.getElementById('clearExpiredBtn');
+    clearBtn.style.display = expiredCount ? '' : 'none';
+    clearBtn.textContent = 'ვადაგასულების წაშლა (' + expiredCount + ')';
     document.getElementById('discountCount').textContent = DISCOUNTS.length ? DISCOUNTS.length + ' ჩანაწერი' : '';
     if (!DISCOUNTS.length) {
       listEl.innerHTML = '<div class="list-empty">ფასდაკლებები ჯერ არ არის</div>';
@@ -586,7 +643,7 @@
             <span class="pill pill-${status}">${STATUS_LABEL[status]}</span>
             <div class="dr-actions">
               ${status !== 'expired' ? `<button class="btn ghost small" type="button" data-toggle="${d.id}">${d.active ? 'გამორთვა' : 'ჩართვა'}</button>` : ''}
-              <button class="btn ghost small" type="button" data-delete="${d.id}">წაშლა</button>
+              <button class="btn danger small" type="button" data-delete="${d.id}">წაშლა</button>
             </div>
           </div>
         </div>`;
@@ -610,17 +667,50 @@
       setFeedback('listFeedback', '');
       await loadDiscounts();
     }
-    if (del) {
-      if (!window.confirm('ნამდვილად გსურთ ამ ფასდაკლების წაშლა?')) return;
-      const { error } = await supabaseClient.from('discounts').delete().eq('id', Number(del.dataset.delete));
-      if (error) {
-        console.error('Could not delete discount', error);
-        setFeedback('listFeedback', 'წაშლა ვერ მოხერხდა: ' + (error.message || ''));
-        return;
-      }
-      setFeedback('listFeedback', '');
-      await loadDiscounts();
+    if (del) await deleteDiscount(Number(del.dataset.delete), del, 'listFeedback');
+  });
+
+  document.getElementById('dCurrentSales').addEventListener('click', async (e) => {
+    const del = e.target.closest('[data-delete]');
+    if (del) await deleteDiscount(Number(del.dataset.delete), del, 'formFeedback');
+  });
+
+  async function deleteDiscount(id, btn, feedbackId) {
+    const d = DISCOUNTS.find((x) => x.id === id);
+    if (!d) return;
+    const p = productById(d.product_id);
+    const question = p
+      ? 'წაიშალოს ' + p.name + '-ის აქცია (' + formatPrice(d.sale_price) + ' ₾)?\nფასი დაუბრუნდება ' + formatPrice(p.price) + ' ₾-ს.'
+      : 'წაიშალოს ეს აქცია?';
+    if (!window.confirm(question)) return;
+    btn.disabled = true;
+    const { error } = await supabaseClient.from('discounts').delete().eq('id', id);
+    if (error) {
+      console.error('Could not delete discount', error);
+      setFeedback(feedbackId, 'წაშლა ვერ მოხერხდა: ' + (error.message || ''));
+      btn.disabled = false;
+      return;
     }
+    setFeedback(feedbackId, 'აქცია წაიშალა ✓', true);
+    await loadDiscounts();
+  }
+
+  const clearExpiredBtn = document.getElementById('clearExpiredBtn');
+  clearExpiredBtn.addEventListener('click', async () => {
+    const now = new Date();
+    const ids = DISCOUNTS.filter((d) => statusOf(d, now) === 'expired').map((d) => d.id);
+    if (!ids.length) return;
+    if (!window.confirm('წაიშალოს ' + ids.length + ' ვადაგასული აქცია?')) return;
+    clearExpiredBtn.disabled = true;
+    const { error } = await supabaseClient.from('discounts').delete().in('id', ids);
+    clearExpiredBtn.disabled = false;
+    if (error) {
+      console.error('Could not delete expired discounts', error);
+      setFeedback('listFeedback', 'წაშლა ვერ მოხერხდა: ' + (error.message || ''));
+      return;
+    }
+    setFeedback('listFeedback', 'ვადაგასული აქციები წაიშალა ✓', true);
+    await loadDiscounts();
   });
 
   /* ---------- data ---------- */
