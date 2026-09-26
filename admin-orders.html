@@ -217,7 +217,7 @@
     var k = (location.pathname.split('/').pop() || 'index').replace(/\.html$/, '') || 'index';
     if (t === 'dark') { document.documentElement.setAttribute('data-theme','dark'); }
     else if (!t || t === 'moto') {
-      var ml = {'index':1,'product':1,'faq':1,'support':1,'compare':1,'admin':1,'admin-orders':1,'admin-stats':1,'profile':1};
+      var ml = {'index':1,'product':1,'faq':1,'support':1,'compare':1,'admin':1,'admin-orders':1,'admin-stats':1,'admin-discounts':1,'profile':1};
       if (ml[k]) {
         // paint the dark ground immediately; moto.css still has to come off the
         // network and the page's own <style> would flash light until it lands
@@ -231,7 +231,7 @@
       }
     }
     else if (t === 'classic') {
-      var m = {'index':'classic-index.css','product':'classic-product.css','admin':'classic-admin.css','admin-orders':'classic-admin.css','admin-stats':'classic-admin.css','faq':'classic-faq.css','support':'classic-support.css','compare':'classic-compare.css'};
+      var m = {'index':'classic-index.css','product':'classic-product.css','admin':'classic-admin.css','admin-orders':'classic-admin.css','admin-stats':'classic-admin.css','admin-discounts':'classic-admin.css','faq':'classic-faq.css','support':'classic-support.css','compare':'classic-compare.css'};
       var href = m[k];
       if (href) {
         var l = document.createElement('link');
@@ -261,6 +261,7 @@
     შეკვეთები
     <span class="tab-badge" id="newOrdersBadge">0</span>
   </a>
+  <a class="admin-tab" href="admin-discounts.html">ფასდაკლებები</a>
   <a class="admin-tab" href="admin-stats.html">სტატისტიკა</a>
 </nav>
 

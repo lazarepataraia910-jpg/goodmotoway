@@ -123,6 +123,7 @@
     .gm-order-modal-head { position: relative; }
     .gm-order-product-line { background: var(--paper, #F3F1EB); border-radius: 10px; padding: 10px 12px; font-size: 13.5px; display: flex; justify-content: space-between; gap: 10px; align-items: center; }
     .gm-order-product-line b { font-weight: 700; }
+    .gm-order-old-price { color: var(--slate, #8A93A0); font-weight: 600; margin-right: 4px; }
     .gm-field { display: flex; flex-direction: column; gap: 6px; }
     .gm-field label { font-size: 12px; font-weight: 700; color: var(--slate, #8A93A0); letter-spacing: 0.2px; }
     .gm-field input[type="text"], .gm-field input[type="date"], .gm-field select, .gm-field textarea {
@@ -226,7 +227,7 @@
       </div>
       <div class="gm-order-product-line">
         <span>${esc(currentProduct.name)}</span>
-        <b>${formatPrice(currentProduct.price)} ₾</b>
+        <b>${currentProduct.originalPrice ? `<s class="gm-order-old-price">${formatPrice(currentProduct.originalPrice)} ₾</s> ` : ''}${formatPrice(currentProduct.price)} ₾</b>
       </div>
       ${hasColors ? `
       <div class="gm-field">
@@ -416,6 +417,9 @@
     lines.push(`პროდუქტი: ${order.productName}${order.color ? ' (ფერი: ' + order.color + ')' : ''}`);
     lines.push(`რაოდენობა: ${order.qty}`);
     lines.push(`თანხა: ${formatPrice(order.total)} ₾`);
+    if (order.originalPrice && order.originalPrice > order.unitPrice) {
+      lines.push(`ფასდაკლება: ${formatPrice(order.unitPrice)} ₾ (ნაცვლად ${formatPrice(order.originalPrice)} ₾)`);
+    }
     lines.push(`ფილიალი: ${GM_PICKUP_POINT}`);
     lines.push(`თარიღი: ${formatDMY(order.date)} ${order.time}`);
     lines.push(`სახელი: ${order.name}`);
@@ -453,6 +457,8 @@
       productName: currentProduct.name,
       color: selectedColor ? (selectedColor.name || '') : '',
       qty: currentQty,
+      unitPrice: currentProduct.price,
+      originalPrice: currentProduct.originalPrice,
       total,
       date: fields.date,
       time: fields.time,
@@ -567,6 +573,7 @@
       id: Number(btn.dataset.orderId),
       name: btn.dataset.orderName || '',
       price: Number(btn.dataset.orderPrice) || 0,
+      originalPrice: Number(btn.dataset.orderOriginalPrice) || null,
       colors: parseColorsAttr(btn.dataset.orderColors)
     };
     openModal(product, btn);

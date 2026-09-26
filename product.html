@@ -139,6 +139,14 @@
   .price-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 20px; }
   .price { font-size: 36px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
   .price small { font-size: 13px; color: var(--slate); font-weight: 500; }
+  .price-row { flex-wrap: wrap; }
+  .price-old { font-size: 18px; font-weight: 600; color: var(--slate); }
+  .price-sale { color: var(--red); }
+  .badge-sale {
+    align-self: center; font-size: 13px; font-weight: 800; padding: 5px 11px;
+    border-radius: 999px; color: #fff; background: var(--red);
+  }
+  .sale-note { margin: -12px 0 18px; font-size: 13px; font-weight: 600; color: var(--red-dark); }
 
   .desc-text { color: var(--slate); font-size: 14.5px; line-height: 1.65; margin-bottom: 22px; white-space: pre-line; }
 
@@ -211,7 +219,7 @@
     var k = (location.pathname.split('/').pop() || 'index').replace(/\.html$/, '') || 'index';
     if (t === 'dark') { document.documentElement.setAttribute('data-theme','dark'); }
     else if (!t || t === 'moto') {
-      var ml = {'index':1,'product':1,'faq':1,'support':1,'compare':1,'admin':1,'admin-orders':1,'admin-stats':1,'profile':1};
+      var ml = {'index':1,'product':1,'faq':1,'support':1,'compare':1,'admin':1,'admin-orders':1,'admin-stats':1,'admin-discounts':1,'profile':1};
       if (ml[k]) {
         // paint the dark ground immediately; moto.css still has to come off the
         // network and the page's own <style> would flash light until it lands
@@ -225,7 +233,7 @@
       }
     }
     else if (t === 'classic') {
-      var m = {'index':'classic-index.css','product':'classic-product.css','admin':'classic-admin.css','admin-orders':'classic-admin.css','admin-stats':'classic-admin.css','faq':'classic-faq.css','support':'classic-support.css','compare':'classic-compare.css'};
+      var m = {'index':'classic-index.css','product':'classic-product.css','admin':'classic-admin.css','admin-orders':'classic-admin.css','admin-stats':'classic-admin.css','admin-discounts':'classic-admin.css','faq':'classic-faq.css','support':'classic-support.css','compare':'classic-compare.css'};
       var href = m[k];
       if (href) {
         var l = document.createElement('link');
@@ -311,6 +319,29 @@
     return normalizeProduct(data);
   }
 
+  // Lowest sale price currently in its window, if any. A missing discounts
+  // table (migration not run yet) just means no sale.
+  async function loadSale(id) {
+    const nowIso = new Date().toISOString();
+    const { data, error } = await supabaseClient
+      .from('discounts')
+      .select('sale_price, ends_at')
+      .eq('product_id', id)
+      .eq('active', true)
+      .lte('starts_at', nowIso)
+      .gt('ends_at', nowIso)
+      .order('sale_price', { ascending: true })
+      .limit(1);
+    if (error || !data || !data.length) return null;
+    return { price: Number(data[0].sale_price), endsAt: data[0].ends_at };
+  }
+
+  function formatSaleEnd(iso) {
+    const d = new Date(iso);
+    const p2 = (n) => String(n).padStart(2, '0');
+    return p2(d.getDate()) + '.' + p2(d.getMonth() + 1) + ' ' + p2(d.getHours()) + ':' + p2(d.getMinutes());
+  }
+
   function normalizeProduct(row) {
     const images = Array.isArray(row.images) ? row.images.filter(Boolean) : [];
     const fallback = typeof row.img === 'string' ? row.img.trim() : '';
@@ -373,12 +404,15 @@
   }
 
   const productId = readQuery();
-  const product = await loadProduct(productId);
+  const [product, sale] = await Promise.all([loadProduct(productId), loadSale(productId)]);
 
   if (!product) {
     renderNotFound();
     return;
   }
+
+  const onSale = !!sale && sale.price < product.price;
+  const effectivePrice = onSale ? sale.price : product.price;
 
   document.title = `${product.name} — GoodMotoway`;
   const metaDesc = document.querySelector('meta[name="description"]');
@@ -416,8 +450,11 @@
             </div>
           </div>` : ''}
           <div class="price-row">
-            <span class="price">${formatPrice(product.price)} ₾</span>
+            ${onSale ? `<s class="price-old">${formatPrice(product.price)} ₾</s>` : ''}
+            <span class="price${onSale ? ' price-sale' : ''}">${formatPrice(effectivePrice)} ₾</span>
+            ${onSale ? `<span class="badge-sale">−${Math.round((1 - sale.price / product.price) * 100)}%</span>` : ''}
           </div>
+          ${onSale ? `<div class="sale-note">ფასდაკლება მოქმედებს ${esc(formatSaleEnd(sale.endsAt))}-მდე</div>` : ''}
           <p class="desc-text">${esc(product.desc || '')}</p>
           <div class="spec-grid">
             ${product.speed ? specItem('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>', 'მაქს. სიჩქარე', product.speed + ' კმ/სთ') : ''}
@@ -428,7 +465,7 @@
             ${product.weight ? specItem('<path d="M6 2h12v6l-3 3 3 3v6H6v-6l3-3-3-3z"/>', 'წონა', product.weight + ' კგ') : ''}
           </div>
           <div class="cta-row">
-            <button type="button" class="btn-primary" data-order-id="${product.id}" data-order-name="${esc(product.name)}" data-order-price="${product.price}" data-order-colors="${product.colors && product.colors.length ? esc(JSON.stringify(product.colors.map(c => ({ name: c.name || '', hex: c.hex })))) : ''}" ${product.inStock ? '' : 'disabled'}>
+            <button type="button" class="btn-primary" data-order-id="${product.id}" data-order-name="${esc(product.name)}" data-order-price="${effectivePrice}" data-order-original-price="${onSale ? product.price : ''}" data-order-colors="${product.colors && product.colors.length ? esc(JSON.stringify(product.colors.map(c => ({ name: c.name || '', hex: c.hex })))) : ''}" ${product.inStock ? '' : 'disabled'}>
               ${product.inStock ? 'შეკვეთა' : 'არ არის მარაგში'}
             </button>
             <a class="btn-secondary" style="text-decoration:none;" href="tel:551484883">

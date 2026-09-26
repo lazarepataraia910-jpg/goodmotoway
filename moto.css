@@ -483,3 +483,37 @@ table.orders-table td { border-bottom: 1px solid #1e2126; }
 .order-row-meta, .order-row-top, .order-empty { color: #6d737c; }
 .save-feedback { color: #35c46a; }
 .save-feedback.error { color: #ff3b3b; }
+
+/* ================= sale prices (catalog, product, compare) ================= */
+.badge-sale {
+  background: var(--red); color: #fff; font-family: 'JetBrains Mono', monospace;
+  font-weight: 700; letter-spacing: 0.06em;
+}
+.card-price-old, .price-old { color: #6d737c; font-family: 'JetBrains Mono', monospace; font-weight: 400; }
+.card-price-sale, .price-sale { color: #ff3b3b; }
+.sale-note {
+  font-family: 'JetBrains Mono', monospace; font-size: 11.5px; letter-spacing: 0.08em; color: #ff3b3b;
+}
+
+/* ================= admin-discounts.html ================= */
+.discount-row { border: 1px solid #1e2126; background: #0b0c0e; }
+.dr-name {
+  font-family: 'Archivo Black', 'Noto Sans Georgian', sans-serif; font-synthesis-weight: none;
+  text-transform: uppercase; font-size: 14px; color: #fff;
+}
+.dr-prices s { color: #6d737c; }
+.dr-prices .new { font-family: 'Archivo Black', 'Noto Sans Georgian', sans-serif; font-synthesis-weight: none; color: #fff; }
+.dr-prices .pct { background: var(--red); font-family: 'JetBrains Mono', monospace; }
+.dr-period { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: #6d737c; }
+.dr-left { color: #35c46a; font-family: 'JetBrains Mono', monospace; }
+.duration-chip { background: #0b0c0e; border-color: #2a2f36; color: #8b9099; }
+.duration-chip:hover { color: #fff; border-color: #fff; }
+.duration-chip.active { background: var(--red); border-color: var(--red); color: #fff; }
+.field-hint { color: #6d737c; }
+.field-hint b { color: #f2f3f4; }
+.field-hint .save { color: #35c46a; }
+.pill-live { background: rgba(53, 196, 106, 0.14); color: #35c46a; }
+.pill-scheduled { background: rgba(225, 20, 20, 0.14); color: #ff3b3b; }
+.pill-expired { background: rgba(109, 115, 124, 0.16); color: #8b9099; }
+.pill-off { background: rgba(109, 115, 124, 0.1); color: #6d737c; }
+:root input[type="datetime-local"] { color-scheme: dark; }

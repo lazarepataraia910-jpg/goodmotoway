@@ -27,6 +27,7 @@
     'admin': 'classic-admin.css',
     'admin-orders': 'classic-admin.css',
     'admin-stats': 'classic-admin.css',
+    'admin-discounts': 'classic-admin.css',
     'faq': 'classic-faq.css',
     'support': 'classic-support.css',
     'compare': 'classic-compare.css'
@@ -42,6 +43,7 @@
     'admin': 'moto.css',
     'admin-orders': 'moto.css',
     'admin-stats': 'moto.css',
+    'admin-discounts': 'moto.css',
     'profile': 'moto.css'
   };
 
@@ -155,7 +157,7 @@
   });
 
   var currentFile = window.location.pathname.split('/').pop() || 'index.html';
-  var isAdminPage = /^admin(-orders|-stats)?(\.html)?$/.test(currentFile);
+  var isAdminPage = /^admin(-orders|-stats|-discounts)?(\.html)?$/.test(currentFile);
 
   var chromeStyle = document.createElement('style');
   chromeStyle.textContent =

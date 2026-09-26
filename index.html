@@ -181,6 +181,12 @@
   .card-price-row { margin-top: auto; display: flex; align-items: flex-end; justify-content: space-between; padding-top: 6px; gap: 8px; }
   .card-price { font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
   .card-price small { font-size: 11.5px; color: var(--slate); font-weight: 500; }
+  .card-price-old { display: block; font-size: 13px; font-weight: 600; color: var(--slate); }
+  .card-price-sale { color: var(--red); }
+  .badge-sale {
+    position: absolute; bottom: 12px; right: 12px; font-size: 12px; font-weight: 800;
+    padding: 5px 10px; border-radius: 999px; color: #fff; background: var(--red);
+  }
   .gm-order-btn-trigger {
     border: none; background: var(--red); color: #fff; border-radius: 8px; padding: 10px 16px;
     font-size: 13.5px; font-weight: 700; white-space: nowrap; transition: background 0.15s ease;
@@ -232,7 +238,7 @@
     var k = (location.pathname.split('/').pop() || 'index').replace(/\.html$/, '') || 'index';
     if (t === 'dark') { document.documentElement.setAttribute('data-theme','dark'); }
     else if (!t || t === 'moto') {
-      var ml = {'index':1,'product':1,'faq':1,'support':1,'compare':1,'admin':1,'admin-orders':1,'admin-stats':1,'profile':1};
+      var ml = {'index':1,'product':1,'faq':1,'support':1,'compare':1,'admin':1,'admin-orders':1,'admin-stats':1,'admin-discounts':1,'profile':1};
       if (ml[k]) {
         // paint the dark ground immediately; moto.css still has to come off the
         // network and the page's own <style> would flash light until it lands
@@ -246,7 +252,7 @@
       }
     }
     else if (t === 'classic') {
-      var m = {'index':'classic-index.css','product':'classic-product.css','admin':'classic-admin.css','admin-orders':'classic-admin.css','admin-stats':'classic-admin.css','faq':'classic-faq.css','support':'classic-support.css','compare':'classic-compare.css'};
+      var m = {'index':'classic-index.css','product':'classic-product.css','admin':'classic-admin.css','admin-orders':'classic-admin.css','admin-stats':'classic-admin.css','admin-discounts':'classic-admin.css','faq':'classic-faq.css','support':'classic-support.css','compare':'classic-compare.css'};
       var href = m[k];
       if (href) {
         var l = document.createElement('link');
@@ -437,6 +443,40 @@
     return data.map(normalizeProduct);
   }
 
+  // A product can carry several sale windows; the lowest price currently in
+  // its window wins. If the discounts table does not exist yet, nothing is on sale.
+  async function loadSales() {
+    const nowIso = new Date().toISOString();
+    const { data, error } = await supabaseClient
+      .from('discounts')
+      .select('product_id, sale_price, ends_at')
+      .eq('active', true)
+      .lte('starts_at', nowIso)
+      .gt('ends_at', nowIso);
+    if (error) return {};
+    const best = {};
+    (data || []).forEach(d => {
+      const price = Number(d.sale_price);
+      if (!best[d.product_id] || price < best[d.product_id].price) best[d.product_id] = { price, endsAt: d.ends_at };
+    });
+    return best;
+  }
+
+  function applySale(p, sales) {
+    const s = sales[p.id];
+    const onSale = !!s && s.price < p.price;
+    return {
+      ...p,
+      salePrice: onSale ? s.price : null,
+      saleEndsAt: onSale ? s.endsAt : null,
+      effectivePrice: onSale ? s.price : p.price
+    };
+  }
+
+  function percentOff(oldPrice, newPrice) {
+    return Math.round((1 - newPrice / oldPrice) * 100);
+  }
+
   let PRODUCTS = [];
 
   const favorites = new Set();
@@ -463,8 +503,8 @@
       if (showFavoritesOnly && !favorites.has(p.id)) return false;
       if (powerSel.value !== "all" && String(p.motor) !== powerSel.value) return false;
       if (minSpeedSel.value !== "all" && p.speed < Number(minSpeedSel.value)) return false;
-      if (minPriceEl.value && p.price < Number(minPriceEl.value)) return false;
-      if (maxPriceEl.value && p.price > Number(maxPriceEl.value)) return false;
+      if (minPriceEl.value && p.effectivePrice < Number(minPriceEl.value)) return false;
+      if (maxPriceEl.value && p.effectivePrice > Number(maxPriceEl.value)) return false;
       const q = qEl.value.trim().toLowerCase();
       if (q) {
         const hay = `${p.name} ${p.tag}`.toLowerCase();
@@ -473,8 +513,8 @@
       return true;
     });
     const sort = sortEl.value;
-    if (sort === "price_asc") list = [...list].sort((a,b) => a.price - b.price);
-    if (sort === "price_desc") list = [...list].sort((a,b) => b.price - a.price);
+    if (sort === "price_asc") list = [...list].sort((a,b) => a.effectivePrice - b.effectivePrice);
+    if (sort === "price_desc") list = [...list].sort((a,b) => b.effectivePrice - a.effectivePrice);
     if (sort === "range_desc") list = [...list].sort((a,b) => b.rangeMax - a.rangeMax);
     if (sort === "speed_desc") list = [...list].sort((a,b) => b.speed - a.speed);
     return list;
@@ -514,6 +554,7 @@
             </a>
             <span class="badge-tag">${esc(p.tag)}</span>
             <span class="badge-stock ${p.inStock ? '' : 'out'}">${p.inStock ? 'მარაგშია' : 'არ არის მარაგში'}</span>
+            ${p.salePrice ? `<span class="badge-sale">−${percentOff(p.price, p.salePrice)}%</span>` : ''}
             <button class="fav-btn" data-id="${p.id}" aria-label="favorite">
               <svg class="icon" style="width:16px;height:16px;" viewBox="0 0 24 24" fill="${isFav ? '#D8253B' : 'none'}" stroke="#D8253B" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
             </button>
@@ -533,8 +574,8 @@
               ${specItem('<path d="M6 2h12v6l-3 3 3 3v6H6v-6l3-3-3-3z"/>', 'წონა', p.weight + ' კგ')}
             </div>
             <div class="card-price-row">
-              <div class="card-price">${formatPrice(p.price)} ₾<br><small>1 წლიანი გარანტია</small></div>
-              <button type="button" class="gm-order-btn-trigger" data-order-id="${p.id}" data-order-name="${esc(p.name)}" data-order-price="${p.price}" data-order-colors="${p.colors && p.colors.length ? esc(JSON.stringify(p.colors.map(c => ({ name: c.name || '', hex: c.hex })))) : ''}" ${p.inStock ? '' : 'disabled'}>${p.inStock ? 'შეკვეთა' : 'არ არის მარაგში'}</button>
+              <div class="card-price">${p.salePrice ? `<s class="card-price-old">${formatPrice(p.price)} ₾</s>` : ''}<span class="${p.salePrice ? 'card-price-sale' : ''}">${formatPrice(p.effectivePrice)} ₾</span><br><small>1 წლიანი გარანტია</small></div>
+              <button type="button" class="gm-order-btn-trigger" data-order-id="${p.id}" data-order-name="${esc(p.name)}" data-order-price="${p.effectivePrice}" data-order-original-price="${p.salePrice ? p.price : ''}" data-order-colors="${p.colors && p.colors.length ? esc(JSON.stringify(p.colors.map(c => ({ name: c.name || '', hex: c.hex })))) : ''}" ${p.inStock ? '' : 'disabled'}>${p.inStock ? 'შეკვეთა' : 'არ არის მარაგში'}</button>
             </div>
           </div>
         </div>
@@ -597,7 +638,8 @@
 
 
   (async function init() {
-    PRODUCTS = await loadProducts();
+    const [products, sales] = await Promise.all([loadProducts(), loadSales()]);
+    PRODUCTS = products.map(p => applySale(p, sales));
     document.getElementById("loadingState").style.display = "none";
     render();
   })();

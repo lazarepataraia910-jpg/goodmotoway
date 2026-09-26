@@ -134,6 +134,8 @@
   .compare-col-head { display: flex; flex-direction: column; align-items: flex-start; gap: 7px; min-width: 150px; }
   .compare-col-head img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; background: #EFECE3; }
   .compare-col-head .cc-name { font-weight: 700; font-size: 14px; }
+  .price-old { color: var(--slate); font-weight: 600; font-size: 0.85em; }
+  .badge-sale { display: inline-block; font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 999px; color: #fff; background: var(--red); vertical-align: middle; }
   .compare-col-head .cc-price { color: var(--red-dark); font-weight: 700; font-size: 16px; }
   .compare-col-head a { font-size: 12px; color: var(--red-dark); font-weight: 700; }
   .compare-col-head a:hover { color: var(--text); }
@@ -164,7 +166,7 @@
     var k = (location.pathname.split('/').pop() || 'index').replace(/\.html$/, '') || 'index';
     if (t === 'dark') { document.documentElement.setAttribute('data-theme','dark'); }
     else if (!t || t === 'moto') {
-      var ml = {'index':1,'product':1,'faq':1,'support':1,'compare':1,'admin':1,'admin-orders':1,'admin-stats':1,'profile':1};
+      var ml = {'index':1,'product':1,'faq':1,'support':1,'compare':1,'admin':1,'admin-orders':1,'admin-stats':1,'admin-discounts':1,'profile':1};
       if (ml[k]) {
         // paint the dark ground immediately; moto.css still has to come off the
         // network and the page's own <style> would flash light until it lands
@@ -178,7 +180,7 @@
       }
     }
     else if (t === 'classic') {
-      var m = {'index':'classic-index.css','product':'classic-product.css','admin':'classic-admin.css','admin-orders':'classic-admin.css','admin-stats':'classic-admin.css','faq':'classic-faq.css','support':'classic-support.css','compare':'classic-compare.css'};
+      var m = {'index':'classic-index.css','product':'classic-product.css','admin':'classic-admin.css','admin-orders':'classic-admin.css','admin-stats':'classic-admin.css','admin-discounts':'classic-admin.css','faq':'classic-faq.css','support':'classic-support.css','compare':'classic-compare.css'};
       var href = m[k];
       if (href) {
         var l = document.createElement('link');
@@ -298,10 +300,40 @@
       console.error('Could not load products', error);
       return [];
     }
-    return data.map(normalizeProduct);
+    const products = data.map(normalizeProduct);
+    const sales = await loadSales();
+    return products.map(p => {
+      const s = sales[p.id];
+      const onSale = !!s && s.price < p.price;
+      return { ...p, salePrice: onSale ? s.price : null, effectivePrice: onSale ? s.price : p.price };
+    });
+  }
+
+  // lowest live sale price per product; no discounts table yet means no sales
+  async function loadSales() {
+    const nowIso = new Date().toISOString();
+    const { data, error } = await supabaseClient
+      .from('discounts')
+      .select('product_id, sale_price')
+      .eq('active', true)
+      .lte('starts_at', nowIso)
+      .gt('ends_at', nowIso);
+    if (error) return {};
+    const best = {};
+    (data || []).forEach(d => {
+      const price = Number(d.sale_price);
+      if (!best[d.product_id] || price < best[d.product_id].price) best[d.product_id] = { price };
+    });
+    return best;
   }
 
   function formatPrice(n) { return new Intl.NumberFormat('ka-GE').format(n); }
+  function percentOff(p) { return Math.round((1 - p.salePrice / p.price) * 100); }
+  function priceHtml(p) {
+    return p.salePrice
+      ? `<s class="price-old">${formatPrice(p.price)} ₾</s> ${formatPrice(p.salePrice)} ₾ <span class="badge-sale">−${percentOff(p)}%</span>`
+      : `${formatPrice(p.price)} ₾`;
+  }
 
   let PRODUCTS = [];
   let targetCount = 0;
@@ -360,7 +392,7 @@
           <img src="${esc(p.img)}" alt="${esc(p.name)}" />
           <div class="mc-body">
             <div class="mc-name">${esc(p.name)}</div>
-            <div class="mc-price">${formatPrice(p.price)} ₾</div>
+            <div class="mc-price">${priceHtml(p)}</div>
           </div>
         </button>
       `;
@@ -393,7 +425,7 @@
   });
 
   const SPEC_ROWS = [
-    { label: 'ფასი', fn: p => formatPrice(p.price) + ' ₾' },
+    { label: 'ფასი', fn: p => formatPrice(p.effectivePrice) + ' ₾' + (p.salePrice ? ' (−' + percentOff(p) + '%)' : '') },
     { label: 'მარაგი', fn: p => p.inStock ? 'მარაგშია' : 'არ არის მარაგში' },
     { label: 'მაქს. სიჩქარე', fn: p => p.speed ? p.speed + ' კმ/სთ' : '—' },
     { label: 'გარბენი', fn: p => (p.rangeMin && p.rangeMax) ? p.rangeMin + '-' + p.rangeMax + ' კმ' : '—' },
@@ -418,7 +450,7 @@
                 <div class="compare-col-head">
                   <img src="${esc(p.img)}" alt="${esc(p.name)}" />
                   <span class="cc-name">${esc(p.name)}</span>
-                  <span class="cc-price">${formatPrice(p.price)} ₾</span>
+                  <span class="cc-price">${priceHtml(p)}</span>
                   <a href="product.html?id=${p.id}">დეტალურად →</a>
                 </div>
               </th>
