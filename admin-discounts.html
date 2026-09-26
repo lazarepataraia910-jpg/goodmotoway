@@ -132,6 +132,34 @@
 
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 12px; }
   .form-grid .full { grid-column: 1 / -1; }
+
+  .model-picker {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px;
+    max-height: 520px; overflow-y: auto; padding: 2px;
+    border: 1px solid transparent; border-radius: 12px;
+  }
+  .model-picker.invalid { border-color: var(--red-dark); padding: 6px; }
+  .model-option {
+    position: relative; display: flex; flex-direction: column; text-align: left; padding: 0;
+    border: 2px solid var(--line-light); border-radius: 12px; overflow: hidden; background: var(--surface);
+    color: var(--text); cursor: pointer; font-family: 'Noto Sans Georgian', sans-serif;
+    transition: border-color 0.15s ease;
+  }
+  .model-option:hover { border-color: var(--slate); }
+  .model-option.selected { border-color: var(--red); }
+  .model-option:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+  .model-option img, .model-option .mo-noimg {
+    width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; background: var(--paper);
+  }
+  .model-option .mo-body { padding: 8px 10px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .model-option .mo-name { font-size: 12.5px; font-weight: 700; line-height: 1.25; }
+  .model-option .mo-price { font-size: 12px; color: var(--slate); font-weight: 600; }
+  .model-option .mo-check {
+    position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--red); color: #fff; font-size: 12px; font-weight: 800;
+    display: none; align-items: center; justify-content: center;
+  }
+  .model-option.selected .mo-check { display: flex; }
   .field-hint { margin-top: 6px; font-size: 12px; color: var(--slate); min-height: 16px; }
   .field-hint b { color: var(--text); }
   .field-hint .save { color: var(--sage); font-weight: 700; }
@@ -273,8 +301,8 @@
       <div class="panel-head"><h3>ახალი ფასდაკლება</h3></div>
       <div class="form-grid">
         <div class="full">
-          <label for="dProduct">მოდელი</label>
-          <select id="dProduct"><option value="">აირჩიე მოდელი</option></select>
+          <label id="dProductLabel">მოდელი</label>
+          <div class="model-picker" id="modelPicker" role="radiogroup" aria-labelledby="dProductLabel"></div>
           <div class="field-hint" id="dProductHint"></div>
         </div>
         <div class="full">
@@ -337,7 +365,8 @@
   const setupSlot = document.getElementById('setupSlot');
   const logoutBtn = document.getElementById('logoutBtn');
   const form = document.getElementById('discountForm');
-  const productSel = document.getElementById('dProduct');
+  const pickerEl = document.getElementById('modelPicker');
+  let selectedProductId = null;
   const priceInput = document.getElementById('dPrice');
   const startInput = document.getElementById('dStart');
   const endInput = document.getElementById('dEnd');
@@ -414,7 +443,7 @@
     hint.innerHTML = 'ახალი ფასი იმოქმედებს <b>' + escapeHtml(formatSpan(end - start)) + '</b>';
   }
   function updatePriceHint() {
-    const p = productById(productSel.value);
+    const p = productById(selectedProductId);
     const hint = document.getElementById('dPriceHint');
     const val = Number(priceInput.value);
     if (!p || !val) { hint.textContent = ''; return; }
@@ -428,13 +457,39 @@
     startInput.value = toLocalInput(now);
     applyDuration();
     updatePriceHint();
-    [productSel, priceInput, startInput, endInput].forEach((el) => el.classList.remove('invalid'));
+    [pickerEl, priceInput, startInput, endInput].forEach((el) => el.classList.remove('invalid'));
   }
 
-  productSel.addEventListener('change', () => {
-    const p = productById(productSel.value);
-    document.getElementById('dProductHint').innerHTML = p ? 'ახლანდელი ფასი: <b>' + formatPrice(p.price) + ' ₾</b>' : '';
+  function selectProduct(id) {
+    selectedProductId = id;
+    pickerEl.querySelectorAll('.model-option').forEach((b) => {
+      const on = Number(b.dataset.id) === id;
+      b.classList.toggle('selected', on);
+      b.setAttribute('aria-checked', on ? 'true' : 'false');
+    });
+    pickerEl.classList.remove('invalid');
+    const p = productById(id);
+    document.getElementById('dProductHint').innerHTML = p ? '<b>' + escapeHtml(p.name) + '</b> · ახლანდელი ფასი: <b>' + formatPrice(p.price) + ' ₾</b>' : '';
     updatePriceHint();
+  }
+
+  function renderPicker() {
+    if (!PRODUCTS.length) { pickerEl.innerHTML = '<div class="list-empty">მოდელები ვერ მოიძებნა</div>'; return; }
+    pickerEl.innerHTML = PRODUCTS.map((p) => `
+      <button type="button" class="model-option" role="radio" aria-checked="false" data-id="${p.id}">
+        <span class="mo-check" aria-hidden="true">✓</span>
+        ${p.img ? `<img src="${escapeHtml(p.img)}" alt="" loading="lazy" />` : '<span class="mo-noimg"></span>'}
+        <span class="mo-body">
+          <span class="mo-name">${escapeHtml(p.name)}</span>
+          <span class="mo-price">${formatPrice(p.price)} ₾</span>
+        </span>
+      </button>`).join('');
+    if (selectedProductId) selectProduct(selectedProductId);
+  }
+
+  pickerEl.addEventListener('click', (e) => {
+    const opt = e.target.closest('.model-option');
+    if (opt) selectProduct(Number(opt.dataset.id));
   });
   priceInput.addEventListener('input', updatePriceHint);
   startInput.addEventListener('change', applyDuration);
@@ -452,16 +507,16 @@
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    [productSel, priceInput, startInput, endInput].forEach((el) => el.classList.remove('invalid'));
+    [pickerEl, priceInput, startInput, endInput].forEach((el) => el.classList.remove('invalid'));
 
-    const p = productById(productSel.value);
+    const p = productById(selectedProductId);
     const price = Number(priceInput.value);
     const start = new Date(startInput.value);
     const end = new Date(endInput.value);
 
     let firstBad = null;
-    const bad = (el) => { el.classList.add('invalid'); if (!firstBad) firstBad = el; };
-    if (!p) bad(productSel);
+    const bad = (el, focusEl) => { el.classList.add('invalid'); if (!firstBad) firstBad = focusEl || el; };
+    if (!p) bad(pickerEl, pickerEl.querySelector('.model-option'));
     if (!price || price <= 0 || (p && price >= p.price)) bad(priceInput);
     if (isNaN(start)) bad(startInput);
     if (isNaN(end) || (!isNaN(start) && end <= start)) bad(endInput);
@@ -570,15 +625,19 @@
 
   /* ---------- data ---------- */
   async function loadProducts() {
-    const { data, error } = await supabaseClient.from('products').select('id, name, price').order('name');
+    const { data, error } = await supabaseClient.from('products').select('id, name, price, img, images').order('name');
     if (error) {
       console.error('Could not load products', error);
       setFeedback('formFeedback', 'მოდელების ჩატვირთვა ვერ მოხერხდა');
       return;
     }
-    PRODUCTS = (data || []).map((p) => ({ id: p.id, name: p.name, price: Number(p.price) || 0 }));
-    productSel.innerHTML = '<option value="">აირჩიე მოდელი</option>' +
-      PRODUCTS.map((p) => `<option value="${p.id}">${escapeHtml(p.name)} — ${formatPrice(p.price)} ₾</option>`).join('');
+    PRODUCTS = (data || []).map((p) => ({
+      id: p.id,
+      name: p.name,
+      price: Number(p.price) || 0,
+      img: (Array.isArray(p.images) && p.images.find(Boolean)) || (typeof p.img === 'string' ? p.img.trim() : '')
+    }));
+    renderPicker();
   }
 
   async function loadDiscounts() {

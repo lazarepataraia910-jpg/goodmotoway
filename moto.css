@@ -517,3 +517,15 @@ table.orders-table td { border-bottom: 1px solid #1e2126; }
 .pill-expired { background: rgba(109, 115, 124, 0.16); color: #8b9099; }
 .pill-off { background: rgba(109, 115, 124, 0.1); color: #6d737c; }
 :root input[type="datetime-local"] { color-scheme: dark; }
+
+/* discounts page: photo model picker */
+.model-option { background: #0b0c0e; border-color: #1e2126; }
+.model-option:hover { border-color: #3a3f47; }
+.model-option.selected { border-color: var(--red); }
+.model-option img, .model-option .mo-noimg { background: #101216; }
+.model-option .mo-name {
+  font-family: 'Archivo Black', 'Noto Sans Georgian', sans-serif; font-synthesis-weight: none;
+  text-transform: uppercase; font-size: 11.5px; color: #fff;
+}
+.model-option .mo-price { font-family: 'JetBrains Mono', monospace; color: #8b9099; }
+.model-picker.invalid { border-color: #ff3b3b; }
