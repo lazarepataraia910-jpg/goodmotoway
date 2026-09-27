@@ -16,10 +16,22 @@
 
   // Keyed without the extension: a static host may serve either /product.html
   // or the clean /product, and both have to resolve to the same stylesheet.
+  // Product pages themselves live at /product/<id>-<name>.
   function pageKey() {
-    var file = window.location.pathname.split('/').pop() || 'index';
-    return file.replace(/\.html$/, '') || 'index';
+    var segments = window.location.pathname.split('/').filter(Boolean);
+    if (segments[0] === 'product') return 'product';
+    return (segments.pop() || 'index').replace(/\.html$/, '') || 'index';
   }
+
+  // "/product/12-cq-3": the id is what the page looks up, the name is only for
+  // people and search engines. Non-Latin names just leave the id.
+  function productPath(product) {
+    var slug = String((product && product.name) || '').toLowerCase()
+      .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    return '/product/' + product.id + (slug ? '-' + slug : '');
+  }
+  window.gmProductPath = productPath;
 
   var CLASSIC_CSS_BY_PAGE = {
     'index': 'classic-index.css',
@@ -188,7 +200,9 @@
   if (mainEl && !mainEl.id) mainEl.id = 'gmMainContent';
   var skipLink = document.createElement('a');
   skipLink.className = 'gm-skip-link';
-  skipLink.href = mainEl ? ('#' + mainEl.id) : '#';
+  // spelled out in full: product pages set <base href="/">, which would turn a
+  // bare "#id" into a link to the homepage
+  skipLink.href = window.location.pathname + window.location.search + '#' + (mainEl ? mainEl.id : '');
   skipLink.textContent = 'კონტენტზე გადასვლა';
   document.body.insertBefore(skipLink, document.body.firstChild);
 

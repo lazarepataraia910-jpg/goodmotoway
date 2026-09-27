@@ -1,5 +1,14 @@
 {
+  "redirects": [
+    {
+      "source": "/product.html",
+      "has": [{ "type": "query", "key": "id", "value": "(?<pid>\\d+)" }],
+      "destination": "/product/:pid",
+      "permanent": true
+    }
+  ],
   "rewrites": [
+    { "source": "/product/:slug", "destination": "/product.html" },
     { "source": "/sitemap.xml", "destination": "/api/sitemap" },
     { "source": "/favicon.ico", "destination": "/favicon.svg" }
   ],

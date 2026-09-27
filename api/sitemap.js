@@ -13,6 +13,14 @@ const STATIC_PAGES = [
   { path: 'support.html', priority: '0.6', changefreq: 'monthly' }
 ];
 
+// Same rule as gmProductPath in auth.js: /product/<id>-<latin name>.
+function productPath(product) {
+  const slug = String(product.name || '').toLowerCase()
+    .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  return 'product/' + product.id + (slug ? '-' + slug : '');
+}
+
 function escapeXml(value) {
   return String(value).replace(/[&<>"']/g, (c) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;'
@@ -20,7 +28,7 @@ function escapeXml(value) {
 }
 
 async function loadProducts() {
-  const response = await fetch(SUPABASE_URL + '/rest/v1/products?select=id,created_at&order=id', {
+  const response = await fetch(SUPABASE_URL + '/rest/v1/products?select=id,name,created_at&order=id', {
     headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
   });
   if (!response.ok) throw new Error('products request failed: ' + response.status);
@@ -48,7 +56,7 @@ module.exports = async (req, res) => {
   }
   for (const product of products) {
     const lastmod = product.created_at ? '    <lastmod>' + String(product.created_at).slice(0, 10) + '</lastmod>\n' : '';
-    body += urlEntry(SITE + 'product.html?id=' + encodeURIComponent(product.id),
+    body += urlEntry(SITE + productPath(product),
       lastmod + '    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n');
   }
   body += '</urlset>\n';

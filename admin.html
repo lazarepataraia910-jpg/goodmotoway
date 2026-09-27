@@ -257,7 +257,9 @@
     // default, so clear it once and let the new look through
     if (t && !localStorage.getItem('gm_theme_v2')) { localStorage.removeItem('gm_theme'); t = null; }
     localStorage.setItem('gm_theme_v2', '1');
-    var k = (location.pathname.split('/').pop() || 'index').replace(/\.html$/, '') || 'index';
+    // product pages live at /product/<id>-<name>, everything else at /<page>.html
+    var seg = location.pathname.split('/').filter(Boolean);
+    var k = seg[0] === 'product' ? 'product' : ((seg.pop() || 'index').replace(/\.html$/, '') || 'index');
     if (t === 'dark') { document.documentElement.setAttribute('data-theme','dark'); }
     else if (!t || t === 'moto') {
       var ml = {'index':1,'product':1,'faq':1,'support':1,'compare':1,'admin':1,'admin-orders':1,'admin-stats':1,'admin-discounts':1,'profile':1};

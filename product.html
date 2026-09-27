@@ -2,6 +2,8 @@
 <html lang="ka">
 <head>
 <meta charset="UTF-8" />
+<!-- served at /product/<id>-<name>, so relative paths (auth.css, moto.css, index.html…) resolve from the site root -->
+<base href="/" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>GoodMotoway — პროდუქტის გალერეა</title>
 <meta name="description" content="დაათვალიერე GoodMotoway-ს ელექტრო მოპედის დეტალური მახასიათებლები, ფოტოები და ფასი." />
@@ -230,7 +232,9 @@
     // default, so clear it once and let the new look through
     if (t && !localStorage.getItem('gm_theme_v2')) { localStorage.removeItem('gm_theme'); t = null; }
     localStorage.setItem('gm_theme_v2', '1');
-    var k = (location.pathname.split('/').pop() || 'index').replace(/\.html$/, '') || 'index';
+    // product pages live at /product/<id>-<name>, everything else at /<page>.html
+    var seg = location.pathname.split('/').filter(Boolean);
+    var k = seg[0] === 'product' ? 'product' : ((seg.pop() || 'index').replace(/\.html$/, '') || 'index');
     if (t === 'dark') { document.documentElement.setAttribute('data-theme','dark'); }
     else if (!t || t === 'moto') {
       var ml = {'index':1,'product':1,'faq':1,'support':1,'compare':1,'admin':1,'admin-orders':1,'admin-stats':1,'admin-discounts':1,'profile':1};
@@ -322,7 +326,10 @@
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxjZWVicmhidm55em94a2F1dWdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU3ODkyNzAsImV4cCI6MjEwMTM2NTI3MH0.IeGvLg09wjni7OJdiLeAiO3pvrXxIUgzISNKnVKpXYI';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  // /product/12-cq-3 (current), or the older product.html?id=12 from links shared before
   function readQuery() {
+    const fromPath = window.location.pathname.match(/^\/product\/(\d+)/);
+    if (fromPath) return Number(fromPath[1]);
     const params = new URLSearchParams(window.location.search);
     return Number(params.get('id'));
   }
@@ -438,7 +445,12 @@
     canonical.rel = 'canonical';
     document.head.appendChild(canonical);
   }
-  canonical.href = 'https://www.goodmotoway.com/product.html?id=' + encodeURIComponent(product.id);
+  const productPath = window.gmProductPath(product);
+  canonical.href = 'https://www.goodmotoway.com' + productPath;
+  // an old ?id= link or a renamed model: show the current address without reloading
+  if (window.location.pathname !== productPath || window.location.search) {
+    history.replaceState(history.state, '', productPath + window.location.hash);
+  }
   document.getElementById('crumbName').textContent = product.name;
 
   let images = product.images && product.images.length ? product.images : [product.img];
