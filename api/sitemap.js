@@ -49,7 +49,9 @@ module.exports = async (req, res) => {
   }
 
   let body = '<?xml version="1.0" encoding="UTF-8"?>\n';
-  body += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+  body += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'
+    + ' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"'
+    + ' xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">\n';
   for (const page of STATIC_PAGES) {
     body += urlEntry(SITE + page.path,
       '    <changefreq>' + page.changefreq + '</changefreq>\n    <priority>' + page.priority + '</priority>\n');

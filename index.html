@@ -265,12 +265,6 @@
     .card-price-row { flex-direction: column; align-items: stretch; }
   }
 
-  /* the catalogue's heading, so the card titles (h3) sit under an h2 */
-  .visually-hidden {
-    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
-  }
-
 </style>
 <script>
   (function(){try{
@@ -318,7 +312,7 @@
   </a>
   <div class="header-right">
     <div class="nav-links" id="navLinks">
-      <a id="adminLoginBtn" class="admin-link" href="admin.html" aria-label="Admin panel">
+      <a id="adminLoginBtn" class="admin-link" href="admin.html" rel="nofollow" aria-label="Admin panel">
         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V8a5 5 0 0 1 10 0v3"/></svg>
         ადმინ პანელი
       </a>
@@ -391,7 +385,6 @@
 </div>
 
 <main>
-  <h2 class="visually-hidden">ელექტრო მოპედების კატალოგი</h2>
   <div class="results-bar">
     <span class="results-count"><b id="resultCount">6</b> მოდელი მოიძებნა</span>
     <div class="sort-wrap">
@@ -609,7 +602,7 @@ document.addEventListener('DOMContentLoaded', function () {
           </div>
           <div class="card-body">
             <div class="card-meta">GoodMotoway</div>
-            <h3 class="card-title display">${esc(p.name)}</h3>
+            <h2 class="card-title display">${esc(p.name)}</h2>
             <p class="card-desc">${esc(p.desc)}</p>
             <div class="spec-grid">
               ${specItem('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>', 'მაქს. სიჩქარე', p.speed + ' კმ/სთ')}

@@ -33,7 +33,7 @@
     .gm-cart-overlay[hidden] { display: none; }
     .gm-cart-panel { background: var(--surface, #fff); color: var(--text, #14171C); width: 100%; max-width: 380px; height: 100%; overflow: auto; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
     .gm-cart-head { display: flex; align-items: center; justify-content: space-between; }
-    .gm-cart-head h2 { margin: 0; font-size: 17px; }
+    .gm-cart-title { margin: 0; font-size: 17px; font-weight: 700; }
     .gm-cart-close { border: none; background: transparent; color: var(--slate, #8A93A0); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
     .gm-cart-close:hover { background: rgba(20,23,28,0.06); color: var(--text, #14171C); }
     .gm-cart-row { border: 1px solid var(--line-light, #E4E1D8); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
@@ -81,7 +81,7 @@
     cartOverlay.innerHTML = `
       <div class="gm-cart-panel" role="dialog" aria-modal="true" aria-labelledby="gmCartTitle">
         <div class="gm-cart-head">
-          <h2 id="gmCartTitle">${TEXT.cartTitle}</h2>
+          <div class="gm-cart-title" id="gmCartTitle">${TEXT.cartTitle}</div>
           <button type="button" class="gm-cart-close" id="gmCartCloseBtn" aria-label="${TEXT.close}">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>

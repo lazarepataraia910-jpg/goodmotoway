@@ -6,14 +6,14 @@
 <base href="/" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>GoodMotoway — პროდუქტის გალერეა</title>
-<meta name="description" content="დაათვალიერე GoodMotoway-ს ელექტრო მოპედის დეტალური მახასიათებლები, ფოტოები და ფასი." />
+<meta name="description" content="დაათვალიერე GoodMotoway-ს ელექტრო მოპედის ფოტოები, ფასი და მახასიათებლები — სიჩქარე, გარბენი, ძრავა და ბატარეა. ყველა მოდელზე 1 წლიანი გარანტია." />
 <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 <meta name="theme-color" content="#0b0c0e" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="GoodMotoway" />
 <meta property="og:locale" content="ka_GE" />
 <meta property="og:title" content="GoodMotoway — პროდუქტის გალერეა" />
-<meta property="og:description" content="დაათვალიერე GoodMotoway-ს ელექტრო მოპედის დეტალური მახასიათებლები, ფოტოები და ფასი." />
+<meta property="og:description" content="დაათვალიერე GoodMotoway-ს ელექტრო მოპედის ფოტოები, ფასი და მახასიათებლები — სიჩქარე, გარბენი, ძრავა და ბატარეა. ყველა მოდელზე 1 წლიანი გარანტია." />
 <meta name="twitter:card" content="summary" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -99,6 +99,17 @@
     background: var(--surface); border: 1px solid var(--line-light); border-radius: 20px; overflow: hidden;
   }
   .detail-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; }
+
+  .buy-info {
+    margin-top: 20px; background: var(--surface); border: 1px solid var(--line-light);
+    border-radius: 20px; padding: 28px 32px;
+  }
+  .buy-info-title { margin: 0 0 10px; font-size: 20px; font-weight: 700; }
+  .buy-info-summary { margin: 0 0 14px; color: var(--text); font-size: 15px; line-height: 1.6; }
+  .buy-info-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+  .buy-info-list li { color: var(--slate); font-size: 14px; line-height: 1.6; }
+  .buy-info-list b { color: var(--text); }
+  @media (max-width: 640px) { .buy-info { padding: 22px 20px; } }
 
   .gallery-side { padding: 32px; border-right: 1px solid var(--line-light); }
   .main-image {
@@ -436,8 +447,34 @@
   const effectivePrice = onSale ? sale.price : product.price;
 
   document.title = `${product.name} — GoodMotoway`;
+
+  // "1200W ძრავით, მაქსიმალური სიჩქარით 55 კმ/სთ და 60-80 კმ გარბენით ერთ დატენვაზე"
+  const specPhrases = [];
+  if (product.motor) specPhrases.push(product.motor + 'W ძრავით');
+  if (product.speed) specPhrases.push('მაქსიმალური სიჩქარით ' + product.speed + ' კმ/სთ');
+  if (product.rangeMin && product.rangeMax) specPhrases.push(product.rangeMin + '-' + product.rangeMax + ' კმ გარბენით ერთ დატენვაზე');
+  const specSentence = specPhrases.length > 1
+    ? specPhrases.slice(0, -1).join(', ') + ' და ' + specPhrases[specPhrases.length - 1]
+    : specPhrases.join('');
+  const productSummary = specSentence ? `${product.name} — ელექტრო მოპედი ${specSentence}.` : '';
+
+  // search results show roughly 120-160 characters, so a short description is
+  // topped up with the specs, price and warranty
   const metaDesc = document.querySelector('meta[name="description"]');
-  if (metaDesc) metaDesc.setAttribute('content', `${product.name} — ${product.desc ? product.desc.slice(0, 140) : 'დეტალები, ფოტოები და ფასი GoodMotoway-ზე.'}`);
+  if (metaDesc) {
+    const sentences = [
+      product.desc ? product.desc.trim().replace(/[.!]+$/, '') + '.' : '',
+      specSentence ? `ელექტრო მოპედი ${specSentence}.` : (product.desc ? '' : 'ელექტრო მოპედი.'),
+      `ფასი ${formatPrice(effectivePrice)} ₾, 1 წლიანი გარანტია.`
+    ].filter(Boolean);
+    // whole sentences only: one that would push past 160 characters is left out
+    let text = `${product.name} — ${sentences[0]}`;
+    if ([...text].length > 160) text = [...text].slice(0, 157).join('').replace(/\s+\S*$/, '') + '…';
+    for (const sentence of sentences.slice(1)) {
+      if ([...(text + ' ' + sentence)].length <= 160) text += ' ' + sentence;
+    }
+    metaDesc.setAttribute('content', text);
+  }
   // one canonical per model, so search engines don't fold every ?id= into one page
   let canonical = document.querySelector('link[rel="canonical"]');
   if (!canonical) {
@@ -514,7 +551,39 @@
         </div>
       </div>
     </div>
+    <section class="buy-info" aria-labelledby="buyInfoTitle">
+      <h2 class="buy-info-title display" id="buyInfoTitle">ყიდვის პირობები</h2>
+      ${productSummary ? `<p class="buy-info-summary">${esc(productSummary)}</p>` : ''}
+      <ul class="buy-info-list">
+        <li><b>გარანტია.</b> 1 წლიანი გარანტია მოიცავს ძრავას, ბატარეასა და ელექტრო სისტემას და ვრცელდება ქარხნულ დეფექტებზე.</li>
+        <li><b>აღება.</b> შეკვეთილ მოპედს იღებ ჩვენს სალონში — უნივერსიტეტის ქუჩა N6, ორშ–შაბ 10:00–19:00.</li>
+        <li><b>ტესტ-დრაივი.</b> დაგვირეკე ან მოგვწერე WhatsApp-ზე სასურველი დროის მითითებით და შეხვედრას დავნიშნავთ.</li>
+        <li><b>განვადება.</b> დაგვიკავშირდი და გეტყვით, რომელი ბანკის განვადებაა ამჟამად ხელმისაწვდომი და რა პირობებით.</li>
+        <li><b>საბუთები.</b> შესაძენად საკმარისია პირადობის დამადასტურებელი მოწმობა.</li>
+      </ul>
+    </section>
   `;
+
+  // lets search engines show price and stock next to the result
+  const productLd = document.createElement('script');
+  productLd.type = 'application/ld+json';
+  productLd.textContent = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: product.desc || productSummary || undefined,
+    image: images.filter(Boolean),
+    url: canonical.href,
+    offers: {
+      '@type': 'Offer',
+      price: String(effectivePrice),
+      priceCurrency: 'GEL',
+      availability: product.inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      url: canonical.href,
+      seller: { '@type': 'Organization', name: 'GoodMotoway' }
+    }
+  });
+  document.head.appendChild(productLd);
 
   const copyLinkBtn = document.getElementById('copyLinkBtn');
   if (copyLinkBtn) {

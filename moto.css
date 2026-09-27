@@ -189,7 +189,7 @@ footer a { color: #f2f3f4; text-decoration: underline; text-underline-offset: 3p
 
 /* ---- Order modal + cart drawer (markup comes from order.js) ---- */
 .gm-order-modal, .gm-cart-panel { border: 1px solid #23272d; }
-.gm-order-modal h2, .gm-cart-head h2 { font-weight: 900; letter-spacing: -0.02em; }
+.gm-order-modal h2, .gm-cart-title { font-weight: 900; letter-spacing: -0.02em; }
 .gm-order-product-line { background: #0b0c0e; border: 1px solid #1e2126; }
 .gm-field label {
   font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.14em;
@@ -224,6 +224,11 @@ footer a { color: #f2f3f4; text-decoration: underline; text-underline-offset: 3p
 .breadcrumb span.current { color: #c4c8ce; }
 
 .detail-card { background: #101216; border: 1px solid #1e2126; }
+.buy-info { background: #101216; border: 1px solid #1e2126; }
+.buy-info-title { color: #fff; font-weight: 900; }
+.buy-info-summary { color: #c4c8ce; }
+.buy-info-list li { color: #8b9099; }
+.buy-info-list b { color: #f2f3f4; }
 .gallery-side { border-right: 1px solid #1e2126; }
 .main-image { background: #0b0c0e; border: 1px solid #23272d; }
 .main-image:hover img { transform: none; }
