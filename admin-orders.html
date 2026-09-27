@@ -347,7 +347,8 @@
   const SUPABASE_URL = 'https://lceebrhbvnyzoxkauugo.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxjZWVicmhidm55em94a2F1dWdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU3ODkyNzAsImV4cCI6MjEwMTM2NTI3MH0.IeGvLg09wjni7OJdiLeAiO3pvrXxIUgzISNKnVKpXYI';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  const ADMIN_EMAIL = 'lazarepataraia910@gmail.com';
+  // keep in step with public.is_admin() in supabase/migration_admin_list.sql
+  const ADMIN_EMAILS = ['lazarepataraia910@gmail.com', 'aka.molashkhia2@gmail.com'];
 
   const STATUS_LABEL = { new: 'ახალი', confirmed: 'დადასტურებული', done: 'შესრულებული', cancelled: 'გაუქმებული' };
 
@@ -644,7 +645,7 @@
   }
 
   function isAdminUser(user) {
-    return !!user && typeof user.email === 'string' && user.email.toLowerCase() === ADMIN_EMAIL;
+    return !!user && typeof user.email === 'string' && ADMIN_EMAILS.includes(user.email.toLowerCase());
   }
 
   async function checkAdminSession() {

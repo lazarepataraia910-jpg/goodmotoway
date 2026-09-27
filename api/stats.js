@@ -7,7 +7,8 @@
 //   VERCEL_PROJECT_ID       - the project id (Project -> Settings -> General)
 //   VERCEL_TEAM_ID          - only if the project belongs to a team, not a personal account
 
-const ADMIN_EMAIL = 'lazarepataraia910@gmail.com';
+// keep in step with public.is_admin() in supabase/migration_admin_list.sql
+const ADMIN_EMAILS = ['lazarepataraia910@gmail.com', 'aka.molashkhia2@gmail.com'];
 const SUPABASE_URL = 'https://lceebrhbvnyzoxkauugo.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxjZWVicmhidm55em94a2F1dWdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU3ODkyNzAsImV4cCI6MjEwMTM2NTI3MH0.IeGvLg09wjni7OJdiLeAiO3pvrXxIUgzISNKnVKpXYI';
 const AGGREGATE_URL = 'https://api.vercel.com/v1/query/web-analytics/visits/aggregate';
@@ -21,7 +22,7 @@ async function isAdminRequest(req) {
   });
   if (!response.ok) return false;
   const user = await response.json();
-  return typeof user.email === 'string' && user.email.toLowerCase() === ADMIN_EMAIL;
+  return typeof user.email === 'string' && ADMIN_EMAILS.includes(user.email.toLowerCase());
 }
 
 function rangeForDays(days) {
