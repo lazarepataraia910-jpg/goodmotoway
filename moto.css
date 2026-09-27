@@ -5,9 +5,10 @@
 
    It first re-points the CSS custom properties, which is what makes the
    JS-injected surfaces (order modal, cart drawer, toasts, auth chip)
-   follow along without touching order.js or auth.js. */
+   follow along without touching order.js or auth.js.
 
-@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@400;700&display=swap');
+   Its fonts (Archivo Black, JetBrains Mono) are linked from each page's <head>
+   rather than @imported here, so they don't wait for this file to arrive. */
 
 :root {
   --ink: #0b0c0e;

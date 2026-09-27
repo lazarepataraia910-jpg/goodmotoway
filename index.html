@@ -18,11 +18,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="preconnect" href="https://lceebrhbvnyzoxkauugo.supabase.co" crossorigin />
-<!-- font sheets are fetched early at high priority but don't hold up first paint;
-     the second one is what moto.css imports, started here instead of after it -->
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@400;700&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800&display=swap" /></noscript>
+<!-- font sheets don't hold up first paint: text shows in a system font until they land.
+     The second is the moto theme's display faces, loaded here rather than behind moto.css. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@400;700&display=swap" media="print" onload="this.media='all'" />
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800&display=swap" /><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@400;700&display=swap" /></noscript>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" />
 <script type="application/ld+json">
 {
