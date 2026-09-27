@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /profile
+Disallow: /api/
+
+Sitemap: https://www.goodmotoway.com/sitemap.xml

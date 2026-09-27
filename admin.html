@@ -739,7 +739,8 @@
 
   async function uploadImage(blob) {
     const fileName = `img-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
-    const { error } = await supabaseClient.storage.from('product-images').upload(fileName, blob, { contentType: 'image/jpeg' });
+    // every upload gets a fresh name, so browsers can keep it for a year
+    const { error } = await supabaseClient.storage.from('product-images').upload(fileName, blob, { contentType: 'image/jpeg', cacheControl: '31536000' });
     if (error) throw error;
     const { data } = supabaseClient.storage.from('product-images').getPublicUrl(fileName);
     return data.publicUrl;

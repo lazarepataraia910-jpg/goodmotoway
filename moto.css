@@ -37,7 +37,7 @@ header {
   font-family: 'Archivo Black', 'Noto Sans Georgian', sans-serif; font-weight: 800; font-synthesis-weight: none; font-size: 17px;
   letter-spacing: 0.02em; text-transform: uppercase; color: #fff;
 }
-.logo-text b { color: var(--red); font-weight: 400; }
+.logo-text b { color: #ff2a2a; font-weight: 400; }
 .logo img { border: 1px solid #23272d; }
 
 .nav-links, .header-actions {
@@ -110,22 +110,22 @@ main { padding: 72px 48px; }
 .card:hover { border-color: var(--red); }
 .card-media { background: #0b0c0e; }
 .badge-tag {
-  background: #0b0c0e; color: var(--red); font-family: 'JetBrains Mono', monospace;
-  font-size: 11px; font-weight: 400; letter-spacing: 0.16em; text-transform: uppercase; padding: 6px 10px;
+  background: #0b0c0e; color: #ff2a2a; font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; font-weight: 400; letter-spacing: 0.16em; text-transform: uppercase; padding: 6px 10px;
 }
 .badge-stock {
   background: #0b0c0e; color: #35c46a; font-family: 'JetBrains Mono', monospace;
-  font-size: 11px; font-weight: 700; letter-spacing: 0.1em; padding: 6px 10px; border: 1px solid #35c46a;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.1em; padding: 6px 10px; border: 1px solid #35c46a;
 }
 /* the page's own .badge-stock.out sets a slate background and outranks the
    single-class rule above, so the black has to be restated here */
 .badge-stock.out { background: #0b0c0e; color: #ff3b3b; border-color: #ff3b3b; }
-.fav-btn { background: #0b0c0e; border: 1px solid #2a2f36; width: 34px; height: 34px; }
+.fav-btn { background: #0b0c0e; border: 1px solid #2a2f36; width: 44px; height: 44px; }
 .fav-btn:hover { border-color: var(--red); }
 
 .card-meta {
-  font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 400;
-  letter-spacing: 0.16em; color: var(--red); text-transform: uppercase;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 400;
+  letter-spacing: 0.16em; color: #ff2a2a; text-transform: uppercase;
 }
 .card-title {
   font-family: 'Archivo Black', 'Noto Sans Georgian', sans-serif; font-weight: 800; font-synthesis-weight: none; font-size: 19px;
@@ -133,16 +133,16 @@ main { padding: 72px 48px; }
 }
 .card-desc { color: #8b9099; }
 .spec-grid { border-top: 1px solid #1e2126; padding-top: 12px; }
-.spec-item { color: #6d737c; }
+.spec-item { color: #8b9099; }
 .spec-item svg { color: var(--red); }
 .spec-item .sv-label {
-  font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; color: #6d737c;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.06em; color: #8b9099;
 }
 .spec-item .sv-value { color: #c4c8ce; font-weight: 600; }
 .card-price {
   font-family: 'Archivo Black', 'Noto Sans Georgian', sans-serif; font-weight: 800; font-synthesis-weight: none; font-size: 21px; color: #fff; letter-spacing: 0;
 }
-.card-price small { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #6d737c; }
+.card-price small { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #8b9099; }
 
 .gm-order-btn-trigger {
   background: var(--red); color: #fff; font-weight: 700; font-size: 14px;
@@ -163,15 +163,16 @@ main { padding: 72px 48px; }
 .contact-strip .ct-sub { color: #8b9099; }
 .contact-strip a { border: 1px solid #2a2f36; color: #f2f3f4; font-weight: 700; min-height: 44px; }
 .contact-strip a:hover { border-color: #fff; }
-.contact-strip a.primary { background: var(--red); border-color: var(--red); }
+.contact-strip a.primary { background: var(--red); border-color: var(--red); color: #fff; }
 .contact-strip a.primary:hover { background: #ff2a2a; border-color: #ff2a2a; }
 
 footer {
-  background: #0b0c0e; border-top: 1px solid #1e2126; color: #5f656e;
+  background: #0b0c0e; border-top: 1px solid #1e2126; color: #8b9099;
   font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 40px 48px;
 }
-footer b { color: var(--red); }
-footer a { color: #8b9099; }
+footer b { color: #ff2a2a; }
+/* a link inside a sentence needs more than colour to stand out, and a finger-sized hit area */
+footer a { color: #f2f3f4; text-decoration: underline; text-underline-offset: 3px; display: inline-block; padding: 14px 0; }
 
 /* ---- Floating chrome (square, to match the flat look) ---- */
 .whatsapp-float { background: #25D366; box-shadow: none; width: 52px; height: 52px; }
