@@ -63,6 +63,13 @@
     text-align: center; padding: 20px; color: var(--slate); font-size: 13px;
     border-top: 1px solid var(--line-light);
   }
+
+  /* footer credit: the studio that built the site */
+  .made-by {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-top: 12px; font-size: 12px; line-height: 1; opacity: 0.8;
+  }
+  .made-by img { width: 18px; height: 18px; display: block; flex: none; }
 </style>
 </head>
 <body>
@@ -78,7 +85,7 @@
   <a class="btn-primary" href="index.html">მთავარ გვერდზე დაბრუნება</a>
 </main>
 
-<footer>Good<b>Motoway</b> · ელექტრო მოპედების ავტორიზებული დილერი · უნივერსიტეტის ქუჩა N6 · <a href="tel:551484883">551 48 48 83</a> · © <span id="gmYear"></span> GoodMotoway</footer>
+<footer>Good<b>Motoway</b> · ელექტრო მოპედების ავტორიზებული დილერი · უნივერსიტეტის ქუჩა N6 · <a href="tel:551484883">551 48 48 83</a> · © <span id="gmYear"></span> GoodMotoway<div class="made-by"><img src="mysite-logo.svg" alt="" width="18" height="18" /><span>შექმნილია mysite-ის მიერ</span></div></footer>
 
 <script>
   document.getElementById('gmYear').textContent = new Date().getFullYear();
